@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Built-By: root
+Created-By: Apache Maven
+Build-Jdk: 1.8.0_171
+Extension-Name: zap-comp
+Specification-Title: Runs zap, listens to tests, produces report
+Implementation-Title: zap-comp
+Implementation-Version: 1.0
+Group-Id: io.jenkins.plugins
+Short-Name: zap-comp
+Long-Name: Zap Compare
+Plugin-Version: 1.0
+Hudson-Version: 2.7.3
+Jenkins-Version: 2.7.3
+Plugin-Dependencies: workflow-step-api:2.16
+Plugin-Developers: 
+

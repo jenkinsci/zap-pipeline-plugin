@@ -1,0 +1,2 @@
+#Wed Aug 15 15:04:37 BST 2018
+constructor=host,port,timeout,failBuild,zapHome,allowedHosts

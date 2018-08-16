@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ZAP Scanning Report</title>
+	<link href="normalize.css" rel="stylesheet">
+	<link href="skeleton.css" rel="stylesheet">
+	<link href="main.css" rel="stylesheet">
+
+	<script src="angular.min.js"></script>
+	<script src="main.js"></script>
+
+</head>
+<body ng-app="zap" ng-controller="mainController" ng-init="load()">
+
+	<div class="navbar">
+		<a><img src="back.png"></a>
+	</div>
+	<div class="container">
+		<div class="row stats">
+			<div class="four columns">
+				<a>
+					<h3><span class="high circle"></span> {{counts.high}}</h3>
+					<h5>High risk</h5>
+				</a>
+			</div>
+			<div class="four columns">
+				<a>
+					<h3><span class="medium circle"></span> {{counts.medium}}</h3>
+					<h5>Medium risk</h5>
+				</a>
+			</div>
+			<div class="four columns">
+				<a>
+					<h3><span class="low circle"></span> {{counts.low}}</h3>
+					<h5>Low risk</h5>
+				</a>
+			</div>
+		</div>
+
+
+		<div ng-repeat="alert in alerts" class="row alerts">
+			<div class="column alert {{colors[alert.riskCode-1]}}">		
+				<h5><span ng-if="alert.isNew">New: </span>{{alert.alert}} ({{alert.instances.length}})</h5>
+				<div class="description" ng-bind-html="alert.description | to_trusted"></div>
+				<p class="confidence">Confidence: <strong>{{alert.confidence}}</strong></p>
+				<h6>Instances<span ng-if="alert.hasNewInstances"> (new)</span>:</h6>
+				<pre ng-repeat="instance in alert.instances track by $index">
+
+<code>URI: {{instance.uri}}
+Method: {{instance.method}}
+Param: {{instance.param}}</code>
+
+				</pre>
+
+				<h6>Solution:</h6>
+				<div ng-bind-html="alert.solution | to_trusted" class="generated"></div>
+
+			</div>
+		</div>
+
+				<div class="row center header">
+			<a class="button" ng-click="loadAll()" ng-if="!showAll">Load all alerts for this build</a>
+		</div>
+
+		
+	</div>
+
+
+</body>
+</html>
