@@ -37,12 +37,12 @@ Once you have proxied your tests through ZAP or ran the crawler, this function r
 
 ```groovy
 archiveZap()
+```
+
 Reads the alerts found by ZAP, checks if there are any new alerts that are higher than the failBuild parameter (and fails the build if so), and generates a report with differences.
-```
 
 
 
-```
 
 # Proxying your tests
 ```groovy
