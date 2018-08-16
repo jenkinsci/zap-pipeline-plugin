@@ -199,6 +199,8 @@ public class ZapCompare extends Recorder {
             sites = new JSONArray();
             sites.add(report);
         }
+        System.out.println("sites are this:");
+        System.out.println(sites.toString());
 
         // Converts all the alerts in the site array into ZapAlerts and adds them to the alerts
         Function<JSONObject, Stream<? extends ZapAlert>> alerts = site -> ((ArrayList<ZapAlert>) new Gson()
