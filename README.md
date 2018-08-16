@@ -5,8 +5,9 @@
 
 
 <img align="left" src='/src/main/webapp/logo.png'>
-This is a Java Jenkins pipeline plugin for [OWASP Zed Attack Proxy](https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project). This plugin allows you to proxy your tests through ZAP and then generate a report containing new alerts since the previous build. It also allows you to fail the build if there is a new alert with a risk level of your choice. It is made for [Pipeline](https://jenkins.io/doc/book/pipeline/) builds & adds additional functions to your Jenkinsfiles.
+This is a Java Jenkins pipeline plugin for <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> . This plugin allows you to proxy your tests through ZAP and then generate a report containing new alerts since the previous build. It also allows you to fail the build if there is a new alert with a risk level of your choice. It is made for [Pipeline](https://jenkins.io/doc/book/pipeline/) builds & adds additional functions to your Jenkinsfiles.
 
+<br>
      
 # API
 ```groovy
