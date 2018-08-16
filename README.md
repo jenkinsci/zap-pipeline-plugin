@@ -3,11 +3,14 @@
 # ZAProxy Jenkins _Pipeline_ plugin
 
 
-<img align="left" src='/src/main/webapp/logo.png'></a>
+<img align="left" src='/src/main/webapp/logo.png'>
 This is a Java Jenkins pipeline plugin for OWASP Zed Attack Proxy. This plugin allows you to proxy your tests through ZAP and then generate a report containing new alerts since the previous build. It also allows you to fail the build if there is a new alert with a risk level of your choice. It is made for [Pipeline](https://jenkins.io/doc/book/pipeline/) builds & adds additional functions to your Jenkinsfiles.
 
-# API
 
+<img src="https://i.imgur.com/WtTwQtt.png">
+
+
+# API
 ```groovy
 startZap(host: 127.0.0.1, port: 9095, timeout: 900, failBuild:3, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'])
 ```
