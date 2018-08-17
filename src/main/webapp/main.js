@@ -15,8 +15,7 @@ var parseRawBuild = function(build){
 
 	// If there is only one site, it's put into build.site by zap, otherwise [build.site]
 	if (!Array.isArray(build.site)) { build.site = [build.site] }
-    console.log(build)
-	build.site.forEach(function(data){
+    	build.site.forEach(function(data){
 		if (data && data.alerts && data.alerts.length != 0){
 			data.alerts.forEach((alert) => {
 				
@@ -132,7 +131,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window){
 		Object.keys($scope.counts).forEach((k) => { $scope.counts[k] = 0})
 
 		$scope.alerts.sort((a, b) => {
-			return a.riskCode < b.riskCode
+			return a.riskCode > b.riskCode ? -1 : (a.riskCode < b.riskCode ? 1 : 0)
 		})
 
 
