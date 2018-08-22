@@ -286,7 +286,7 @@ public class ZapDriver {
         cmd.add(CMD_TIMEOUT);
 
         try {
-            //launcher.launch().cmds(cmd).pwd(ws).start();
+            launcher.launch().cmds(cmd).pwd(ws).start();
             return true;
         } catch (Exception e) {
             return false;
