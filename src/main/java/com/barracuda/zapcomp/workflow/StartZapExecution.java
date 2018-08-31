@@ -58,7 +58,14 @@ public class StartZapExecution extends AbstractStepExecutionImpl {
         ZapDriver.setFailBuild(zsp.getFailBuild());
         ZapDriver.setAllowedHosts(zsp.getAllowedHosts());
 
+
         this.listener.getLogger().println("zap-comp: Starting ZAP on port " + zsp.getPort() + "...");
+
+        if (zsp.getZapHome() == null || zsp.getZapHome().isEmpty()) {
+            System.out.println("zap-comp: Did not start ZAP process because zapHome is not set");
+            getContext().onSuccess(true);
+            return true;
+        }
 
         boolean success = ZapDriver.startZapProcess(zsp.getZapHome(), ws, launcher);
 
@@ -90,7 +97,7 @@ public class StartZapExecution extends AbstractStepExecutionImpl {
                 listener.getLogger().println("zap-comp: Waiting for ZAP to initialize...");
             } catch (InterruptedException e) {
                 listener.getLogger().println(
-                    "zap-comp: ZAP failed to initialize on host " + ZapDriver.getZapHost() + ":" + ZapDriver.getZapPort());
+                        "zap-comp: ZAP failed to initialize on host " + ZapDriver.getZapHost() + ":" + ZapDriver.getZapPort());
                 break;
             }
 
@@ -99,9 +106,15 @@ public class StartZapExecution extends AbstractStepExecutionImpl {
         if (!zapHasStarted) {
             System.out.println("zap-comp: Failed to start ZAP on port " + ZapDriver.getZapPort());
             getContext().onFailure(
-                new Throwable("zap-comp: Failed to start ZAP on port " + ZapDriver.getZapPort() + ". Socket timed out"));
+                    new Throwable("zap-comp: Failed to start ZAP on port " + ZapDriver.getZapPort() + ". Socket timed out"));
 
             return false;
+        }
+
+        if (zsp.getSessionPath() != null || !zsp.getSessionPath().isEmpty()) {
+            System.out.println("zap-comp: Loading session " + zsp.getSessionPath());
+            boolean loadedSession = ZapDriver.loadSession(zsp.getSessionPath());
+            if (!loadedSession) getContext().onFailure(new Throwable("zap-comp: Could not load session file"));
         }
 
         getContext().onSuccess(true);

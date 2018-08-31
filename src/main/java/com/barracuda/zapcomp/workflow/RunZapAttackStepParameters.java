@@ -1,13 +1,19 @@
 package com.barracuda.zapcomp.workflow;
 
 public class RunZapAttackStepParameters {
-    private String filePath;
+    private String scanPolicyName;
+    private int user;
 
-    public RunZapAttackStepParameters(String filePath) {
-        this.filePath = filePath;
+    public RunZapAttackStepParameters(String scanPolicyName, int user) {
+        this.scanPolicyName = scanPolicyName;
+        this.user = user;
     }
 
-    public String getFilePath(){
-        return this.filePath;
+    public String getScanPolicyName() {
+        return scanPolicyName;
+    }
+
+    public int getUser() {
+        return user;
     }
 }

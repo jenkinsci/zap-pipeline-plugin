@@ -7,28 +7,28 @@ import org.kohsuke.stapler.*;
 import javax.annotation.CheckForNull;
 
 
-public class LoadZapPolicyStep extends Step {
-    private final LoadZapPolicyStepParameters zsp;
+public class ImportZapPolicyStep extends Step {
+    private final ImportZapPolicyStepParameters zsp;
 
     @DataBoundConstructor
-    public LoadZapPolicyStep(@CheckForNull String policyPath) {
-        this.zsp = new LoadZapPolicyStepParameters(policyPath);
+    public ImportZapPolicyStep(@CheckForNull String policyPath) {
+        this.zsp = new ImportZapPolicyStepParameters(policyPath);
     }
 
     @CheckForNull
-    public LoadZapPolicyStepParameters getParameters() {
+    public ImportZapPolicyStepParameters getParameters() {
         return zsp;
     }
 
     @Override
     public StepExecution start(StepContext context) {
-        return new LoadZapPolicyExecution(context, this);
+        return new ImportZapPolicyExecution(context, this);
     }
 
     @Extension
-    public static class DescriptorImpl extends DefaultStepDescriptorImpl<LoadZapPolicyExecution> {
+    public static class DescriptorImpl extends DefaultStepDescriptorImpl<ImportZapPolicyExecution> {
         public DescriptorImpl() {
-            super(LoadZapPolicyExecution.class, "loadZapScanPolicy", "Load a ZAP scan policy from the specified path");
+            super(ImportZapPolicyExecution.class, "importZapScanPolicy", "Import a ZAP scan policy from the specified path");
         }
     }
 

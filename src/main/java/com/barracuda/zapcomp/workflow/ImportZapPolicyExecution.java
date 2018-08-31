@@ -5,15 +5,13 @@ import hudson.model.*;
 import org.jenkinsci.plugins.workflow.steps.*;
 
 import java.io.*;
-import java.time.*;
-import java.util.concurrent.*;
 
 
-public class LoadZapPolicyExecution extends AbstractStepExecutionImpl {
+public class ImportZapPolicyExecution extends AbstractStepExecutionImpl {
     private TaskListener listener;
-    private LoadZapPolicyStep step;
+    private ImportZapPolicyStep step;
 
-    public LoadZapPolicyExecution(StepContext context, LoadZapPolicyStep step) {
+    public ImportZapPolicyExecution(StepContext context, ImportZapPolicyStep step) {
         super(context);
 
         try {
@@ -27,7 +25,7 @@ public class LoadZapPolicyExecution extends AbstractStepExecutionImpl {
     @Override
     public boolean start() {
         listener.getLogger().println("zap-comp: Loading attack policy...");
-        LoadZapPolicyStepParameters zsp = step.getParameters();
+        ImportZapPolicyStepParameters zsp = step.getParameters();
         boolean success = ZapDriver.loadPolicy(zsp.getPolicyPath());
         if (!success) {
             listener.getLogger().println("zap-comp: Failed to load attack policy at " + zsp.getPolicyPath());

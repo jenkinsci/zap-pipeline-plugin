@@ -1,34 +1,36 @@
 package com.barracuda.zapcomp.workflow;
 
-import hudson.*;
-import org.jenkinsci.plugins.workflow.steps.*;
-import org.kohsuke.stapler.*;
+import hudson.Extension;
+import org.jenkinsci.plugins.workflow.steps.Step;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.jenkinsci.plugins.workflow.steps.StepExecution;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.annotation.CheckForNull;
 
 
-public class LoadZapPolicyStep extends Step {
-    private final LoadZapPolicyStepParameters zsp;
+public class ImportZapUrlsStep extends Step {
+    private final ImportZapUrlsStepParameters zsp;
 
     @DataBoundConstructor
-    public LoadZapPolicyStep(@CheckForNull String policyPath) {
-        this.zsp = new LoadZapPolicyStepParameters(policyPath);
+    public ImportZapUrlsStep(@CheckForNull String path) {
+        this.zsp = new ImportZapUrlsStepParameters(path);
     }
 
     @CheckForNull
-    public LoadZapPolicyStepParameters getParameters() {
+    public ImportZapUrlsStepParameters getParameters() {
         return zsp;
     }
 
     @Override
     public StepExecution start(StepContext context) {
-        return new LoadZapPolicyExecution(context, this);
+        return new ImportZapUrlsExecution(context, this);
     }
 
     @Extension
-    public static class DescriptorImpl extends DefaultStepDescriptorImpl<LoadZapPolicyExecution> {
+    public static class DescriptorImpl extends DefaultStepDescriptorImpl<ImportZapUrlsExecution> {
         public DescriptorImpl() {
-            super(LoadZapPolicyExecution.class, "loadZapScanPolicy", "Load a ZAP scan policy from the specified path");
+            super(ImportZapUrlsExecution.class, "importZapUrls", "Load a list of URLs for ZAP to use from the specified path");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.barracuda.zapcomp;
 
+import com.barracuda.zapcomp.workflow.RunZapAttackStepParameters;
 import com.mashape.unirest.http.*;
 import com.mashape.unirest.http.exceptions.*;
 import hudson.*;
@@ -17,7 +18,7 @@ import java.util.stream.*;
 
 /**
  * ZapDriver Controls ZAP using HTTP api
- * 
+ *
  * @see <a href="https://github.com/zaproxy/zaproxy/wiki/ApiDetails">ZAP API Documentation</a>
  */
 
@@ -62,12 +63,13 @@ public class ZapDriver {
             URI uri = new URI("http", null, ZAP_HOST, ZAP_PORT, apiUrl, query, null);
 
             InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
-            System.out.println(apiUrl);
+
             String res = IOUtils.toString(response, StandardCharsets.UTF_8);
             System.out.println(res);
             return JSONObject.fromObject(res);
         } catch (URISyntaxException | IOException | UnirestException e) {
             // Should be handled in calling function
+            e.printStackTrace();
             return null;
         }
     }
@@ -92,11 +94,12 @@ public class ZapDriver {
 
     /**
      * Starts the ZAP crawler on a specified URL
+     *
      * @param host The host to attack
      * @return Success
      */
     public static boolean startZapCrawler(String host) {
-        if(crawlId!=0){
+        if (crawlId != 0) {
             return false;
         }
 
@@ -140,12 +143,37 @@ public class ZapDriver {
         }
     }
 
+    public static boolean loadSession(String sessionPath) {
+        System.out.println("zap-comp: Loading session from " + sessionPath);
+        Map<String, String> arguments = Collections.singletonMap("name", sessionPath);
+        JSONObject result = zapApi("core/action/loadSession", arguments);
+
+        return result != null && result.has("Result") && result.getString("Result").equals("OK");
+    }
+
+    public static boolean importUrls(String path) {
+        System.out.println("zap-comp: Importing URLs from " + path);
+        Map<String, String> arguments = Collections.singletonMap("filePath", path);
+        JSONObject result = zapApi("importurls/action/importurls", arguments);
+        return result != null && result.has("Result") && result.getString("Result").equals("OK");
+    }
+
+    public static boolean loadPolicy(String policy) {
+        Map<String, String> arguments = Collections.singletonMap("path", policy);
+        JSONObject result = zapApi("ascan/action/importScanPolicy", arguments);
+
+        if (result == null) return false;
+
+        return (result.has("Result") && result.getString("Result").equals("OK")) ||
+                (result.has("code") && result.getString("code").equals("already_exists"));
+    }
+
     /**
      * Starts the ZAP attack. If allowedHosts is not provided in jenkinsfile, it will scan only hosts that are local
-     * 
+     *
      * @return Success
      */
-    public static boolean zapAttack() {
+    public static boolean zapAttack(RunZapAttackStepParameters zsp) {
         // Reset scans
         STARTED_SCANS.clear();
 
@@ -156,15 +184,12 @@ public class ZapDriver {
         List<String> scanUrls = new ArrayList<>();
         JSONArray sites = sitesObj.getJSONArray("sites");
         for (Object site : sites) {
-
             String url = site.toString();
-            System.out.println("the url is: "+url);
+
             // Only starts the scan if a scan on the site isn't currently running
             boolean found = scanUrls.stream().anyMatch(scan -> scan.equals(site.toString()));
-            System.out.println("is it found? "+ found);
             if (!found) {
-                System.out.println("beginning scan...");
-                if (beginScan(url))
+                if (beginScan(url, zsp))
                     scanUrls.add(url);
             }
 
@@ -175,10 +200,11 @@ public class ZapDriver {
 
     /**
      * Begins a scan on a selected URL if it is in the allowed hosts parameter or if it is local (and allowed hosts parameter is empty)
+     *
      * @param url The URL to scan. Does not include ZAP host prefix
      * @return Success
      */
-    private static boolean beginScan(String url) {
+    private static boolean beginScan(String url, RunZapAttackStepParameters zsp) {
         try {
             List<String> allowedHosts = ZapDriver.ALLOWED_HOSTS;
             String host = new URI(url).getHost(); // http://10.0.0.1 becomes 10.0.0.1
@@ -186,7 +212,7 @@ public class ZapDriver {
 
             // If it is in the allowed hosts parameter - or if the url is unset if it is local
             // localhost.localdomain does not resolve properly with INetAddress.getByName, which is why there is an additional check
-            if(!host.equals("localhost.localdomain")) {
+            if (!host.equals("localhost.localdomain")) {
                 if (ZapDriver.ALLOWED_HOSTS.isEmpty()) {
                     InetAddress addr = null;
                     try {
@@ -200,14 +226,25 @@ public class ZapDriver {
                     if (!addr.isAnyLocalAddress() && !addr.isLoopbackAddress())
                         return false;
                 } else if (!allowedHosts.contains(host)) {
-                    System.out.println("Host "+host+" is not in the allowedHosts parameter and is not a local host. Not scanning.");
+                    System.out.println("Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
                     return false;
                 }
             }
-            // Start the scan on a particular site
+            // Start the scan on a particular site with a particular user
+            String attackUrl = "ascan/action/scan";
             Map<String, String> arguments = Collections.singletonMap("url", url);
 
-            JSONObject result = zapApi("ascan/action/scan", arguments);
+            if (zsp.getUser() != 0) {
+                System.out.println("zap-comp: Loading user ID: " + zsp.getUser());
+                attackUrl += "AsUser";
+                arguments.put("userId", Integer.toString(zsp.getUser()));
+            }
+
+            if (zsp.getScanPolicyName() != null && !zsp.getScanPolicyName().isEmpty()) {
+                arguments.put("scanPolicyName", zsp.getScanPolicyName());
+            }
+
+            JSONObject result = zapApi(attackUrl, arguments);
             if (result != null) {
                 int zapScanId = result.getInt("scan");
                 STARTED_SCANS.add(zapScanId);
@@ -224,7 +261,7 @@ public class ZapDriver {
 
     /**
      * Gets the current status of the started attacks (average of all)
-     * 
+     *
      * @return The % complete
      */
     public static int zapAttackStatus() {

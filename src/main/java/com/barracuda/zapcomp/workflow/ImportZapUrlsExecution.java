@@ -1,19 +1,20 @@
 package com.barracuda.zapcomp.workflow;
 
-import com.barracuda.zapcomp.*;
-import hudson.model.*;
-import org.jenkinsci.plugins.workflow.steps.*;
+import com.barracuda.zapcomp.ZapDriver;
+import hudson.model.TaskListener;
+import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
 
-import java.io.*;
-import java.time.*;
-import java.util.concurrent.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 
-public class LoadZapPolicyExecution extends AbstractStepExecutionImpl {
+public class ImportZapUrlsExecution extends AbstractStepExecutionImpl {
     private TaskListener listener;
-    private LoadZapPolicyStep step;
+    private ImportZapUrlsStep step;
 
-    public LoadZapPolicyExecution(StepContext context, LoadZapPolicyStep step) {
+    public ImportZapUrlsExecution(StepContext context, ImportZapUrlsStep step) {
         super(context);
 
         try {
@@ -26,13 +27,11 @@ public class LoadZapPolicyExecution extends AbstractStepExecutionImpl {
 
     @Override
     public boolean start() {
-        listener.getLogger().println("zap-comp: Loading attack policy...");
-        LoadZapPolicyStepParameters zsp = step.getParameters();
-        boolean success = ZapDriver.loadPolicy(zsp.getPolicyName());
-        if (!success) {
-            listener.getLogger().println("zap-comp: Failed to load attack policy at " + zsp.getPolicyName());
-            getContext().onFailure(new Throwable("zap-comp: Failed to load attack policy at " + zsp.getPolicyName()));
-            return false;
+        listener.getLogger().println("zap-comp: Importing list of URLs...");
+        ImportZapUrlsStepParameters zsp = step.getParameters();
+        boolean success = ZapDriver.importUrls(zsp.getPath());
+        if(!success){
+            listener.getLogger().println("zap-comp: Failed to load list of URLs at " + zsp.getPath());
         }
 
         getContext().onSuccess(true);

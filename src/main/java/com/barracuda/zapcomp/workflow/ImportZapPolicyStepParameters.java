@@ -1,9 +1,9 @@
 package com.barracuda.zapcomp.workflow;
 
-public class LoadZapPolicyStepParameters {
+public class ImportZapPolicyStepParameters {
     private String policyPath;
 
-    public LoadZapPolicyStepParameters(String policyPath) {
+    public ImportZapPolicyStepParameters(String policyPath) {
         this.policyPath = policyPath;
     }
 

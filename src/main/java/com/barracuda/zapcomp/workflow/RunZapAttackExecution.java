@@ -37,16 +37,10 @@ public class RunZapAttackExecution extends AbstractStepExecutionImpl {
             return false;
         }
 
-        /*
-        RunZapAttackStepParameters zsp = step.getParameters();
-        if(zsp == null || zsp.getFilePath()==null){
-            this.listener.getLogger().println("zap-comp: Using URLs collected by ZAP");
-        } else{
-            this.listener.getLogger().println("zap-comp: Importing URLs from "+zsp.getFilePath());
-        }*/
+        listener.getLogger().println("zap-comp: Set mode to attack mode");
 
-        listener.getLogger().println("Set mode to attack mode..");
-        boolean startAttackSuccess = ZapDriver.zapAttack();
+        RunZapAttackStepParameters zsp = step.getParameters();
+        boolean startAttackSuccess = ZapDriver.zapAttack(zsp);
         if (!startAttackSuccess) {
             listener.getLogger().println("zap-comp: Failed to start attack");
             getContext().onSuccess(false);

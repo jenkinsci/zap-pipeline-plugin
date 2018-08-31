@@ -12,18 +12,20 @@ public class StartZapStep extends Step {
 
     /**
      * Called with startZap() in jenkinsfile
-     * @param host The host to run ZAP on - default localhost
-     * @param port The port to run ZAP on - default 9092
-     * @param timeout The amount of seconds to let the ZAP attack run for before it quits - default 1000
-     * @param failBuild Fail the build if there is a new critical alert - default 0
-     * @param zapHome Where the zap process is located - default /opt/zap/
+     *
+     * @param host         The host to run ZAP on - default localhost
+     * @param port         The port to run ZAP on - default 9092
+     * @param timeout      The amount of seconds to let the ZAP attack run for before it quits - default 1000
+     * @param failBuild    Fail the build if there is a new critical alert - default 0
+     * @param zapHome      Where the zap process is located - if not set this will not start ZAP (but still make calls if you're running it locally)
      * @param allowedHosts The hosts to allow scans to begin on, if none are specified then it will run the attack locally only
+     * @param sessionPath  Optional path to the session file
      */
 
 
     @DataBoundConstructor
     public StartZapStep(@CheckForNull String host, int port, int timeout,
-                        int failBuild, @CheckForNull String zapHome, List<String> allowedHosts) {
+                        int failBuild, String zapHome, List<String> allowedHosts, String sessionPath) {
 
         if (host == null)
             host = "localhost";
@@ -34,17 +36,14 @@ public class StartZapStep extends Step {
         if (timeout == 0)
             timeout = 1000;
 
-        if (zapHome == null || zapHome.equals(""))
+        if (zapHome == null || zapHome.isEmpty())
             zapHome = System.getProperty("ZAP_HOME");
 
-        if (zapHome == null || zapHome.equals(""))
-            zapHome = "/opt/zap";
-
-        if (allowedHosts == null || allowedHosts.isEmpty()){
+        if (allowedHosts == null || allowedHosts.isEmpty()) {
             allowedHosts = new ArrayList<>();
         }
 
-        this.zsp = new StartZapStepParameters(host, port, timeout, failBuild, zapHome, allowedHosts);
+        this.zsp = new StartZapStepParameters(host, port, timeout, failBuild, zapHome, allowedHosts, sessionPath);
     }
 
     @CheckForNull
