@@ -10,10 +10,6 @@ import javax.annotation.*;
 public class RunZapCrawlerStep extends Step {
     private final RunZapCrawlerParameters zsp;
 
-    /**
-     * For runZapCrawler() function in Jenkinsfile
-     */
-
     @DataBoundConstructor
     public RunZapCrawlerStep(@CheckForNull String host) {
         if(host == null){

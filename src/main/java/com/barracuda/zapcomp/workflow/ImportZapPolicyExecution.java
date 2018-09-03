@@ -26,6 +26,11 @@ public class ImportZapPolicyExecution extends AbstractStepExecutionImpl {
     public boolean start() {
         listener.getLogger().println("zap-comp: Loading attack policy...");
         ImportZapPolicyStepParameters zsp = step.getParameters();
+        if(zsp == null || zsp.getPolicyPath().isEmpty()){
+            getContext().onFailure(new Throwable("zap-comp: Policy path not provided!"));
+            return false;
+        }
+
         boolean success = ZapDriver.loadPolicy(zsp.getPolicyPath());
         if (!success) {
             listener.getLogger().println("zap-comp: Failed to load attack policy at " + zsp.getPolicyPath());

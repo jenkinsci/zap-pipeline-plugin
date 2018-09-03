@@ -84,7 +84,7 @@ public class ZapDriver {
     }
 
     public static boolean shutdownZap() {
-        return true;// zapApi("core/action/shutdown") != null;
+        return zapApi("core/action/shutdown") != null;
     }
 
     public static boolean setZapMode(String mode) {
@@ -112,8 +112,7 @@ public class ZapDriver {
             JSONObject result = zapApi("spider/action/scan", arguments);
 
             if (result != null) {
-                int zapScanId = result.getInt("scan");
-                crawlId = zapScanId;
+                crawlId = result.getInt("scan");
                 return true;
             }
 
@@ -143,6 +142,11 @@ public class ZapDriver {
         }
     }
 
+    /**
+     * Loads a ZAP session
+     * @param sessionPath - The path of the .session file
+     * @return Success
+     */
     public static boolean loadSession(String sessionPath) {
         System.out.println("zap-comp: Loading session from " + sessionPath);
         Map<String, String> arguments = Collections.singletonMap("name", sessionPath);
@@ -151,6 +155,11 @@ public class ZapDriver {
         return result != null && result.has("Result") && result.getString("Result").equals("OK");
     }
 
+    /**
+     * Imports URLs from a text file
+     * @param path - The path to load from
+     * @return Success
+     */
     public static boolean importUrls(String path) {
         System.out.println("zap-comp: Importing URLs from " + path);
         Map<String, String> arguments = Collections.singletonMap("filePath", path);
@@ -158,6 +167,11 @@ public class ZapDriver {
         return result != null && result.has("Result") && result.getString("Result").equals("OK");
     }
 
+    /**
+     * Loads a ZAP policy from a file path
+     * @param policy - The path to load from
+     * @return Success
+     */
     public static boolean loadPolicy(String policy) {
         Map<String, String> arguments = Collections.singletonMap("path", policy);
         JSONObject result = zapApi("ascan/action/importScanPolicy", arguments);
@@ -170,7 +184,7 @@ public class ZapDriver {
 
     /**
      * Starts the ZAP attack. If allowedHosts is not provided in jenkinsfile, it will scan only hosts that are local
-     *
+     * @param zsp The parameters from the groovy step
      * @return Success
      */
     public static boolean zapAttack(RunZapAttackStepParameters zsp) {
@@ -232,7 +246,8 @@ public class ZapDriver {
             }
             // Start the scan on a particular site with a particular user
             String attackUrl = "ascan/action/scan";
-            Map<String, String> arguments = Collections.singletonMap("url", url);
+            Map<String, String> arguments = new HashMap<>();
+            arguments.put("url", url);
 
             if (zsp.getUser() != 0) {
                 System.out.println("zap-comp: Loading user ID: " + zsp.getUser());
@@ -296,6 +311,13 @@ public class ZapDriver {
         return totalProgress / (totalScans);
     }
 
+    /**
+     * Starts the ZAP process
+     * @param zapHome - The location of the zap.sh file
+     * @param ws - Passed by step
+     * @param launcher - Passed by step
+     * @return Success
+     */
     public static boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher) {
         List<String> cmd = new ArrayList<>();
 

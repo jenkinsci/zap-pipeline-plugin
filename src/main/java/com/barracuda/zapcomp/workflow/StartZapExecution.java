@@ -78,7 +78,7 @@ public class StartZapExecution extends AbstractStepExecutionImpl {
         OffsetDateTime startedTime = OffsetDateTime.now();
         listener.getLogger().println("zap-comp: Waiting for ZAP to initialize...");
 
-        boolean zapHasStarted = true;
+        boolean zapHasStarted = false;
 
         do {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(Constants.ZAP_INITIALIZE_TIMEOUT))) {
@@ -111,7 +111,7 @@ public class StartZapExecution extends AbstractStepExecutionImpl {
             return false;
         }
 
-        if (zsp.getSessionPath() != null || !zsp.getSessionPath().isEmpty()) {
+        if (zsp.getSessionPath() != null && !zsp.getSessionPath().isEmpty()) {
             System.out.println("zap-comp: Loading session " + zsp.getSessionPath());
             boolean loadedSession = ZapDriver.loadSession(zsp.getSessionPath());
             if (!loadedSession) getContext().onFailure(new Throwable("zap-comp: Could not load session file"));
