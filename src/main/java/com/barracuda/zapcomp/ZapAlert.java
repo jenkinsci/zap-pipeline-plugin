@@ -22,7 +22,6 @@ public class ZapAlert implements Serializable {
     public String getPluginid() {
         return pluginid;
     }
-
     public void setPluginid(String pluginid) {
         this.pluginid = pluginid;
     }
@@ -30,7 +29,6 @@ public class ZapAlert implements Serializable {
     public String getAlert() {
         return alert;
     }
-
     public void setAlert(String alert) {
         this.alert = alert;
     }
@@ -38,7 +36,6 @@ public class ZapAlert implements Serializable {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -46,7 +43,6 @@ public class ZapAlert implements Serializable {
     public String getRiskcode() {
         return riskcode;
     }
-
     public void setRiskcode(String riskcode) {
         this.riskcode = riskcode;
     }
@@ -54,7 +50,6 @@ public class ZapAlert implements Serializable {
     public String getConfidence() {
         return confidence;
     }
-
     public void setConfidence(String confidence) {
         this.confidence = confidence;
     }
@@ -62,7 +57,6 @@ public class ZapAlert implements Serializable {
     public List<ZapAlertInstance> getInstances() {
         return instances;
     }
-
     public void setInstances(List<ZapAlertInstance> instances) {
         this.instances = instances;
     }
@@ -70,7 +64,6 @@ public class ZapAlert implements Serializable {
     public String getSourceid() {
         return sourceid;
     }
-
     public void setSourceid(String sourceid) {
         this.sourceid = sourceid;
     }
@@ -78,7 +71,6 @@ public class ZapAlert implements Serializable {
     public String getWascid() {
         return wascid;
     }
-
     public void setWascid(String wascid) {
         this.wascid = wascid;
     }
@@ -92,9 +84,9 @@ public class ZapAlert implements Serializable {
         ZapAlert alert = (ZapAlert) object;
 
         return new EqualsBuilder().append(this.pluginid, alert.pluginid).append(this.alert, alert.alert)
-                        .append(this.name, alert.name).append(this.riskcode, alert.riskcode)
-                        .append(this.confidence, alert.confidence).append(this.sourceid, alert.sourceid)
-                        .append(this.wascid, alert.wascid).append(this.instances.hashCode(), alert.instances.hashCode()).isEquals();
+                .append(this.name, alert.name).append(this.riskcode, alert.riskcode)
+                .append(this.confidence, alert.confidence).append(this.sourceid, alert.sourceid)
+                .append(this.wascid, alert.wascid).append(this.instances.hashCode(), alert.instances.hashCode()).isEquals();
     }
 
     @Override
@@ -105,7 +97,7 @@ public class ZapAlert implements Serializable {
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("pluginid", this.pluginid).append("alert", this.alert)
-                        .append("riskcode", this.riskcode).append("confidence", this.confidence).append("sourceid", this.sourceid)
-                        .append("wascid=" + this.wascid).toString();
+                .append("riskcode", this.riskcode).append("confidence", this.confidence).append("sourceid", this.sourceid)
+                .append("wascid=" + this.wascid).toString();
     }
 }

@@ -18,7 +18,6 @@ public class ZapAlertInstance implements Serializable {
     public String getUri() {
         return uri;
     }
-
     public void setUri(String uri) {
         this.uri = uri;
     }
@@ -26,7 +25,6 @@ public class ZapAlertInstance implements Serializable {
     public String getMethod() {
         return method;
     }
-
     public void setMethod(String method) {
         this.method = method;
     }
@@ -36,7 +34,7 @@ public class ZapAlertInstance implements Serializable {
     }
 
     public boolean equals(Object object) {
-        if(object instanceof ZapAlertInstance) {
+        if (object instanceof ZapAlertInstance) {
             ZapAlertInstance instance = (ZapAlertInstance) object;
             return new EqualsBuilder().append(this.uri, instance.uri).append(this.method, instance.method)
                     .append(this.evidence, instance.evidence).isEquals();

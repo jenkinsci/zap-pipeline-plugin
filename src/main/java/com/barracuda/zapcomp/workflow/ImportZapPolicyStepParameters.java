@@ -10,7 +10,6 @@ public class ImportZapPolicyStepParameters {
         this.policyPath = policyPath;
     }
 
-
     public String getPolicyPath() {
         return policyPath;
     }

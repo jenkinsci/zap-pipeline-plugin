@@ -19,6 +19,6 @@ public class DefaultStepDescriptorImpl<T extends StepExecution> extends Abstract
 
     @Override
     public final String getDisplayName() {
-        return  displayName;
+        return displayName;
     }
 }

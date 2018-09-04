@@ -47,14 +47,13 @@ public class RunZapCrawlerExecution extends AbstractStepExecutionImpl {
         }
 
 
-
         this.listener.getLogger().println("zap-comp: Starting crawler on host " + zsp.getHost() + "...");
 
         boolean success = ZapDriver.startZapCrawler(zsp.getHost());
 
         if (!success) {
             System.out.println("zap-comp: Failed to start ZAP crawler on host " + zsp.getHost());
-            getContext().onFailure(new Throwable("zap-comp: Failed ot start ZAP crawler on host "+zsp.getHost()));
+            getContext().onFailure(new Throwable("zap-comp: Failed ot start ZAP crawler on host " + zsp.getHost()));
             return false;
         }
 
@@ -62,8 +61,8 @@ public class RunZapCrawlerExecution extends AbstractStepExecutionImpl {
         int timeoutSeconds = ZapDriver.getZapTimeout();
         int status = ZapDriver.zapCrawlerStatus();
 
-        while(status < Constants.COMPLETED_PERCENTAGE){
-            if(OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))){
+        while (status < Constants.COMPLETED_PERCENTAGE) {
+            if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
                 listener.getLogger().println("zap-comp: Crawler timed out before it could complete the scan");
                 break;
             }
@@ -71,11 +70,11 @@ public class RunZapCrawlerExecution extends AbstractStepExecutionImpl {
             status = ZapDriver.zapCrawlerStatus();
             listener.getLogger().println("zap-comp: Crawler progress is: " + status + "%");
 
-            try{
+            try {
                 // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause when the scan is complete.
-                if(status!=Constants.COMPLETED_PERCENTAGE)
+                if (status != Constants.COMPLETED_PERCENTAGE)
                     TimeUnit.SECONDS.sleep(Constants.SCAN_SLEEP);
-            } catch(InterruptedException e){
+            } catch (InterruptedException e) {
                 // Usually if Jenkins build is stopped
             }
         }

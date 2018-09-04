@@ -28,7 +28,7 @@ public abstract class ZapBuildAction implements Action, SimpleBuildStep.LastBuil
 
     public String getIconFileName() {
         return "/plugin/zap-comp/logo.png";
-    };
+    }
 
     public String getDisplayName() {
         return "ZAP Scanning Report";
@@ -43,7 +43,7 @@ public abstract class ZapBuildAction implements Action, SimpleBuildStep.LastBuil
         System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", ""); // Allow JS scripts to be run
 
         DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(this.dir()), this.getTitle(),
-                        "/plugin/zap-comp/logo.png", false);
+                "/plugin/zap-comp/logo.png", false);
 
         if (req.getRestOfPath().equals("")) {
             File file = new File(run.getRootDir(), "zap/index.html");

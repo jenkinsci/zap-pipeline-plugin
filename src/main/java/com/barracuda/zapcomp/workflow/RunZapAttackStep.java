@@ -13,8 +13,8 @@ public class RunZapAttackStep extends Step {
     /**
      * For zapAttack() function in Jenkinsfile
      *
-     * @param scanPolicyName        The scan policy name to use when attacking (optional). Make sure to load the policy from a file first using loadScanPolicy()
-     * @param userId                  The ZAP user ID to run the attack with, loaded from the context (optional)
+     * @param scanPolicyName The scan policy name to use when attacking (optional). Make sure to load the policy from a file first using loadScanPolicy()
+     * @param userId         The ZAP user ID to run the attack with, loaded from the context (optional)
      */
 
     @DataBoundConstructor
@@ -23,7 +23,9 @@ public class RunZapAttackStep extends Step {
     }
 
     @CheckForNull
-    public RunZapAttackStepParameters getParameters(){ return zsp; }
+    public RunZapAttackStepParameters getParameters() {
+        return zsp;
+    }
 
 
     @Override

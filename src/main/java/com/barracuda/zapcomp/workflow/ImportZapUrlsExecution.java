@@ -30,13 +30,13 @@ public class ImportZapUrlsExecution extends AbstractStepExecutionImpl {
         listener.getLogger().println("zap-comp: Importing list of URLs...");
 
         ImportZapUrlsStepParameters zsp = step.getParameters();
-        if(zsp==null || zsp.getPath().isEmpty()){
+        if (zsp == null || zsp.getPath().isEmpty()) {
             getContext().onFailure(new Throwable("zap-comp: Could not load URLs file"));
             return false;
         }
 
         boolean success = ZapDriver.importUrls(zsp.getPath());
-        if(!success){
+        if (!success) {
             listener.getLogger().println("zap-comp: Failed to load list of URLs at " + zsp.getPath());
         }
 

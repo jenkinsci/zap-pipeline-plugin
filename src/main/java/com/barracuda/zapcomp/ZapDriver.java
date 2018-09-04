@@ -23,7 +23,6 @@ import java.util.stream.*;
  */
 
 public class ZapDriver {
-
     private static String ZAP_HOST;
     private static int ZAP_PORT;
     private static int ZAP_TIMEOUT;
@@ -32,7 +31,6 @@ public class ZapDriver {
     private static final String CMD_DAEMON = "-daemon";
     private static final String CMD_HOST = "-host";
     private static final String CMD_PORT = "-port";
-
     private static final String CMD_CONFIG = "-config";
     private static final String CMD_DISABLEKEY = "api.disablekey=true";
     private static final String CMD_REGEX = "api.addrs.addr.regex=true";
@@ -40,7 +38,6 @@ public class ZapDriver {
     private static final String CMD_TIMEOUT = "connection.timeoutInSecs=600";
 
     private static final String ZAP_PROGRAM = "zap.sh";
-
     private static List<String> ALLOWED_HOSTS = new ArrayList<>();
     private static final List<Integer> STARTED_SCANS = new ArrayList<>();
     private static int crawlId;
@@ -104,8 +101,6 @@ public class ZapDriver {
         }
 
         try {
-
-
             // Start the scan on a particular site
             Map<String, String> arguments = Collections.singletonMap("url", host);
 
@@ -144,6 +139,7 @@ public class ZapDriver {
 
     /**
      * Loads a ZAP session
+     *
      * @param sessionPath - The path of the .session file
      * @return Success
      */
@@ -157,6 +153,7 @@ public class ZapDriver {
 
     /**
      * Imports URLs from a text file
+     *
      * @param path - The path to load from
      * @return Success
      */
@@ -169,6 +166,7 @@ public class ZapDriver {
 
     /**
      * Loads a ZAP policy from a file path
+     *
      * @param policy - The path to load from
      * @return Success
      */
@@ -184,6 +182,7 @@ public class ZapDriver {
 
     /**
      * Starts the ZAP attack. If allowedHosts is not provided in jenkinsfile, it will scan only hosts that are local
+     *
      * @param zsp The parameters from the groovy step
      * @return Success
      */
@@ -313,8 +312,9 @@ public class ZapDriver {
 
     /**
      * Starts the ZAP process
-     * @param zapHome - The location of the zap.sh file
-     * @param ws - Passed by step
+     *
+     * @param zapHome  - The location of the zap.sh file
+     * @param ws       - Passed by step
      * @param launcher - Passed by step
      * @return Success
      */
@@ -372,12 +372,12 @@ public class ZapDriver {
         ZapDriver.ALLOWED_HOSTS = allowedHosts;
     }
 
-    public static int getZapTimeout() {
-        return ZapDriver.ZAP_TIMEOUT;
-    }
-
     public static String getZapHost() {
         return ZapDriver.ZAP_HOST;
+    }
+
+    public static int getZapTimeout() {
+        return ZapDriver.ZAP_TIMEOUT;
     }
 
     public static int getZapPort() {

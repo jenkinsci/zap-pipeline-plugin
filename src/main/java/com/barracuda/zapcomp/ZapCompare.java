@@ -65,9 +65,9 @@ public class ZapCompare extends Recorder {
                     "formMethod=GET", null);
 
             InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
-            System.out.println("the url is+ "+uri.toString());
+            System.out.println("the url is+ " + uri.toString());
             String res = IOUtils.toString(response, StandardCharsets.UTF_8);
-            System.out.println("the response is "+ res);
+            System.out.println("the response is " + res);
             fp.write(res, "UTF-8");
 
             return true;
@@ -80,7 +80,7 @@ public class ZapCompare extends Recorder {
     /**
      * Retrieves the previous report and copies it to the new build workspace
      *
-     * @param path The path to save the old report
+     * @param path    The path to save the old report
      * @param oldPath The path of the old report
      */
     private void savePreviousZapReport(File path, File oldPath) {
@@ -115,7 +115,7 @@ public class ZapCompare extends Recorder {
     /**
      * Gets the current builds saved ZAP report - used when comparing the report to the previous report
      *
-     * @param path - The path of the current report
+     * @param path     - The path of the current report
      * @param fileName - The filename of the report, eg zap-report.json
      * @return The JSONObject of the report
      */
@@ -154,7 +154,7 @@ public class ZapCompare extends Recorder {
     /**
      * Archives the current raw ZAP JSON report &amp; saves static files
      *
-     * @param run - The current build
+     * @param run          - The current build
      * @param taskListener - Logging
      * @return If it was a success or not
      */
@@ -215,7 +215,7 @@ public class ZapCompare extends Recorder {
      * Checks 2 reports and checks if the newest has any new critical alerts, only run if failBuild is set to true in the parameters
      * of archiveZap
      *
-     * @param run - The current build
+     * @param run      - The current build
      * @param listener - Logging
      * @return If it has new critical alerts or not
      */
@@ -229,7 +229,7 @@ public class ZapCompare extends Recorder {
 
         // Get alerts in the new report
         String jsonSiteName = "site";
-        try{
+        try {
             Object sites = currentBuildReport.get(jsonSiteName);
             if (sites == null)
                 return false; // No sites in report? did ZAP run correctly?
@@ -252,7 +252,7 @@ public class ZapCompare extends Recorder {
             return currentBuildAlerts.stream()
                     .filter(newAlert -> finalPreviousBuildAlerts.stream().noneMatch(oldAlert -> oldAlert.equals(newAlert)))
                     .anyMatch(alert -> Integer.parseInt(alert.getRiskcode()) >= ZapDriver.getFailBuild());
-        } catch(NullPointerException e){
+        } catch (NullPointerException e) {
             listener.getLogger().println("zap-comp: Could not determine weather build has new alerts.");
             return false;
         }

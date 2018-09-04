@@ -47,15 +47,15 @@ public class ArchiveZapExecution extends AbstractStepExecutionImpl {
                     listener.getLogger().println("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report");
                     build.setResult(Result.FAILURE);
                     getContext().onFailure(
-                        new Throwable("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report"));
+                            new Throwable("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report"));
                     return false;
                 }
             }
         } finally {
             boolean success = ZapDriver.shutdownZap();
-            if (!success) {
+            if (!success)
                 listener.getLogger().println("zap-comp: Failed to shutdown ZAP (it's not running?)");
-            }
+
         }
 
         getContext().onSuccess(true);

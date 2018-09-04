@@ -63,13 +63,12 @@ public class RunZapAttackExecution extends AbstractStepExecutionImpl {
 
             try {
                 // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause when the scan is complete
-                if(status!=Constants.COMPLETED_PERCENTAGE)
+                if (status != Constants.COMPLETED_PERCENTAGE)
                     TimeUnit.SECONDS.sleep(Constants.SCAN_SLEEP);
             } catch (InterruptedException e) {
                 // Usually if the Jenkins build is stopped
             }
         }
-
 
         getContext().onSuccess(true);
         return true;

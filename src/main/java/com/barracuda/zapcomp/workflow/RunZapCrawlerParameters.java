@@ -6,7 +6,6 @@ public class RunZapCrawlerParameters {
     public RunZapCrawlerParameters(String host) {
         this.host = host;
     }
-
     public String getHost() {
         return host;
     }
