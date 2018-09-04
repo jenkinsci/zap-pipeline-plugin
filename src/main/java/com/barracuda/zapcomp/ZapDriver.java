@@ -138,6 +138,20 @@ public class ZapDriver {
     }
 
     /**
+     * Imports URLs from a text file
+     *
+     * @param path - The path to load from
+     * @return Success
+     */
+    public static boolean importUrls(String path) {
+        System.out.println("zap-comp: Importing URLs from " + path);
+        Map<String, String> arguments = Collections.singletonMap("filePath", path);
+
+        JSONObject result = zapApi("importurls/action/importurls", arguments);
+        return result != null && result.has("Result") && result.getString("Result").equals("OK");
+    }
+
+    /**
      * Loads a ZAP session
      *
      * @param sessionPath - The path of the .session file
@@ -148,19 +162,6 @@ public class ZapDriver {
         Map<String, String> arguments = Collections.singletonMap("name", sessionPath);
         JSONObject result = zapApi("core/action/loadSession", arguments);
 
-        return result != null && result.has("Result") && result.getString("Result").equals("OK");
-    }
-
-    /**
-     * Imports URLs from a text file
-     *
-     * @param path - The path to load from
-     * @return Success
-     */
-    public static boolean importUrls(String path) {
-        System.out.println("zap-comp: Importing URLs from " + path);
-        Map<String, String> arguments = Collections.singletonMap("filePath", path);
-        JSONObject result = zapApi("importurls/action/importurls", arguments);
         return result != null && result.has("Result") && result.getString("Result").equals("OK");
     }
 
@@ -355,39 +356,30 @@ public class ZapDriver {
     public static void setZapHost(String zapHost) {
         ZapDriver.ZAP_HOST = zapHost;
     }
-
     public static void setZapPort(int zapPort) {
         ZapDriver.ZAP_PORT = zapPort;
     }
-
     public static void setFailBuild(int fail) {
         ZapDriver.FAIL_BUILD = fail;
     }
-
     public static void setZapTimeout(int timeout) {
         ZapDriver.ZAP_TIMEOUT = timeout;
     }
-
     public static void setAllowedHosts(List<String> allowedHosts) {
         ZapDriver.ALLOWED_HOSTS = allowedHosts;
     }
-
-    public static String getZapHost() {
-        return ZapDriver.ZAP_HOST;
-    }
-
     public static int getZapTimeout() {
         return ZapDriver.ZAP_TIMEOUT;
     }
-
     public static int getZapPort() {
         return ZapDriver.ZAP_PORT;
     }
-
     public static int getFailBuild() {
         return ZapDriver.FAIL_BUILD;
     }
-
+    public static String getZapHost() {
+        return ZapDriver.ZAP_HOST;
+    }
     public static List<String> getAllowedHosts() {
         return ZapDriver.ALLOWED_HOSTS;
     }

@@ -40,7 +40,7 @@ public abstract class ZapBuildAction implements Action, SimpleBuildStep.LastBuil
 
     // Called by Jenkins
     public void doDynamic(StaplerRequest req, StaplerResponse rsp) throws IOException, ServletException {
-        System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", ""); // Allow JS scripts to be run
+        System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", ""); // Allow JS scripts to be run (content security policy)
 
         DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(this.dir()), this.getTitle(),
                 "/plugin/zap-comp/logo.png", false);
