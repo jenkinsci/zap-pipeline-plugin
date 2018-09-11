@@ -3,6 +3,7 @@ package com.barracuda.zapcomp.workflow;
 import com.barracuda.zapcomp.*;
 import hudson.*;
 import hudson.model.*;
+import org.jaxen.expr.DefaultStep;
 import org.jenkinsci.plugins.workflow.steps.*;
 
 import java.io.*;
@@ -13,29 +14,14 @@ import java.util.concurrent.*;
 /**
  * Executor for startZap() function in jenkinsfile
  */
-public class RunZapCrawlerExecution extends AbstractStepExecutionImpl {
-
-    private TaskListener listener;
-    private FilePath ws;
+public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
     private Node node;
     private RunZapCrawlerStep step;
 
     public RunZapCrawlerExecution(StepContext context, RunZapCrawlerStep step) {
         super(context);
-        System.out.println("in zapcrawler");
-
-        try {
-            this.step = step;
-            this.node = context.get(Node.class);
-            this.ws = context.get(FilePath.class);
-            this.listener = context.get(TaskListener.class);
-
-        } catch (IOException | InterruptedException e) {
-            this.listener.getLogger().println("zap-comp: Failed to run ZAP crawler");
-            getContext().onFailure(e);
-        }
+        this.step = step;
     }
-
 
     @Override
     public boolean start() {
@@ -114,19 +100,5 @@ public class RunZapCrawlerExecution extends AbstractStepExecutionImpl {
 
         getContext().onSuccess(true);
         return true;
-
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        start();
-    }
-
-    // findbugs fails without this because "non-transient non-serializable instance field in serializable class" because AbstractStepExecutionImpl has a base parent of Serializable
-    private void writeObject(ObjectOutputStream out) {
-    }
-
-    private void readObject(ObjectInputStream in) {
     }
 }

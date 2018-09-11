@@ -1,6 +1,5 @@
 package com.barracuda.zapcomp.workflow;
 
-
 import javax.annotation.CheckForNull;
 
 public class ImportZapPolicyStepParameters {

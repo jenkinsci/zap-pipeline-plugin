@@ -22,11 +22,9 @@ public class StartZapStep extends Step {
      * @param sessionPath  Optional path to the session file
      */
 
-
     @DataBoundConstructor
     public StartZapStep(@CheckForNull String host, int port, int timeout,
                         int failBuild, String zapHome, List<String> allowedHosts, String sessionPath) {
-
         if (host == null)
             host = "localhost";
 

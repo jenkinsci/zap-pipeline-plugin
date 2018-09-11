@@ -33,6 +33,4 @@ public class ImportZapUrlsStep extends Step {
             super(ImportZapUrlsExecution.class, "importZapUrls", "Load a list of URLs for ZAP to use from the specified path");
         }
     }
-
-
 }

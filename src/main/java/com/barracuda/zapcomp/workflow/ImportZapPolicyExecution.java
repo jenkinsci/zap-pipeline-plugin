@@ -2,24 +2,18 @@ package com.barracuda.zapcomp.workflow;
 
 import com.barracuda.zapcomp.*;
 import hudson.model.*;
+import org.jaxen.expr.DefaultStep;
 import org.jenkinsci.plugins.workflow.steps.*;
 
 import java.io.*;
 
 
-public class ImportZapPolicyExecution extends AbstractStepExecutionImpl {
-    private TaskListener listener;
+public class ImportZapPolicyExecution extends DefaultStepExecutionImpl {
     private ImportZapPolicyStep step;
 
     public ImportZapPolicyExecution(StepContext context, ImportZapPolicyStep step) {
         super(context);
-
-        try {
-            this.step = step;
-            this.listener = context.get(TaskListener.class);
-        } catch (IOException | InterruptedException e) {
-            getContext().onFailure(e);
-        }
+        this.step = step;
     }
 
     @Override
@@ -41,18 +35,4 @@ public class ImportZapPolicyExecution extends AbstractStepExecutionImpl {
         getContext().onSuccess(true);
         return true;
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        start();
-    }
-
-    // findbugs fails without this because "non-transient non-serializable instance field in serializable class"
-    private void writeObject(ObjectOutputStream out) {
-    }
-
-    private void readObject(ObjectInputStream in) {
-    }
-
 }

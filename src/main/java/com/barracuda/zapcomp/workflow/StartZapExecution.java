@@ -13,28 +13,12 @@ import java.util.concurrent.*;
 /**
  * Executor for startZap() function in jenkinsfile
  */
-public class StartZapExecution extends AbstractStepExecutionImpl {
-
-    private TaskListener listener;
-    private FilePath ws;
-    private Launcher launcher;
-    private Node node;
+public class StartZapExecution extends DefaultStepExecutionImpl {
     private StartZapStep step;
 
     public StartZapExecution(StepContext context, StartZapStep step) {
         super(context);
-
-        try {
-            this.step = step;
-            this.node = context.get(Node.class);
-            this.launcher = context.get(Launcher.class);
-            this.ws = context.get(FilePath.class);
-            this.listener = context.get(TaskListener.class);
-
-        } catch (IOException | InterruptedException e) {
-            this.listener.getLogger().println("zap-comp: Failed to start ZAP process");
-            getContext().onFailure(e);
-        }
+        this.step = step;
     }
 
     @Override
@@ -57,7 +41,6 @@ public class StartZapExecution extends AbstractStepExecutionImpl {
         ZapDriver.setZapTimeout(zsp.getTimeout());
         ZapDriver.setFailBuild(zsp.getFailBuild());
         ZapDriver.setAllowedHosts(zsp.getAllowedHosts());
-
 
         this.listener.getLogger().println("zap-comp: Starting ZAP on port " + zsp.getPort() + "...");
 
@@ -120,18 +103,5 @@ public class StartZapExecution extends AbstractStepExecutionImpl {
         getContext().onSuccess(true);
         return true;
 
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        start();
-    }
-
-    // findbugs fails without this because "non-transient non-serializable instance field in serializable class" because AbstractStepExecutionImpl has a base parent of Serializable
-    private void writeObject(ObjectOutputStream out) {
-    }
-
-    private void readObject(ObjectInputStream in) {
     }
 }

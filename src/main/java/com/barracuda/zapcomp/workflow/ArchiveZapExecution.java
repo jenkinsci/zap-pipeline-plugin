@@ -11,23 +11,9 @@ import java.io.*;
  * Executor for archiveZap() function in Jenkinsfile
  */
 
-public class ArchiveZapExecution extends AbstractStepExecutionImpl {
-    private TaskListener listener;
-    private FilePath ws;
-    private Run build;
-
+public class ArchiveZapExecution extends DefaultStepExecutionImpl {
     ArchiveZapExecution(StepContext context) {
         super(context);
-
-        try {
-            this.build = context.get(Run.class);
-            this.ws = context.get(FilePath.class);
-            this.listener = context.get(TaskListener.class);
-
-        } catch (IOException | InterruptedException e) {
-            this.listener.getLogger().println("zap-comp: Failed to start archive reports");
-            getContext().onFailure(e);
-        }
     }
 
     @Override
@@ -61,11 +47,4 @@ public class ArchiveZapExecution extends AbstractStepExecutionImpl {
         getContext().onSuccess(true);
         return true;
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        start();
-    }
-
 }

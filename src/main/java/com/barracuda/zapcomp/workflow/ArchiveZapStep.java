@@ -23,6 +23,4 @@ public class ArchiveZapStep extends Step implements Serializable {
             super(ArchiveZapExecution.class, "archiveZap", "Create & Archive ZAP report");
         }
     }
-
-
 }

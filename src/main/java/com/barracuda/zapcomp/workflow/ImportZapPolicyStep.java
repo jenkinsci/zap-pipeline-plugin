@@ -6,7 +6,6 @@ import org.kohsuke.stapler.*;
 
 import javax.annotation.CheckForNull;
 
-
 public class ImportZapPolicyStep extends Step {
     private final ImportZapPolicyStepParameters zsp;
 
@@ -31,6 +30,4 @@ public class ImportZapPolicyStep extends Step {
             super(ImportZapPolicyExecution.class, "importZapScanPolicy", "Import a ZAP scan policy from the specified path");
         }
     }
-
-
 }

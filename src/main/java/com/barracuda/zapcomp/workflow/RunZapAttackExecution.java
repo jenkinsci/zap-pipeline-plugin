@@ -11,19 +11,12 @@ import java.util.concurrent.*;
 /**
  * Executor for zapAttack() function in jenkinsfile
  */
-public class RunZapAttackExecution extends AbstractStepExecutionImpl {
-    private TaskListener listener;
+public class RunZapAttackExecution extends DefaultStepExecutionImpl {
     private RunZapAttackStep step;
 
     public RunZapAttackExecution(StepContext context, RunZapAttackStep step) {
         super(context);
-
-        try {
-            this.step = step;
-            this.listener = context.get(TaskListener.class);
-        } catch (IOException | InterruptedException e) {
-            getContext().onFailure(e);
-        }
+        this.step = step;
     }
 
     @Override
@@ -73,18 +66,4 @@ public class RunZapAttackExecution extends AbstractStepExecutionImpl {
         getContext().onSuccess(true);
         return true;
     }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        start();
-    }
-
-    // findbugs fails without this because "non-transient non-serializable instance field in serializable class"
-    private void writeObject(ObjectOutputStream out) {
-    }
-
-    private void readObject(ObjectInputStream in) {
-    }
-
 }

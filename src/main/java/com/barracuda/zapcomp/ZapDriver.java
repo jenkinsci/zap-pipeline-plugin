@@ -103,18 +103,17 @@ public class ZapDriver {
         try {
             // Start the scan on a particular site
             Map<String, String> arguments = Collections.singletonMap("url", host);
-
             JSONObject result = zapApi("spider/action/scan", arguments);
 
             if (result != null) {
                 crawlId = result.getInt("scan");
                 return true;
             }
-
-            return false;
         } catch (JSONException e) {
-            return false;
+            // Return below
         }
+
+        return false;
     }
 
     /**
@@ -266,12 +265,11 @@ public class ZapDriver {
                 return true;
             }
 
-            return false;
         } catch (JSONException | URISyntaxException e) {
-            System.out.println("got a big exceptioney boi!");
-            e.printStackTrace();
-            return false;
+            // Return below
         }
+
+        return false;
     }
 
     /**
