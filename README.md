@@ -1,10 +1,6 @@
 <img src="https://i.imgur.com/WtTwQtt.png">
 
 
-# ZAProxy Jenkins _Pipeline_ plugin
-
-<br />
-
 <a href='https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project' align="top"><img align="left" src='https://github.com/vrondakis/zap-jenkins-pipeline-plugin/raw/master/src/main/webapp/logo.png'></a>
 
 <br />
@@ -15,14 +11,8 @@ OWASP Zed Attack Proxy Jenkins Plugin for pipeline builds
 <br />
 
 This is a Jenkins pipeline plugin that let's you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. It can also generate a good-looking report with new alerts (compared to the previous build) and optionally fail the build if any new high-risk alerts are found, and more!
-
-
-<br><br>
-
-
-----------
-     
-# API
+  
+### API
 ```groovy
 startZap(host: 127.0.0.1, port: 9095, timeout: 900, failBuild:3, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'], sessionPath:"/path/to/session.session")
 
@@ -82,12 +72,12 @@ Reads the alerts found by ZAP, checks if there are any new alerts that are highe
 
 
 
-# Proxying your tests
+### Proxying your tests
 ```groovy
 sh "mvn verify -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=9095 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=9095"
 ```
 
 You may need to exclude some hosts from the proxy. If so use the -Dhttp.nonProxyHosts parameter, eg -Dhttp.nonProxyHosts=*.com\\|*.co.uk
 
-# Proxying localhost
+### Proxying localhost
 By default Java will not proxy localhost, 127.0.0.1, or any common loopback addresses. There is no way to disable this unless you set -Dhttp.nonProxyHosts= (empty). This means it's impossible to proxy just localhost without editing project code. You can mitigate this by changing your applications host to localhost.localdomain, which isn't checked by Java 
