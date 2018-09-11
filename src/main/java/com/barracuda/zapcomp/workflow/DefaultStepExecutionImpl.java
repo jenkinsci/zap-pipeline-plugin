@@ -43,11 +43,4 @@ public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl
             this.listener.getLogger().println("zap-comp: Failed to run: "+e.getClass());
         }
     }
-
-    // findbugs fails without this because "non-transient non-serializable instance field in serializable class"
-    private void writeObject(ObjectOutputStream out) {
-    }
-
-    private void readObject(ObjectInputStream in) {
-    }
 }

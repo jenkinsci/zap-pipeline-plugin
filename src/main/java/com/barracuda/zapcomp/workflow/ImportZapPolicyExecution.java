@@ -35,4 +35,11 @@ public class ImportZapPolicyExecution extends DefaultStepExecutionImpl {
         getContext().onSuccess(true);
         return true;
     }
+
+    // findbugs fails without this because "non-transient non-serializable instance field in serializable class"
+    private void writeObject(ObjectOutputStream out) {
+    }
+
+    private void readObject(ObjectInputStream in) {
+    }
 }
