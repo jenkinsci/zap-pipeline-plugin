@@ -60,5 +60,4 @@ public class StartZapStep extends Step {
             super(StartZapExecution.class, "startZap", "Start ZAP process");
         }
     }
-
 }

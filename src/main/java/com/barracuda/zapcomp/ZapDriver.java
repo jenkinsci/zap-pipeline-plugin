@@ -14,8 +14,6 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.*;
 
-// ZAPDriver: controls ZAP using HTTP api
-
 /**
  * ZapDriver Controls ZAP using HTTP api
  *
@@ -266,7 +264,7 @@ public class ZapDriver {
             }
 
         } catch (JSONException | URISyntaxException e) {
-            // Return below
+            return false;
         }
 
         return false;
@@ -298,7 +296,6 @@ public class ZapDriver {
                 } else {
                     totalScanProgress = Constants.COMPLETED_PERCENTAGE; // Failed to retrieve status so skip it
                 }
-
             } catch (JSONException e) {
                 totalScanProgress = Constants.COMPLETED_PERCENTAGE;
             }
@@ -381,5 +378,4 @@ public class ZapDriver {
     public static List<String> getAllowedHosts() {
         return ZapDriver.ALLOWED_HOSTS;
     }
-
 }

@@ -22,6 +22,7 @@ public class ZapAlert implements Serializable {
     public String getPluginid() {
         return pluginid;
     }
+
     public void setPluginid(String pluginid) {
         this.pluginid = pluginid;
     }
@@ -29,6 +30,7 @@ public class ZapAlert implements Serializable {
     public String getAlert() {
         return alert;
     }
+
     public void setAlert(String alert) {
         this.alert = alert;
     }
@@ -36,6 +38,7 @@ public class ZapAlert implements Serializable {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -43,6 +46,7 @@ public class ZapAlert implements Serializable {
     public String getRiskcode() {
         return riskcode;
     }
+
     public void setRiskcode(String riskcode) {
         this.riskcode = riskcode;
     }
@@ -50,6 +54,7 @@ public class ZapAlert implements Serializable {
     public String getConfidence() {
         return confidence;
     }
+
     public void setConfidence(String confidence) {
         this.confidence = confidence;
     }
@@ -57,6 +62,7 @@ public class ZapAlert implements Serializable {
     public List<ZapAlertInstance> getInstances() {
         return instances;
     }
+
     public void setInstances(List<ZapAlertInstance> instances) {
         this.instances = instances;
     }
@@ -64,6 +70,7 @@ public class ZapAlert implements Serializable {
     public String getSourceid() {
         return sourceid;
     }
+
     public void setSourceid(String sourceid) {
         this.sourceid = sourceid;
     }
@@ -71,6 +78,7 @@ public class ZapAlert implements Serializable {
     public String getWascid() {
         return wascid;
     }
+
     public void setWascid(String wascid) {
         this.wascid = wascid;
     }

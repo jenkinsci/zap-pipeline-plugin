@@ -208,7 +208,6 @@ public class ZapCompare extends Recorder {
                 }.getType())).stream();
 
         return sites.stream().map(site -> (JSONObject) site).flatMap(alerts).collect(Collectors.toList());
-
     }
 
     /**

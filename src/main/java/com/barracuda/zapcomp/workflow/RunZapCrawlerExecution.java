@@ -31,11 +31,9 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-
         this.listener.getLogger().println("zap-comp: Starting crawler on host " + zsp.getHost() + "...");
 
         boolean success = ZapDriver.startZapCrawler(zsp.getHost());
-
         if (!success) {
             System.out.println("zap-comp: Failed to start ZAP crawler on host " + zsp.getHost());
             getContext().onFailure(new Throwable("zap-comp: Failed ot start ZAP crawler on host " + zsp.getHost()));
@@ -44,8 +42,8 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
 
         OffsetDateTime startedTime = OffsetDateTime.now();
         int timeoutSeconds = ZapDriver.getZapTimeout();
-        int status = ZapDriver.zapCrawlerStatus();
 
+        int status = ZapDriver.zapCrawlerStatus();
         while (status < Constants.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
                 listener.getLogger().println("zap-comp: Crawler timed out before it could complete the scan");

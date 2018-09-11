@@ -35,5 +35,4 @@ public class RunZapCrawlerStep extends Step {
             super(RunZapCrawlerExecution.class, "runZapCrawler", "Run ZAP crawler on a specified host");
         }
     }
-
 }

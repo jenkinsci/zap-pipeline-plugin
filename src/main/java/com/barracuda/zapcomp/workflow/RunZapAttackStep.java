@@ -39,5 +39,4 @@ public class RunZapAttackStep extends Step {
             super(RunZapAttackExecution.class, "runZapAttack", "Run ZAP attack by changing to attack mode and starting the attack");
         }
     }
-
 }

@@ -36,6 +36,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
+        // Set ZAP properties
         ZapDriver.setZapHost(zsp.getHost());
         ZapDriver.setZapPort(zsp.getPort());
         ZapDriver.setZapTimeout(zsp.getTimeout());
@@ -63,6 +64,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
         boolean zapHasStarted = false;
 
+        // Wait for ZAP to start before continuing...
         do {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(Constants.ZAP_INITIALIZE_TIMEOUT))) {
                 listener.getLogger().println("zap-comp: ZAP failed to start. Socket timed out.");
@@ -94,6 +96,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
+        // Load session
         if (zsp.getSessionPath() != null && !zsp.getSessionPath().isEmpty()) {
             System.out.println("zap-comp: Loading session " + zsp.getSessionPath());
             boolean loadedSession = ZapDriver.loadSession(zsp.getSessionPath());
@@ -102,9 +105,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
         getContext().onSuccess(true);
         return true;
-
     }
-
 
     // findbugs fails without this because "non-transient non-serializable instance field in serializable class"
     private void writeObject(ObjectOutputStream out) {
