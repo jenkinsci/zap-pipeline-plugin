@@ -74,6 +74,11 @@ By default Java will not proxy localhost, 127.0.0.1, or any common loopback addr
 
 -----
 
+## Installation
+Download the latest release from the [releases](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases) section. Move the .hpi file into your Jenkins plugin directory - eg /var/lib/jenkins/plugins/
+
+-----
+
 ## License
 
 	The MIT License (MIT)
