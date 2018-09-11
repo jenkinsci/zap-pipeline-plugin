@@ -83,7 +83,7 @@ Download the latest release from the [releases](https://github.com/vrondakis/zap
 
 	The MIT License (MIT)
 	
-	Copyright (c) 2016 Goran Sarenkapa (JordanGS), and a number of other of contributors
+	Copyright (c) 2018 Manolis Vrondakis
 	
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
