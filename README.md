@@ -30,6 +30,7 @@ runZapCrawler(host: "https://localhost")
 ```
 
 <br>
+
 **importZapScanPolicy** - Loads a specific ZAP attack policy from the path you specify (Scan Policy Manager -> Export), to be used with runZapAttack
 
 ```groovy
