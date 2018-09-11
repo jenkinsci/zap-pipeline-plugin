@@ -1,20 +1,15 @@
+
 <img src="https://i.imgur.com/WtTwQtt.png">
 
 
 <br />
 
-<br />
-<a href='https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project' align="top"><img align="left" src='https://github.com/vrondakis/zap-jenkins-pipeline-plugin/raw/master/src/main/webapp/logo.png'></a>
-
-
-OWASP Zed Attack Proxy Jenkins Plugin for pipeline builds
-==============================================
-
-<br />
-
-This is a Jenkins pipeline plugin that let's you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. It can also generate a good-looking report with new alerts (compared to the previous build) and optionally fail the build if any new high-risk alerts are found, and more!
+<a href='https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project' align="top"><img align="left" src='https://github.com/vrondakis/zap-jenkins-pipeline-plugin/raw/master/src/main/webapp/logo.png'></a>ZAP Jenkins Plugin for pipeline builds
+===
+This is a Jenkins pipeline plugin that let's you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. It also generates a good-looking report with new alerts (compared to the previous build) and optionally fails the build if any new high-risk alerts are found, and more!
   
 ### API
+**startZap** - Starts the ZAP process and configures the plugin. 
 ```groovy
 startZap(host: 127.0.0.1, port: 9095, timeout: 900, failBuild:3, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'], sessionPath:"/path/to/session.session")
 
@@ -25,54 +20,41 @@ failBuild (optional): If a new alert with a risk higher than this, the build wil
 allowedHosts (optional): Once the active ZAP scan starts, it won't scan any hosts unless they are here. If you don't set this it will only scan if the host is localhost
 sessionPath (optional): If you want to load a previous ZAP session that you have expored, you can do that here. Useful when you want to run a scan but don't want to run all your tests through ZAP.
 ```
-Starts the ZAP process and configures the plugin. 
-
 <br>
 
+**runZapCrawler** - Runs the ZAP crawler on a specific URL
 ```groovy
 runZapCrawler(host: "https://localhost")
 ```
 
-Runs the ZAP crawler on a specific URL
-
 <br>
+**importZapScanPolicy** - Loads a specific ZAP attack policy from the path you specify (Scan Policy Manager -> Export), to be used with runZapAttack
 
 ```groovy
 importZapScanPolicy(policyPath: "/home/you/yourattackpolicy.policy")
 ```
-
-Loads a specific ZAP attack policy from the path you specify (Scan Policy Manager -> Export), to be used with runZapAttack
-
 <br>
 
+**importZapUrls** - Imports a list of URLs to ZAP. You need the "Import files containing URLs" plugin for this to work.
 ```groovy
 importZapUrls(path: "/path/to/your/urls")
 ```
-
-Imports a list of URLs to ZAP. You need the "Import files containing URLs" plugin for this to work.
-
 <br>
 
-
+**runZapAttack** - Once you have proxied your tests through ZAP or ran the crawler, this function runs an active scan on all the hosts that have been provided in the allowedHosts parameter in startZap.
 ```groovy
 runZapAttack(userId: 5, scanPolicyName: "yourScanPolicy")
 
 userId (optional): Run the scan with a specific user, loaded from the session
 scanPolicyName (optional): The attack policy to use when running the scan. Loaded with importScanPolicy
 ```
-
-Once you have proxied your tests through ZAP or ran the crawler, this function runs an active scan on all the hosts that have been provided in the allowedHosts parameter in startZap.
-
 <br>
 
+**archiveZap** - Reads the alerts found by ZAP, checks if there are any new alerts that are higher than the failBuild parameter (and fails the build if so), generates a report with differences, and finally shuts down ZAP. This should be the last thing you run.
 
 ```groovy
 archiveZap()
 ```
-
-Reads the alerts found by ZAP, checks if there are any new alerts that are higher than the failBuild parameter (and fails the build if so), and generates a report with differences.
-
-
 
 ### Proxying your tests
 ```groovy
