@@ -96,7 +96,7 @@ var getNew = function(){
 		newAlertInstances = Object.values(newAlertInstances)
 		var res = newAlerts.concat(newAlertInstances)
 
-        if (!res.length>0 && !error){
+        if (res.length<=0 && !error){
             addWarning("No new alerts for this build.", "success")
         }
 
