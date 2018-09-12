@@ -9,6 +9,38 @@
 This is a Jenkins pipeline plugin that let's you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. It also generates a good-looking report with new alerts (compared to the previous build) and optionally fails the build if any new high-risk alerts are found, and more!
   
   -----
+## Jenkinsfile Usage example
+```groovy
+pipeline {
+    agent any
+    stages { 
+        stage('Setup') {
+            steps {
+                script {
+                    startZap(host: 127.0.0.1, port: 9091, timeout:500, zapHome: "/opt/zaproxy", sessionPath:"/somewhere/session.session", allowedHosts:['github.com']) // Start ZAP at /opt/zaproxy/zap.sh, allowing scans on github.com
+                }
+            }
+        }
+        stage('Build & Test') {
+            steps {
+                script {
+                    sh "mvn verify -Dhttp.proxyHost=127.0.0.1 -Dhttp.proxyPort=9091 -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=9091" // Proxy tests through ZAP
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                archiveZap()
+            }
+        }
+    }
+}
+```
+
+This example is a declarative pipeline, but using the functions on a scripted pipeline works the same.
+
  
 ## API
 **startZap** - Starts the ZAP process and configures the plugin. 
