@@ -1,5 +1,6 @@
-[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/vrondakis/zap-jenkins-pipeline-plugin.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/vrondakis/zap-jenkins-pipeline-plugin/context:java)
-
+[![GitHub release](https://img.shields.io/github/release/vrondakis/zap-jenkins-pipeline-plugin.svg?style=for-the-badge)](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/vrondakis/zap-jenkins-pipeline-plugin.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/vrondakis/zap-jenkins-pipeline-plugin/context:java)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/vrondakis/zap-jenkins-pipeline-plugin.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/vrondakis/zap-jenkins-pipeline-plugin/context:javascript)
 <img src="https://i.imgur.com/WtTwQtt.png">
 
 
