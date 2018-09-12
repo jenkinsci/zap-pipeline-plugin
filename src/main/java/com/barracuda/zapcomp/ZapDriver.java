@@ -35,7 +35,8 @@ public class ZapDriver {
     private static final String CMD_NAME = "api.addrs.addr.name=10.*";
     private static final String CMD_TIMEOUT = "connection.timeoutInSecs=600";
 
-    private static final String ZAP_PROGRAM = "zap.sh";
+    private static final String ZAP_UNIX_PROGRAM = "zap.sh";
+    private static final String ZAP_WIN_PROGRAM = "zap.bat";
     private static List<String> ALLOWED_HOSTS = new ArrayList<>();
     private static final List<Integer> STARTED_SCANS = new ArrayList<>();
     private static int crawlId;
@@ -317,7 +318,7 @@ public class ZapDriver {
     public static boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher) {
         List<String> cmd = new ArrayList<>();
 
-        Path zapPath = Paths.get(zapHome, ZAP_PROGRAM);
+        Path zapPath = Paths.get(zapHome, launcher.isUnix() ? ZAP_UNIX_PROGRAM : ZAP_WIN_PROGRAM);
         cmd.add(zapPath.toString());
 
         cmd.add(CMD_DAEMON);
