@@ -1,3 +1,4 @@
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/vrondakis/zap-jenkins-pipeline-plugin.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/vrondakis/zap-jenkins-pipeline-plugin/context:java)
 
 <img src="https://i.imgur.com/WtTwQtt.png">
 
