@@ -1,8 +1,7 @@
+
 [![GitHub release](https://img.shields.io/github/release/vrondakis/zap-jenkins-pipeline-plugin.svg?style=for-the-badge)](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases)
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/vrondakis/zap-jenkins-pipeline-plugin.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/vrondakis/zap-jenkins-pipeline-plugin/context:java)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/vrondakis/zap-jenkins-pipeline-plugin.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/vrondakis/zap-jenkins-pipeline-plugin/context:javascript)
-<img src="https://i.imgur.com/WtTwQtt.png">
-
 
 <br />
 
@@ -11,6 +10,8 @@
 This is a Jenkins pipeline plugin that let's you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. It also generates a good-looking report with new alerts (compared to the previous build) and optionally fails the build if any new high-risk alerts are found, and more!
   
   -----
+<img src="https://i.imgur.com/WtTwQtt.png">
+
 ## Jenkinsfile Usage example
 ```groovy
 pipeline {
