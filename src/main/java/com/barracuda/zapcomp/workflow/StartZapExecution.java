@@ -3,6 +3,7 @@ package com.barracuda.zapcomp.workflow;
 import com.barracuda.zapcomp.*;
 import hudson.*;
 import hudson.model.*;
+import hudson.slaves.SlaveComputer;
 import org.jenkinsci.plugins.workflow.steps.*;
 
 import java.io.*;
@@ -23,10 +24,19 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
     @Override
     public boolean start() {
+        boolean isUnix = false;
+        try {
+            if ("Unix".equals(((SlaveComputer) node.toComputer()).getOSDescription())) isUnix = true;
+        } catch (NullPointerException | InterruptedException | IOException e) {
+            this.listener.getLogger().println("zap-comp: Could not start ZAP. Failed to retrieve OS information");
+            getContext().onSuccess(false);
+            return false;
+        }
+
         if (node.getNodeName().isEmpty()) {
             launcher = new Launcher.LocalLauncher(listener, ws.getChannel());
         } else {
-            launcher = new Launcher.RemoteLauncher(listener, ws.getChannel(), true);
+            launcher = new Launcher.RemoteLauncher(listener, ws.getChannel(), isUnix);
         }
 
         StartZapStepParameters zsp = step.getParameters();

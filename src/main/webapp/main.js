@@ -175,14 +175,12 @@ App.controller('mainController', function($scope, $rootScope, $http, $window){
 
 	        return true
 	    }).catch((e) => {
-	        console.log(e)
-	            $scope.addWarning("Could not retrieve previous build report. All alerts are shown.", "failure")
-	            $scope.showAll = true
-	            error = true
+            $scope.addWarning("Could not retrieve previous build report. All alerts are shown.", "failure")
+            $scope.showAll = true
+            error = true
 	    }).finally(() => {
 		    $scope.alerts = getNew();
 		    $scope.parseAlerts();
-
 	    })
 	}
 
