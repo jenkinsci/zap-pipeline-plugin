@@ -343,8 +343,11 @@ public class ZapDriver {
 
         try {
             launcher.launch().cmds(cmd).pwd(ws).start();
+            System.out.println("zap-comp: Started successfully");
             return true;
         } catch (Exception e) {
+            System.out.println("zap-comp: An error occured while staring ZAP");
+            e.printStackTrace();
             return false;
         }
     }
