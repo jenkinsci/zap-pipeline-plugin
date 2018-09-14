@@ -52,16 +52,17 @@ public class ZapCompare extends Recorder {
      * @param path - Where to save the file
      * @return If it saved successfully or not
      */
-    private boolean saveZapReport(File path) {
+    private boolean saveZapReport(File path, Run build) {
         System.out.println("Running saveZapReport()...");
         try {
+            ZapDriver zapDriver = ZapDriverController.getZapDriver(build);
             FilePath fp = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME));
-            if (ZapDriver.getZapHost() == null || ZapDriver.getZapPort() == 0)
+            if (zapDriver.getZapHost() == null || zapDriver.getZapPort() == 0)
                 return false;
 
             System.out.println("Got the correct file path");
 
-            URI uri = new URI("http", null, ZapDriver.getZapHost(), ZapDriver.getZapPort(), "/OTHER/core/other/jsonreport",
+            URI uri = new URI("http", null, zapDriver.getZapHost(), zapDriver.getZapPort(), "/OTHER/core/other/jsonreport",
                     "formMethod=GET", null);
 
             InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
@@ -175,12 +176,11 @@ public class ZapCompare extends Recorder {
         run.addAction(action);
 
         // Fetches the JSON report from ZAP and saves it
-        if (!saveZapReport(zapDir))
+        if (!saveZapReport(zapDir, run))
             return false;
 
         // Saves the report of the previous build in the current builds workspace
         Optional<File> oldBuildZapDir = getPreviousReportDir(run);
-
         oldBuildZapDir.ifPresent(file -> savePreviousZapReport(zapDir, file));
 
         // Saves index.html file
@@ -223,6 +223,8 @@ public class ZapCompare extends Recorder {
 
         File zapDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
 
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(run);
+
         JSONObject previousBuildReport = getSavedZapReport(zapDir, RAW_OLD_REPORT_FILENAME);
         JSONObject currentBuildReport = getSavedZapReport(zapDir, RAW_REPORT_FILENAME);
 
@@ -238,7 +240,7 @@ public class ZapCompare extends Recorder {
             // If the previous build report could not be found, check the current report for any alerts with critical alerts.
             if (previousBuildReport == null)
                 return currentBuildAlerts.stream()
-                        .anyMatch(newAlert -> Integer.parseInt(newAlert.getRiskcode()) >= ZapDriver.getFailBuild());
+                        .anyMatch(newAlert -> Integer.parseInt(newAlert.getRiskcode()) >= zapDriver.getFailBuild());
 
             Object previousBuildSites = previousBuildReport.get(jsonSiteName);
             List<ZapAlert> previousBuildAlerts = new ArrayList<>();
@@ -250,7 +252,7 @@ public class ZapCompare extends Recorder {
             final List<ZapAlert> finalPreviousBuildAlerts = previousBuildAlerts;
             return currentBuildAlerts.stream()
                     .filter(newAlert -> finalPreviousBuildAlerts.stream().noneMatch(oldAlert -> oldAlert.equals(newAlert)))
-                    .anyMatch(alert -> Integer.parseInt(alert.getRiskcode()) >= ZapDriver.getFailBuild());
+                    .anyMatch(alert -> Integer.parseInt(alert.getRiskcode()) >= zapDriver.getFailBuild());
         } catch (NullPointerException e) {
             listener.getLogger().println("zap-comp: Could not determine weather build has new alerts.");
             return false;

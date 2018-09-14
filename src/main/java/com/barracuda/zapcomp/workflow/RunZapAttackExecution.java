@@ -22,8 +22,8 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
     @Override
     public boolean start() {
         listener.getLogger().println("zap-comp: Starting attack...");
-
-        boolean changeModeSuccess = ZapDriver.setZapMode("attack");
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+        boolean changeModeSuccess = zapDriver.setZapMode("attack");
         if (!changeModeSuccess) {
             listener.getLogger().println("zap-comp: Failed to switch to attack mode");
             getContext().onSuccess(false);
@@ -33,7 +33,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
         listener.getLogger().println("zap-comp: Set mode to attack mode");
 
         RunZapAttackStepParameters zsp = step.getParameters();
-        boolean startAttackSuccess = ZapDriver.zapAttack(zsp);
+        boolean startAttackSuccess = zapDriver.zapAttack(zsp);
         if (!startAttackSuccess) {
             listener.getLogger().println("zap-comp: Failed to start attack");
             getContext().onSuccess(false);
@@ -42,8 +42,8 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
 
         OffsetDateTime startedTime = OffsetDateTime.now();
 
-        int timeoutSeconds = ZapDriver.getZapTimeout();
-        int status = ZapDriver.zapAttackStatus();
+        int timeoutSeconds = zapDriver.getZapTimeout();
+        int status = zapDriver.zapAttackStatus();
 
         while (status < Constants.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
@@ -51,7 +51,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
                 break;
             }
 
-            status = ZapDriver.zapAttackStatus();
+            status = zapDriver.zapAttackStatus();
             listener.getLogger().println("zap-comp: Scan progress is: " + status + "%");
 
             try {

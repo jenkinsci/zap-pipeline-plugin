@@ -46,12 +46,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-        // Set ZAP properties
-        ZapDriver.setZapHost(zsp.getHost());
-        ZapDriver.setZapPort(zsp.getPort());
-        ZapDriver.setZapTimeout(zsp.getTimeout());
-        ZapDriver.setFailBuild(zsp.getFailBuild());
-        ZapDriver.setAllowedHosts(zsp.getAllowedHosts());
+
 
         this.listener.getLogger().println("zap-comp: Starting ZAP on port " + zsp.getPort() + "...");
 
@@ -61,7 +56,16 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return true;
         }
 
-        boolean success = ZapDriver.startZapProcess(zsp.getZapHome(), ws, launcher);
+        ZapDriver zapDriver = ZapDriverController.newDriver(this.build);
+
+        // Set ZAP properties
+        zapDriver.setZapHost(zsp.getHost());
+        zapDriver.setZapPort(zsp.getPort());
+        zapDriver.setZapTimeout(zsp.getTimeout());
+        zapDriver.setFailBuild(zsp.getFailBuild());
+        zapDriver.setAllowedHosts(zsp.getAllowedHosts());
+
+        boolean success = zapDriver.startZapProcess(zsp.getZapHome(), ws, launcher);
 
         if (!success) {
             System.out.println("zap-comp: Failed to start ZAP process");
@@ -84,24 +88,24 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             try {
                 TimeUnit.SECONDS.sleep(Constants.ZAP_INITIALIZE_WAIT);
 
-                new Socket(ZapDriver.getZapHost(), ZapDriver.getZapPort());
-                listener.getLogger().println("zap-comp: ZAP successfully initialized on port " + ZapDriver.getZapPort());
+                new Socket(zapDriver.getZapHost(), zapDriver.getZapPort());
+                listener.getLogger().println("zap-comp: ZAP successfully initialized on port " + zapDriver.getZapPort());
                 zapHasStarted = true;
 
             } catch (IOException e) {
                 listener.getLogger().println("zap-comp: Waiting for ZAP to initialize...");
             } catch (InterruptedException e) {
                 listener.getLogger().println(
-                        "zap-comp: ZAP failed to initialize on host " + ZapDriver.getZapHost() + ":" + ZapDriver.getZapPort());
+                        "zap-comp: ZAP failed to initialize on host " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort());
                 break;
             }
 
         } while (!zapHasStarted);
 
         if (!zapHasStarted) {
-            System.out.println("zap-comp: Failed to start ZAP on port " + ZapDriver.getZapPort());
+            System.out.println("zap-comp: Failed to start ZAP on port " + zapDriver.getZapPort());
             getContext().onFailure(
-                    new Throwable("zap-comp: Failed to start ZAP on port " + ZapDriver.getZapPort() + ". Socket timed out"));
+                    new Throwable("zap-comp: Failed to start ZAP on port " + zapDriver.getZapPort() + ". Socket timed out"));
 
             return false;
         }
@@ -109,7 +113,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         // Load session
         if (zsp.getSessionPath() != null && !zsp.getSessionPath().isEmpty()) {
             System.out.println("zap-comp: Loading session " + zsp.getSessionPath());
-            boolean loadedSession = ZapDriver.loadSession(zsp.getSessionPath());
+            boolean loadedSession = zapDriver.loadSession(zsp.getSessionPath());
             if (!loadedSession) getContext().onFailure(new Throwable("zap-comp: Could not load session file"));
         }
 

@@ -25,7 +25,8 @@ public class ImportZapPolicyExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-        boolean success = ZapDriver.loadPolicy(zsp.getPolicyPath());
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+        boolean success = zapDriver.loadPolicy(zsp.getPolicyPath());
         if (!success) {
             listener.getLogger().println("zap-comp: Failed to load attack policy at " + zsp.getPolicyPath());
             getContext().onFailure(new Throwable("zap-comp: Failed to load attack policy at " + zsp.getPolicyPath()));

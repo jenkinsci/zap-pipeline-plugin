@@ -1,6 +1,7 @@
 package com.barracuda.zapcomp.workflow;
 
 import com.barracuda.zapcomp.ZapDriver;
+import com.barracuda.zapcomp.ZapDriverController;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -28,7 +29,9 @@ public class ImportZapUrlsExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-        boolean success = ZapDriver.importUrls(zsp.getPath());
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+
+        boolean success = zapDriver.importUrls(zsp.getPath());
         if (!success) {
             listener.getLogger().println("zap-comp: Failed to load list of URLs at " + zsp.getPath());
         }

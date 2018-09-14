@@ -18,6 +18,8 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
     @Override
     public boolean start() {
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+
         try {
             ZapCompare zapCompare = new ZapCompare();
 
@@ -28,7 +30,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                 return true;
             }
 
-            if (ZapDriver.getFailBuild() > 0) {
+            if (zapDriver.getFailBuild() > 0) {
                 if (zapCompare.hasNewCriticalAlerts(this.build, this.listener)) {
                     listener.getLogger().println("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report");
                     build.setResult(Result.FAILURE);
@@ -38,7 +40,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                 }
             }
         } finally {
-            boolean success = ZapDriver.shutdownZap();
+            boolean success = zapDriver.shutdownZap();
             if (!success)
                 listener.getLogger().println("zap-comp: Failed to shutdown ZAP (it's not running?)");
 

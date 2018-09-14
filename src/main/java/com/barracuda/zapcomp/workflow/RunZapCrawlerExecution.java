@@ -33,7 +33,8 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
 
         this.listener.getLogger().println("zap-comp: Starting crawler on host " + zsp.getHost() + "...");
 
-        boolean success = ZapDriver.startZapCrawler(zsp.getHost());
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+        boolean success = zapDriver.startZapCrawler(zsp.getHost());
         if (!success) {
             System.out.println("zap-comp: Failed to start ZAP crawler on host " + zsp.getHost());
             getContext().onFailure(new Throwable("zap-comp: Failed ot start ZAP crawler on host " + zsp.getHost()));
@@ -41,16 +42,16 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
         }
 
         OffsetDateTime startedTime = OffsetDateTime.now();
-        int timeoutSeconds = ZapDriver.getZapTimeout();
+        int timeoutSeconds = zapDriver.getZapTimeout();
 
-        int status = ZapDriver.zapCrawlerStatus();
+        int status = zapDriver.zapCrawlerStatus();
         while (status < Constants.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
                 listener.getLogger().println("zap-comp: Crawler timed out before it could complete the scan");
                 break;
             }
 
-            status = ZapDriver.zapCrawlerStatus();
+            status = zapDriver.zapCrawlerStatus();
             listener.getLogger().println("zap-comp: Crawler progress is: " + status + "%");
 
             try {
@@ -73,24 +74,24 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
             try {
                 TimeUnit.SECONDS.sleep(Constants.ZAP_INITIALIZE_WAIT);
 
-                new Socket(ZapDriver.getZapHost(), ZapDriver.getZapPort());
-                listener.getLogger().println("zap-comp: ZAP successfully initialized on port " + ZapDriver.getZapPort());
+                new Socket(zapDriver.getZapHost(), zapDriver.getZapPort());
+                listener.getLogger().println("zap-comp: ZAP successfully initialized on port " + zapDriver.getZapPort());
                 zapHasStarted = true;
 
             } catch (IOException e) {
                 listener.getLogger().println("zap-comp: Waiting for ZAP to initialize...");
             } catch (InterruptedException e) {
                 listener.getLogger().println(
-                        "zap-comp: ZAP failed to initialize on host " + ZapDriver.getZapHost() + ":" + ZapDriver.getZapPort());
+                        "zap-comp: ZAP failed to initialize on host " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort());
                 break;
             }
 
         } while (!zapHasStarted);
 
         if (!zapHasStarted) {
-            System.out.println("zap-comp: Failed to start ZAP on port " + ZapDriver.getZapPort());
+            System.out.println("zap-comp: Failed to start ZAP on port " + zapDriver.getZapPort());
             getContext().onFailure(
-                    new Throwable("zap-comp: Failed to start ZAP on port " + ZapDriver.getZapPort() + ". Socket timed out"));
+                    new Throwable("zap-comp: Failed to start ZAP on port " + zapDriver.getZapPort() + ". Socket timed out"));
 
             return false;
         }
