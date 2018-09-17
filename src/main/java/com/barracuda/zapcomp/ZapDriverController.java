@@ -42,10 +42,13 @@ public class ZapDriverController {
         return driver;
     }
 
-    public static void shutdownZap(Run build){
-        getZapDriver(build).shutdownZap();
+    public static boolean zapDriverExists(Run build){
+        return zapDrivers.containsKey(build.getUrl());
+    }
 
+    public static boolean shutdownZap(Run build){
         zapDrivers.remove(build.getUrl());
+        return getZapDriver(build).shutdownZap();
     }
 
     // Converts map of parameters to URL parameters

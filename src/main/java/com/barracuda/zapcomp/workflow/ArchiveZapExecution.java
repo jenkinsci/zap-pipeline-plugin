@@ -18,32 +18,34 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
     @Override
     public boolean start() {
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+        if(ZapDriverController.zapDriverExists(this.build)){
+            ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
 
-        try {
-            ZapCompare zapCompare = new ZapCompare();
+            try {
+                ZapCompare zapCompare = new ZapCompare();
 
-            boolean archiveResult = zapCompare.archiveRawReport(this.build, this.listener);
-            if (!archiveResult) {
-                listener.getLogger().println("zap-comp: Failed to archive results");
-                getContext().onSuccess(true);
-                return true;
-            }
-
-            if (zapDriver.getFailBuild() > 0) {
-                if (zapCompare.hasNewCriticalAlerts(this.build, this.listener)) {
-                    listener.getLogger().println("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report");
-                    build.setResult(Result.FAILURE);
-                    getContext().onFailure(
-                            new Throwable("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report"));
-                    return false;
+                boolean archiveResult = zapCompare.archiveRawReport(this.build, this.listener);
+                if (!archiveResult) {
+                    listener.getLogger().println("zap-comp: Failed to archive results");
+                    getContext().onSuccess(true);
+                    return true;
                 }
-            }
-        } finally {
-            boolean success = zapDriver.shutdownZap();
-            if (!success)
-                listener.getLogger().println("zap-comp: Failed to shutdown ZAP (it's not running?)");
 
+                if (zapDriver.getFailBuild() > 0) {
+                    if (zapCompare.hasNewCriticalAlerts(this.build, this.listener)) {
+                        listener.getLogger().println("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report");
+                        build.setResult(Result.FAILURE);
+                        getContext().onFailure(
+                                new Throwable("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report"));
+                        return false;
+                    }
+                }
+            } finally {
+                boolean success = ZapDriverController.shutdownZap(this.build);
+                if (!success)
+                    listener.getLogger().println("zap-comp: Failed to shutdown ZAP (it's not running?)");
+
+            }
         }
 
         getContext().onSuccess(true);
