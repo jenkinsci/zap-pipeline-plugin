@@ -13,18 +13,21 @@ public class StartZapStep extends Step {
     /**
      * Called with startZap() in jenkinsfile
      *
-     * @param host         The host to run ZAP on - default localhost
-     * @param port         The port to run ZAP on - default 9092
-     * @param timeout      The amount of seconds to let the ZAP attack run for before it quits - default 1000
-     * @param failBuild    Fail the build if there is a new critical alert - default 0
-     * @param zapHome      Where the zap process is located - if not set this will not start ZAP (but still make calls if you're running it locally)
-     * @param allowedHosts The hosts to allow scans to begin on, if none are specified then it will run the attack locally only
-     * @param sessionPath  Optional path to the session file
+     * @param host             The host to run ZAP on - default localhost
+     * @param port             The port to run ZAP on - default 9092
+     * @param timeout          The amount of seconds to let the ZAP attack run for before it quits - default 1000
+     * @param failAllAlerts    Fail the build if there is a new critical alert - default 0
+     * @param failHighAlerts   Fail the build when there is more than x amount of HIGH risk alerts
+     * @param failMediumAlerts Fail the build when there is more than x amount of MEDIUM risk alerts
+     * @param failLowAlerts    Fail the build when there is more than x amount of LOW risk alerts
+     * @param zapHome          Where the zap process is located - if not set this will not start ZAP (but still make calls if you're running it locally)
+     * @param allowedHosts     The hosts to allow scans to begin on, if none are specified then it will run the attack locally only
+     * @param sessionPath      Optional path to the session file
      */
 
     @DataBoundConstructor
     public StartZapStep(@CheckForNull String host, int port, int timeout,
-                        int failBuild, String zapHome, List<String> allowedHosts, String sessionPath) {
+                        int failAllAlerts, int failHighAlerts, int failMediumAlerts, int failLowAlerts, String zapHome, List<String> allowedHosts, String sessionPath) {
         if (host == null)
             host = "localhost";
 
@@ -41,7 +44,7 @@ public class StartZapStep extends Step {
             allowedHosts = new ArrayList<>();
         }
 
-        this.zsp = new StartZapStepParameters(host, port, timeout, failBuild, zapHome, allowedHosts, sessionPath);
+        this.zsp = new StartZapStepParameters(host, port, timeout, failAllAlerts, failHighAlerts, failMediumAlerts, failLowAlerts, zapHome, allowedHosts, sessionPath);
     }
 
     @CheckForNull

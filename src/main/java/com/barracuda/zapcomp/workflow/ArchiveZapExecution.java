@@ -31,7 +31,8 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                     return true;
                 }
 
-                if (zapDriver.getFailBuild() > 0) {
+                // If any of the fail build parameters are set to a value more than 1
+                if (zapDriver.getFailBuild().values().stream().anyMatch(count -> count > 0)) {
                     if (zapCompare.hasNewCriticalAlerts(this.build, this.listener)) {
                         listener.getLogger().println("zap-comp: ZAP detected a new critical alert. Check the ZAP scanning report");
                         build.setResult(Result.FAILURE);

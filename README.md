@@ -48,12 +48,16 @@ This example is a declarative pipeline, but using the functions on a scripted pi
 ## API
 **startZap** - Starts the ZAP process and configures the plugin. 
 ```groovy
-startZap(host: 127.0.0.1, port: 9095, timeout: 900, failBuild:3, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'], sessionPath:"/path/to/session.session")
+startZap(host: 127.0.0.1, port: 9095, timeout: 900, failHighAlert:1, failLowAlert:10, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'], sessionPath:"/path/to/session.session")
 
 host: The host to run the ZAP proxy server on. Passed to ZAP in the -host parameter.
 port: The port to run the proxy on
 timeout (optional): If a scan takes too long it will stop
-failBuild (optional): If a new alert with a risk higher than this, the build will fail (0=Info, 1=Low, 2=Medium, 3=High, 4=None)
+failAllBuild (optional): Maximum amount of alerts that can happen in total before a build will fail
+failHighBuild (optional): Maximum amount of high risk alerts that can happen before a build will fail
+failMediumBuild (optional): Maximum amount of medium risk alerts that can happen before a build will fail
+failLowBuild (optional): Maximum amount of low risk alerts that can happen before a build will fail
+
 allowedHosts (optional): Once the active ZAP scan starts, it won't scan any hosts unless they are here. If you don't set this it will only scan if the host is localhost
 sessionPath (optional): If you want to load a previous ZAP session that you have expored, you can do that here. Useful when you want to run a scan but don't want to run all your tests through ZAP.
 ```
@@ -88,7 +92,7 @@ scanPolicyName (optional): The attack policy to use when running the scan. Loade
 ```
 <br>
 
-**archiveZap** - Reads the alerts found by ZAP, checks if there are any new alerts that are higher than the failBuild parameter (and fails the build if so), generates a report with differences, and finally shuts down ZAP. This should be the last thing you run.
+**archiveZap** - Reads the alerts found by ZAP, checks if there are any alerts that are higher than the fail build parameters (and fails the build if so), generates a report with differences, and finally shuts down ZAP. This should be the last thing you run.
 
 ```groovy
 archiveZap()

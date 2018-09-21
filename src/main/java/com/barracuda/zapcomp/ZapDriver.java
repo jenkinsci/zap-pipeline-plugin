@@ -19,8 +19,7 @@ public class ZapDriver {
     private String ZAP_HOST;
     private int ZAP_PORT;
     private int ZAP_TIMEOUT;
-    private int FAIL_BUILD;
-
+    private HashMap<Integer, Integer> FAIL_BUILD = new HashMap<>();
     private List<String> ALLOWED_HOSTS = new ArrayList<>();
     private final List<Integer> STARTED_SCANS = new ArrayList<>();
     private int crawlId;
@@ -284,6 +283,7 @@ public class ZapDriver {
         return totalProgress / (totalScans);
     }
 
+
     /**
      * Starts the ZAP process
      *
@@ -335,8 +335,11 @@ public class ZapDriver {
     public void setZapPort(int zapPort) {
         ZAP_PORT = zapPort;
     }
-    public void setFailBuild(int fail) {
-        FAIL_BUILD = fail;
+    public void setFailBuild(int all, int high, int med, int low) {
+        FAIL_BUILD.put(Constants.ALL_ALERT, all);
+        FAIL_BUILD.put(Constants.HIGH_ALERT, high);
+        FAIL_BUILD.put(Constants.MEDIUM_ALERT, med);
+        FAIL_BUILD.put(Constants.LOW_ALERT, low);
     }
     public void setZapTimeout(int timeout) {
         ZAP_TIMEOUT = timeout;
@@ -350,7 +353,7 @@ public class ZapDriver {
     public int getZapPort() {
         return ZAP_PORT;
     }
-    public int getFailBuild() {
+    public HashMap<Integer, Integer> getFailBuild() {
         return FAIL_BUILD;
     }
     public String getZapHost() {

@@ -16,6 +16,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.charset.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.*;
 import java.util.stream.*;
 
@@ -225,7 +226,7 @@ public class ZapCompare extends Recorder {
 
         ZapDriver zapDriver = ZapDriverController.getZapDriver(run);
 
-        JSONObject previousBuildReport = getSavedZapReport(zapDir, RAW_OLD_REPORT_FILENAME);
+        //JSONObject previousBuildReport = getSavedZapReport(zapDir, RAW_OLD_REPORT_FILENAME);
         JSONObject currentBuildReport = getSavedZapReport(zapDir, RAW_REPORT_FILENAME);
 
         // Get alerts in the new report
@@ -236,7 +237,34 @@ public class ZapCompare extends Recorder {
                 return false; // No sites in report? did ZAP run correctly?
 
             List<ZapAlert> currentBuildAlerts = zapReportToAlertList(sites);
+            Map<Integer, Integer> alertCounts = new HashMap<>();
 
+            // Count the number of alerts, {high:5, medium:1, low:2}
+            currentBuildAlerts.forEach(alert -> {
+                int riskCode = Integer.parseInt(alert.getRiskcode());
+                alertCounts.put(riskCode, alertCounts.containsKey(riskCode) ? alertCounts.get(riskCode) + 1 : 1);
+            });
+
+            // Total amount of alerts with a risk code more than 1 (.count returns a long)
+            alertCounts.put(Constants.ALL_ALERT,
+                    currentBuildAlerts.stream()
+                            .filter(alert -> Integer.parseInt(alert.getRiskcode()) > 0)
+                            .map(e -> 1)
+                            .reduce(0, Integer::sum)
+            );
+
+            AtomicBoolean hasNewCriticalAlerts = new AtomicBoolean(false);
+            // Compare the fail build parameter to the amount of alerts in a certain category
+            zapDriver.getFailBuild().forEach((code, val) -> {
+                if (val > 0 && alertCounts.get(code) >= val) {
+                    hasNewCriticalAlerts.set(true);
+                }
+            });
+
+
+            return hasNewCriticalAlerts.get();
+
+            /*
             // If the previous build report could not be found, check the current report for any alerts with critical alerts.
             if (previousBuildReport == null)
                 return currentBuildAlerts.stream()
@@ -250,9 +278,12 @@ public class ZapCompare extends Recorder {
 
             // Check all the new alerts for their risk codes and fail accordingly
             final List<ZapAlert> finalPreviousBuildAlerts = previousBuildAlerts;
+
             return currentBuildAlerts.stream()
                     .filter(newAlert -> finalPreviousBuildAlerts.stream().noneMatch(oldAlert -> oldAlert.equals(newAlert)))
                     .anyMatch(alert -> Integer.parseInt(alert.getRiskcode()) >= zapDriver.getFailBuild());
+            */
+
         } catch (NullPointerException e) {
             listener.getLogger().println("zap-comp: Could not determine weather build has new alerts.");
             return false;

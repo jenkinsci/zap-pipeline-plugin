@@ -46,10 +46,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-
-
         this.listener.getLogger().println("zap-comp: Starting ZAP on port " + zsp.getPort() + "...");
-
         if (zsp.getZapHome() == null || zsp.getZapHome().isEmpty()) {
             System.out.println("zap-comp: Did not start ZAP process because zapHome is not set");
             getContext().onSuccess(true);
@@ -62,23 +59,20 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         zapDriver.setZapHost(zsp.getHost());
         zapDriver.setZapPort(zsp.getPort());
         zapDriver.setZapTimeout(zsp.getTimeout());
-        zapDriver.setFailBuild(zsp.getFailBuild());
+        zapDriver.setFailBuild(zsp.getFailAllAlerts(), zsp.getFailHighAlerts(), zsp.getFailMediumAlerts(), zsp.getFailLowAlerts());
         zapDriver.setAllowedHosts(zsp.getAllowedHosts());
 
         boolean success = zapDriver.startZapProcess(zsp.getZapHome(), ws, launcher);
-
         if (!success) {
             System.out.println("zap-comp: Failed to start ZAP process");
             getContext().onFailure(new Throwable("zap-comp: Failed to start ZAP process"));
             return false;
         }
 
+        // Wait for ZAP to start before continuing...
         OffsetDateTime startedTime = OffsetDateTime.now();
         listener.getLogger().println("zap-comp: Waiting for ZAP to initialize...");
-
         boolean zapHasStarted = false;
-
-        // Wait for ZAP to start before continuing...
         do {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(Constants.ZAP_INITIALIZE_TIMEOUT))) {
                 listener.getLogger().println("zap-comp: ZAP failed to start. Socket timed out.");
