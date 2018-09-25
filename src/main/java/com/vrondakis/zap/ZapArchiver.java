@@ -1,30 +1,45 @@
-package com.barracuda.zapcomp;
+package com.vrondakis.zap;
 
-import com.google.gson.*;
-import com.google.gson.reflect.*;
-import com.mashape.unirest.http.*;
-import com.mashape.unirest.http.exceptions.*;
-import hudson.*;
-import hudson.model.*;
-import hudson.tasks.*;
-import jenkins.model.*;
-import net.sf.json.*;
-import org.apache.commons.io.*;
-
-import javax.annotation.*;
-import java.io.*;
-import java.net.*;
-import java.nio.charset.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.io.IOUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import hudson.FilePath;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+import hudson.tasks.BuildStepMonitor;
+import hudson.tasks.Recorder;
+import jenkins.model.Jenkins;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 /**
- * ZapCompare Main zap-comp class, handles report files &amp; compares reports
+ * ZapArchiver Main zap class, handles generating report.
  */
 
-public class ZapCompare extends Recorder {
+public class ZapArchiver extends Recorder {
     private static final String RAW_REPORT_FILENAME = "zap-raw.json";
     private static final String RAW_OLD_REPORT_FILENAME = "zap-raw-old.json";
 
@@ -37,9 +52,9 @@ public class ZapCompare extends Recorder {
     private boolean saveStaticFiles(@Nonnull Run<?, ?> run) {
         try {
             String indexName = "index.html";
-            String pluginName = "zap-comp";
+            String pluginName = "zap-jenkins-plugin";
             FilePath indexFile = new FilePath(new File(
-                    Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), indexName));
+                            Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), indexName));
             indexFile.copyTo(new FilePath(new File(run.getRootDir(), Constants.DIRECTORY_NAME + "/" + indexName)));
             return true;
         } catch (IOException | InterruptedException e) {
@@ -64,7 +79,7 @@ public class ZapCompare extends Recorder {
             System.out.println("Got the correct file path");
 
             URI uri = new URI("http", null, zapDriver.getZapHost(), zapDriver.getZapPort(), "/OTHER/core/other/jsonreport",
-                    "formMethod=GET", null);
+                            "formMethod=GET", null);
 
             InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
             System.out.println("the url is+ " + uri.toString());
@@ -82,7 +97,7 @@ public class ZapCompare extends Recorder {
     /**
      * Retrieves the previous report and copies it to the new build workspace
      *
-     * @param path    The path to save the old report
+     * @param path The path to save the old report
      * @param oldPath The path of the old report
      */
     private void savePreviousZapReport(File path, File oldPath) {
@@ -117,7 +132,7 @@ public class ZapCompare extends Recorder {
     /**
      * Gets the current builds saved ZAP report - used when comparing the report to the previous report
      *
-     * @param path     - The path of the current report
+     * @param path - The path of the current report
      * @param fileName - The filename of the report, eg zap-report.json
      * @return The JSONObject of the report
      */
@@ -135,10 +150,8 @@ public class ZapCompare extends Recorder {
      */
     private Optional<File> getPreviousReportDir(Run<?, ?> run) {
 
-        File zapBuildDir = getBuildDir(run.getPreviousBuild())
-                .orElseGet(() -> getBuildDir(run.getPreviousBuiltBuild())
+        File zapBuildDir = getBuildDir(run.getPreviousBuild()).orElseGet(() -> getBuildDir(run.getPreviousBuiltBuild())
                         .orElseGet(() -> getBuildDir(run.getPreviousSuccessfulBuild()).orElse(null)));
-
 
         return Optional.ofNullable(zapBuildDir);
     }
@@ -156,7 +169,7 @@ public class ZapCompare extends Recorder {
     /**
      * Archives the current raw ZAP JSON report &amp; saves static files
      *
-     * @param run          - The current build
+     * @param run - The current build
      * @param taskListener - Logging
      * @return If it was a success or not
      */
@@ -166,8 +179,8 @@ public class ZapCompare extends Recorder {
         if (!zapDir.exists()) {
             boolean mResult = zapDir.mkdir();
             if (!mResult) {
-                taskListener.getLogger().println(
-                        "zap-comp: Could not create directory at " + zapDir.toURI().toString() + " (archiveRawReport)");
+                taskListener.getLogger()
+                                .println("zap: Could not create directory at " + zapDir.toURI().toString() + " (archiveRawReport)");
                 return false;
             }
         }
@@ -205,28 +218,27 @@ public class ZapCompare extends Recorder {
 
         // Converts all the alerts in the site array into ZapAlerts and adds them to the alerts
         Function<JSONObject, Stream<? extends ZapAlert>> alerts = site -> ((ArrayList<ZapAlert>) new Gson()
-                .fromJson(site.getJSONArray("alerts").toString(), new TypeToken<List<ZapAlert>>() {
-                }.getType())).stream();
+                        .fromJson(site.getJSONArray("alerts").toString(), new TypeToken<List<ZapAlert>>() {
+                        }.getType())).stream();
 
         return sites.stream().map(site -> (JSONObject) site).flatMap(alerts).collect(Collectors.toList());
     }
 
     /**
-     * Checks 2 reports and checks if the newest has any new critical alerts, only run if failBuild is set to true in the parameters
-     * of archiveZap
+     * Review the report, and fail the build according to given fail build parameters
      *
-     * @param run      - The current build
+     * @param run - The current build
      * @param listener - Logging
-     * @return If it has new critical alerts or not
+     * @return If the build should be failed
      */
-    public boolean hasNewCriticalAlerts(Run<?, ?> run, TaskListener listener) {
-        listener.getLogger().println("zap-comp: Checking results...");
+    public boolean shouldFailBuild(Run<?, ?> run, TaskListener listener) {
+        listener.getLogger().println("zap: Checking results...");
 
         File zapDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
 
         ZapDriver zapDriver = ZapDriverController.getZapDriver(run);
 
-        //JSONObject previousBuildReport = getSavedZapReport(zapDir, RAW_OLD_REPORT_FILENAME);
+        // JSONObject previousBuildReport = getSavedZapReport(zapDir, RAW_OLD_REPORT_FILENAME);
         JSONObject currentBuildReport = getSavedZapReport(zapDir, RAW_REPORT_FILENAME);
 
         // Get alerts in the new report
@@ -239,53 +251,28 @@ public class ZapCompare extends Recorder {
             List<ZapAlert> currentBuildAlerts = zapReportToAlertList(sites);
             Map<Integer, Integer> alertCounts = new HashMap<>();
 
-            // Count the number of alerts, {high:5, medium:1, low:2}
+            // Count the number of alerts
             currentBuildAlerts.forEach(alert -> {
                 int riskCode = Integer.parseInt(alert.getRiskcode());
                 alertCounts.put(riskCode, alertCounts.containsKey(riskCode) ? alertCounts.get(riskCode) + 1 : 1);
             });
 
-            // Total amount of alerts with a risk code more than 1 (.count returns a long)
+            // Total amount of alerts with a risk code more than 1
             alertCounts.put(Constants.ALL_ALERT,
-                    currentBuildAlerts.stream()
-                            .filter(alert -> Integer.parseInt(alert.getRiskcode()) > 0)
-                            .map(e -> 1)
-                            .reduce(0, Integer::sum)
-            );
+                (int) currentBuildAlerts.stream().filter(alert -> Integer.parseInt(alert.getRiskcode()) > 0).count());
 
-            AtomicBoolean hasNewCriticalAlerts = new AtomicBoolean(false);
+            AtomicBoolean failBuild = new AtomicBoolean(false);
             // Compare the fail build parameter to the amount of alerts in a certain category
             zapDriver.getFailBuild().forEach((code, val) -> {
                 if (val > 0 && alertCounts.get(code) >= val) {
-                    hasNewCriticalAlerts.set(true);
+                    failBuild.set(true);
                 }
             });
 
-
-            return hasNewCriticalAlerts.get();
-
-            /*
-            // If the previous build report could not be found, check the current report for any alerts with critical alerts.
-            if (previousBuildReport == null)
-                return currentBuildAlerts.stream()
-                        .anyMatch(newAlert -> Integer.parseInt(newAlert.getRiskcode()) >= zapDriver.getFailBuild());
-
-            Object previousBuildSites = previousBuildReport.get(jsonSiteName);
-            List<ZapAlert> previousBuildAlerts = new ArrayList<>();
-            if (previousBuildSites != null) {
-                previousBuildAlerts = zapReportToAlertList(previousBuildSites);
-            }
-
-            // Check all the new alerts for their risk codes and fail accordingly
-            final List<ZapAlert> finalPreviousBuildAlerts = previousBuildAlerts;
-
-            return currentBuildAlerts.stream()
-                    .filter(newAlert -> finalPreviousBuildAlerts.stream().noneMatch(oldAlert -> oldAlert.equals(newAlert)))
-                    .anyMatch(alert -> Integer.parseInt(alert.getRiskcode()) >= zapDriver.getFailBuild());
-            */
+            return failBuild.get();
 
         } catch (NullPointerException e) {
-            listener.getLogger().println("zap-comp: Could not determine weather build has new alerts.");
+            listener.getLogger().println("zap: Could not determine weather build has new alerts.");
             return false;
         }
     }

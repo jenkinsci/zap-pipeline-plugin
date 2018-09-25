@@ -1,19 +1,26 @@
-package com.barracuda.zapcomp;
+package com.vrondakis.zap;
 
-import hudson.*;
-import hudson.model.*;
-import jenkins.tasks.*;
-import org.kohsuke.stapler.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.Collections;
 
-import javax.servlet.*;
-import java.io.*;
-import java.util.*;
+import javax.servlet.ServletException;
+
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+
+import hudson.FilePath;
+import hudson.model.Action;
+import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Run;
+import jenkins.tasks.SimpleBuildStep;
 
 /**
- * Zap build action
- * Sets up the sidebar Jenkins buttons
+ * Zap build action Sets up the sidebar Jenkins buttons
  */
-
 
 public abstract class ZapBuildAction implements Action, SimpleBuildStep.LastBuildAction {
     private final Run<?, ?> run;
@@ -27,7 +34,7 @@ public abstract class ZapBuildAction implements Action, SimpleBuildStep.LastBuil
     }
 
     public String getIconFileName() {
-        return "/plugin/zap-comp/logo.png";
+        return "/plugin/zap-jenkins-plugin/logo.png";
     }
 
     public String getDisplayName() {
@@ -43,7 +50,7 @@ public abstract class ZapBuildAction implements Action, SimpleBuildStep.LastBuil
         System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", ""); // Allow JS scripts to be run (content security policy)
 
         DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(this.dir()), this.getTitle(),
-                "/plugin/zap-comp/logo.png", false);
+                        "/plugin/zap-jenkins-plugin/logo.png", false);
 
         if (req.getRestOfPath().equals("")) {
             File file = new File(run.getRootDir(), "zap/index.html");

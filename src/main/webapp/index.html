@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
 	<title>ZAP Scanning Report</title>
-	<link href="/plugin/zap-comp/normalize.css" rel="stylesheet">
-	<link href="/plugin/zap-comp/skeleton.css" rel="stylesheet">
-	<link href="/plugin/zap-comp/main.css" rel="stylesheet">
+	<link href="/plugin/zap-jenkins-plugin/normalize.css" rel="stylesheet">
+	<link href="/plugin/zap-jenkins-plugin/skeleton.css" rel="stylesheet">
+	<link href="/plugin/zap-jenkins-plugin/main.css" rel="stylesheet">
 
-	<script src="/plugin/zap-comp/angular.min.js"></script>
-	<script src="/plugin/zap-comp/main.js"></script>
+	<script src="/plugin/zap-jenkins-plugin/angular.min.js"></script>
+	<script src="/plugin/zap-jenkins-plugin/main.js"></script>
 
 </head>
 <body data-ng-app="zap" data-ng-controller="mainController" data-ng-init="load()">
 
 	<div class="navbar">
 		<div class="navbar-container">
-			<a data-ng-click="goBack()"><img alt="Back" src="/plugin/zap-comp/back.png"></a>
+			<a data-ng-click="goBack()"><img alt="Back" src="/plugin/zap-jenkins-plugin/back.png"></a>
 		</div>
 	</div>
 	
@@ -34,7 +34,7 @@
 			</div>
 			<div class="four columns">
 
-				<h3><span class="medium circle"></span> {{counts.medium}}</h3>
+				<h3><span class="medium circle"></span> {{counts.medium}} </h3>
 				<h5>Medium risk</h5>
 
 			</div>
@@ -76,8 +76,8 @@ Param: {{instance.param}}</code>
 			</div>
 		</div>
 
-		<div class="row center header">
-			<a class="button" data-ng-click="loadAll()" data-ng-if="!showAll">Load all alerts for this build</a>
+		<div class="row center header" data-ng-if="suppressedAlerts.length > 0">
+			<a class="button" data-ng-click="loadAll()" data-ng-if="!showAll">Show suppressed alerts for this build</a>
 		</div>
 	</div>
 </body>

@@ -6,11 +6,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-
                 <configuration>
                     <source>8</source>
                     <target>8</target>
-
                     <compilerArgs>
                         <arg>-verbose</arg>
                         <arg>-Xlint:unchecked</arg>
@@ -25,16 +23,16 @@
         <version>3.4</version>
         <relativePath />
     </parent>
-    <groupId>io.jenkins.plugins</groupId>
-    <artifactId>zap-comp</artifactId>
-    <version>1.0</version>
+    <groupId>com.vrondakis.zap</groupId>
+    <artifactId>zap-jenkins-plugin</artifactId>
+    <version>1.3.0</version>
     <packaging>hpi</packaging>
     <properties>
         <jenkins.version>2.7.3</jenkins.version>
         <java.level>8</java.level>
         <workflow.version>2.16</workflow.version>
     </properties>
-    <name>Zap Compare</name>
+    <name>Zap Jenkins Plugin</name>
     <description>Runs zap, listens to tests, produces report</description>
     <licenses>
         <license>
@@ -51,7 +49,6 @@
     </scm>
     -->
 
-
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
@@ -65,7 +62,6 @@
             <url>http://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-
 
     <dependencies>
         <dependency>
@@ -86,10 +82,5 @@
             <artifactId>gson</artifactId>
             <version>2.8.5</version>
         </dependency>
-
-
-
     </dependencies>
-
-
 </project>

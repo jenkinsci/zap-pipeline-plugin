@@ -1,4 +1,4 @@
-package com.barracuda.zapcomp;
+package com.vrondakis.zap;
 
 public class Constants {
     public static final int COMPLETED_PERCENTAGE = 100;

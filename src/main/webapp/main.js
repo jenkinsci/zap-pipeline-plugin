@@ -1,25 +1,17 @@
-var rawNewJson = {}
-var rawOldJson = {}
-
-var currentBuildParsed;
-var lastBuild;
-var addWarning = () => {
-}
-
-
-var error = false
-
 // Converts the build report to an easier format
-var parseRawBuild = function(build){
+var parseRawBuild = function(build) {
 	var alerts = []
 
 	// If there is only one site, it's put into build.site by zap, otherwise [build.site]
-	if (!Array.isArray(build.site)) { build.site = [build.site] }
-    	build.site.forEach(function(data){
-		if (data && data.alerts && data.alerts.length != 0){
+	if (!Array.isArray(build.site)) {
+	 	build.site = [build.site]
+	}
+
+	build.site.forEach(function(data) {
+		if (data && data.alerts && data.alerts.length != 0) {
 			data.alerts.forEach((alert) => {
 				
-				var alert_ = {
+				var alertReformatted = {
 					alert:alert.alert,
 					confidence: alert.confidence,
 					riskCode: alert.riskcode,
@@ -30,8 +22,7 @@ var parseRawBuild = function(build){
 				}
 
 				alert.instances.forEach((instance) => {
-	
-					alert_.instances.push({
+					alertReformatted.instances.push({
 						uri: instance.uri,
 						method: instance.method,
 						param: instance.param,
@@ -39,166 +30,127 @@ var parseRawBuild = function(build){
 					})                    
 				})
 
-				alerts.push(alert_)
+				alerts.push(alertReformatted)
 			})
 		}
 	})
+
+    //Sort alerts into risk order (highest first)
+	alerts.sort((a, b) => {
+		return a.riskCode > b.riskCode ? -1 : (a.riskCode < b.riskCode ? 1 : 0)
+	})
+	
 	return alerts
 }
 
-var getNew = function(){
-	var currentBuildParsed = parseRawBuild(rawNewJson)
+// Formats a string of the totalcounts, with new/fixed counts
+var formatCountString = function(totalCounts, newCounts, fixedCounts) {
+	if (newCounts > 0 && fixedCounts > 0)
+		return totalCounts + " (+" + newCounts +  ", -" + fixedCounts + ")"
 
-	if (rawOldJson){
-		var newAlerts = []
-		var newAlertInstances = []
+	if (newCounts > 0)
+		return totalCounts + " (+" + newCounts + ")"
 
-		var lastBuild = parseRawBuild(rawOldJson)
-		currentBuildParsed.forEach((alert) => {
+	if (fixedCounts > 0)
+		return totalCounts + " (-" + fixedCounts + ")"
 
-			var foundAlert = false
-			lastBuild.forEach((oldAlert) => {
-				if (oldAlert.wascid == alert.wascid && oldAlert.alert == alert.alert && !alert.done && !oldAlert.done){
-					alert.done = true;
-					oldAlert.done = true;
-
-					foundAlert = true
-
-					alert.instances.forEach((instance) => {
-						var newInstance = true
-						oldAlert.instances.forEach((lastInstance) => {
-
-							if (instance.uri.split("?")[0] == lastInstance.uri.split("?")[0]){
-								newInstance = false
-			
-							}
-						})
-
-						if (newInstance){
-							if (!newAlertInstances[alert.uri]){
-								newAlertInstances[alert.uri] = angular.copy(alert)
-								newAlertInstances[alert.uri].instances = []
-								newAlertInstances[alert.uri].hasNewInstances = true
-							}
-
-							newAlertInstances[alert.uri].instances.push(instance)
-						}
-					})
-				}
-			})
-
-			if (!foundAlert){
-				alert.isNew = true
-				newAlerts.push(alert)
-			}
-		})
-
-		newAlertInstances = Object.values(newAlertInstances)
-		var res = newAlerts.concat(newAlertInstances)
-
-        if (res.length<=0 && !error){
-            addWarning("No new alerts for this build.", "success")
-        }
-
-		return res
-	} else{
-		return currentBuildParsed
-	}
+	return totalCounts + " (0)"
 }
 
-
+// Main App
 var App = angular.module("zap", [])
-App.controller('mainController', function($scope, $rootScope, $http, $window){
+App.controller('mainController', function($scope, $rootScope, $http, $window) {
 
+	// Initialise variables
 	$scope.counts = {
-		high: 0,
-		medium: 0,
-		low: 0
+		high : "0 (0)",
+		medium : "0 (0)",
+		low : "0 (0)"
 	}
-
+	$scope.alerts = []
+	$scope.suppressedAlerts = []
+	$scope.currentAlerts = []
+	$scope.previousAlerts = []
+	$scope.colors = ['low-alert', 'medium-alert', 'high-alert']
 	$scope.warnings = []
+	$scope.showAll = false
+	$scope.currentBuild = {}
+	$scope.lastBuild = {}
+
 	$scope.addWarning = (warning, type) => {
 	    $scope.warnings.push({warning:warning, type:type})
 	}
 
-	addWarning = $scope.addWarning;
+	$scope.goBack = () => {
+	    $window.history.back();
+	}
 
+	$scope.updateCounts = () => {
+		highTotal = 0
+		medTotal = 0
+		lowTotal = 0
 
-	$scope.colors = ['low-alert', 'medium-alert', 'high-alert']
-	$scope.alerts = []
-
-	$scope.parseAlerts = () => {
-		Object.keys($scope.counts).forEach((k) => { $scope.counts[k] = 0})
-
-		$scope.alerts.sort((a, b) => {
-			return a.riskCode > b.riskCode ? -1 : (a.riskCode < b.riskCode ? 1 : 0)
-		})
-
-
-		$scope.alerts.forEach((data) => {
+		$scope.currentAlerts.forEach((data) => {
 		    data.showInstances = true
 
-			switch(data.riskCode){
+			switch(data.riskCode) {
 				case "3":
-					$scope.counts.high++;
+					highTotal += data.instances.length;
 					break;
 				case "2":
-					$scope.counts.medium++;
+					medTotal += data.instances.length;
 					break;
 				case "1":
-					$scope.counts.low++;
+					lowTotal += data.instances.length;
 					break;
 			}
 		})
+
+		$scope.counts.high = formatCountString(highTotal, 0, 0)
+		$scope.counts.medium = formatCountString(medTotal, 0, 0)
+		$scope.counts.low = formatCountString(lowTotal, 0, 0)
 	}
 
 	$scope.load = () => {
-
 	    $http({
 	        method: 'get',
 	        url: "zap-raw.json",
-
 	    }).then((data, status) => {
 	        if (data && (data.status==200 || data.status==304) && data.data){
-	            rawNewJson = data.data;
+	            $scope.currentBuild = data.data;
 	        }
-
 	        return $http({
 	            method: 'get',
 	            url: "zap-raw-old.json"
 	         })
-
 	    }).then((data, status) => {
 	        if (data && (data.status==200 || data.status==304) && data.data){
-	            rawOldJson = data.data;
+	            $scope.lastBuild = data.data;
 	        }
-
 	        return true
 	    }).catch((e) => {
             $scope.addWarning("Could not retrieve previous build report. All alerts are shown.", "failure")
             $scope.showAll = true
             error = true
 	    }).finally(() => {
-		    $scope.alerts = getNew();
-		    $scope.parseAlerts();
+		    $scope.currentAlerts = parseRawBuild($scope.currentBuild);
+		    $scope.alerts = $scope.currentAlerts;
+		    $scope.previousAlerts = parseRawBuild($scope.lastBuild);
+		    $scope.updateCounts();
 	    })
 	}
 
-	$scope.showAll = false
 	$scope.loadAll = () => {
 	    $scope.warnings = []
-		$scope.alerts = parseRawBuild(rawNewJson)
 		$scope.showAll = true
-
-		$scope.parseAlerts();
+		$scope.alerts = $scope.currentAlerts + $scope.previousAlerts
+		$scope.alerts.sort((a, b) => {
+			return a.riskCode > b.riskCode ? -1 : (a.riskCode < b.riskCode ? 1 : 0)
+		});
 
 		if ($scope.alerts.length <= 0){
 		    $scope.addWarning("No alerts for this build", "success")
 		}
-	}
-
-	$scope.goBack = () => {
-	    $window.history.back();
 	}
 
 }).filter('to_trusted', ['$sce', function($sce){

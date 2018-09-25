@@ -1,10 +1,10 @@
-package com.barracuda.zapcomp;
-
-import hudson.model.Run;
+package com.vrondakis.zap;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import hudson.model.Run;
 
 /**
  * ZapDriver Controls ZAP using HTTP api
@@ -27,26 +27,26 @@ public class ZapDriverController {
 
     private static HashMap<String, ZapDriver> zapDrivers = new HashMap<>();
 
-    public static ZapDriver getZapDriver(Run build){
+    public static ZapDriver getZapDriver(Run build) {
         ZapDriver driver = zapDrivers.get(build.getUrl());
-        if(driver != null)
+        if (driver != null)
             return driver;
 
         return newDriver(build);
     }
 
-    public static ZapDriver newDriver(Run build){
+    public static ZapDriver newDriver(Run build) {
         ZapDriver driver = new ZapDriver();
         zapDrivers.put(build.getUrl(), driver);
 
         return driver;
     }
 
-    public static boolean zapDriverExists(Run build){
+    public static boolean zapDriverExists(Run build) {
         return zapDrivers.containsKey(build.getUrl());
     }
 
-    public static boolean shutdownZap(Run build){
+    public static boolean shutdownZap(Run build) {
         boolean success = getZapDriver(build).shutdownZap();
         zapDrivers.remove(build.getUrl());
 

@@ -1,41 +1,43 @@
-package com.barracuda.zapcomp.workflow;
+package com.vrondakis.zap.workflow;
 
-import com.barracuda.zapcomp.*;
-import hudson.model.*;
-import org.jenkinsci.plugins.workflow.steps.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
 
-import java.io.*;
-import java.time.*;
-import java.util.concurrent.*;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+
+import com.vrondakis.zap.Constants;
+import com.vrondakis.zap.ZapDriver;
+import com.vrondakis.zap.ZapDriverController;
 
 /**
  * Executor for zapAttack() function in jenkinsfile
  */
 public class RunZapAttackExecution extends DefaultStepExecutionImpl {
-    private RunZapAttackStep step;
+    private RunZapAttackStepParameters runZapAttackStepParameters;
 
-    public RunZapAttackExecution(StepContext context, RunZapAttackStep step) {
+    public RunZapAttackExecution(StepContext context, RunZapAttackStepParameters runZapAttackStepParameters) {
         super(context);
-        this.step = step;
+        this.runZapAttackStepParameters = runZapAttackStepParameters;
     }
 
     @Override
     public boolean start() {
-        listener.getLogger().println("zap-comp: Starting attack...");
+        listener.getLogger().println("zap: Starting attack...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
         boolean changeModeSuccess = zapDriver.setZapMode("attack");
         if (!changeModeSuccess) {
-            listener.getLogger().println("zap-comp: Failed to switch to attack mode");
+            listener.getLogger().println("zap: Failed to switch to attack mode");
             getContext().onSuccess(false);
             return false;
         }
 
-        listener.getLogger().println("zap-comp: Set mode to attack mode");
+        listener.getLogger().println("zap: Set mode to attack mode");
 
-        RunZapAttackStepParameters zsp = step.getParameters();
-        boolean startAttackSuccess = zapDriver.zapAttack(zsp);
+        boolean startAttackSuccess = zapDriver.zapAttack(runZapAttackStepParameters);
         if (!startAttackSuccess) {
-            listener.getLogger().println("zap-comp: Failed to start attack");
+            listener.getLogger().println("zap: Failed to start attack");
             getContext().onSuccess(false);
             return false;
         }
@@ -47,15 +49,16 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
 
         while (status < Constants.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
-                listener.getLogger().println("zap-comp: Scan timed out before it could complete");
+                listener.getLogger().println("zap: Scan timed out before it could complete");
                 break;
             }
 
             status = zapDriver.zapAttackStatus();
-            listener.getLogger().println("zap-comp: Scan progress is: " + status + "%");
+            listener.getLogger().println("zap: Scan progress is: " + status + "%");
 
             try {
-                // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause when the scan is complete
+                // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
+                // when the scan is complete
                 if (status != Constants.COMPLETED_PERCENTAGE)
                     TimeUnit.SECONDS.sleep(Constants.SCAN_SLEEP);
             } catch (InterruptedException e) {

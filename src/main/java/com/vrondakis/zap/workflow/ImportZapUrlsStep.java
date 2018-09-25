@@ -1,30 +1,25 @@
-package com.barracuda.zapcomp.workflow;
+package com.vrondakis.zap.workflow;
 
-import hudson.Extension;
+import javax.annotation.CheckForNull;
+
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import javax.annotation.CheckForNull;
-
+import hudson.Extension;
 
 public class ImportZapUrlsStep extends Step {
-    private final ImportZapUrlsStepParameters zsp;
+    private final ImportZapUrlsStepParameters importZapUrlsStepParameters;
 
     @DataBoundConstructor
     public ImportZapUrlsStep(@CheckForNull String path) {
-        this.zsp = new ImportZapUrlsStepParameters(path);
-    }
-
-    @CheckForNull
-    public ImportZapUrlsStepParameters getParameters() {
-        return zsp;
+        this.importZapUrlsStepParameters = new ImportZapUrlsStepParameters(path);
     }
 
     @Override
     public StepExecution start(StepContext context) {
-        return new ImportZapUrlsExecution(context, this);
+        return new ImportZapUrlsExecution(context, importZapUrlsStepParameters);
     }
 
     @Extension

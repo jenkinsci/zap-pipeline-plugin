@@ -1,12 +1,11 @@
-package com.barracuda.zapcomp;
-
-import hudson.model.Run;
+package com.vrondakis.zap;
 
 import java.io.File;
 
+import hudson.model.Run;
+
 /**
- * ZapAction
- * Used by jenkins to add the sidebar button
+ * ZapAction Used by jenkins to add the sidebar button
  */
 public class ZapAction extends ZapBuildAction {
     private final Run<?, ?> build;
