@@ -82,7 +82,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
 	}
 
 	$scope.goBack = () => {
-	    $window.history.back();
+	    $window.history.back()
 	}
 
 	$scope.updateCounts = () => {
@@ -95,14 +95,14 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
 
 			switch(data.riskCode) {
 				case "3":
-					highTotal += data.instances.length;
-					break;
+					highTotal += data.instances.length
+					break
 				case "2":
-					medTotal += data.instances.length;
-					break;
+					medTotal += data.instances.length
+					break
 				case "1":
-					lowTotal += data.instances.length;
-					break;
+					lowTotal += data.instances.length
+					break
 			}
 		})
 
@@ -117,7 +117,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
 	        url: "zap-raw.json",
 	    }).then((data, status) => {
 	        if (data && (data.status==200 || data.status==304) && data.data){
-	            $scope.currentBuild = data.data;
+	            $scope.currentBuild = data.data
 	        }
 	        return $http({
 	            method: 'get',
@@ -125,18 +125,14 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
 	         })
 	    }).then((data, status) => {
 	        if (data && (data.status==200 || data.status==304) && data.data){
-	            $scope.lastBuild = data.data;
+	            $scope.lastBuild = data.data
 	        }
 	        return true
-	    }).catch((e) => {
-            $scope.addWarning("Could not retrieve previous build report. All alerts are shown.", "failure")
-            $scope.showAll = true
-            error = true
 	    }).finally(() => {
-		    $scope.currentAlerts = parseRawBuild($scope.currentBuild);
-		    $scope.alerts = $scope.currentAlerts;
-		    $scope.previousAlerts = parseRawBuild($scope.lastBuild);
-		    $scope.updateCounts();
+		    $scope.currentAlerts = parseRawBuild($scope.currentBuild)
+		    $scope.alerts = $scope.currentAlerts
+		    $scope.previousAlerts = parseRawBuild($scope.lastBuild)
+		    $scope.updateCounts()
 	    })
 	}
 
@@ -146,7 +142,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
 		$scope.alerts = $scope.currentAlerts + $scope.previousAlerts
 		$scope.alerts.sort((a, b) => {
 			return a.riskCode > b.riskCode ? -1 : (a.riskCode < b.riskCode ? 1 : 0)
-		});
+		})
 
 		if ($scope.alerts.length <= 0){
 		    $scope.addWarning("No alerts for this build", "success")
@@ -155,6 +151,6 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
 
 }).filter('to_trusted', ['$sce', function($sce){
     return function(text) {
-    	return $sce.trustAsHtml(text);
-    };
-}]);
+    	return $sce.trustAsHtml(text)
+    }
+}])
