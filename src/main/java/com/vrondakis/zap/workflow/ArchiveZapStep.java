@@ -21,7 +21,7 @@ public class ArchiveZapStep extends Step implements Serializable {
      * @param failMediumAlerts Fail the run when there is x or more of MEDIUM risk alerts - default 0 (disabled)
      * @param failLowAlerts Fail the run when there is more x or more LOW risk alerts - default 0 (disabled)
      * @param falsePositivesFilePath File name and path (relative to workspace) to the falsePositives config file - default
-     *        "falsePositives.zap"
+     *        "zapfalsePositives.json"
      */
     @DataBoundConstructor
     public ArchiveZapStep(Integer failAllAlerts, Integer failHighAlerts, Integer failMediumAlerts, Integer failLowAlerts,

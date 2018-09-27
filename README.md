@@ -35,7 +35,7 @@ pipeline {
     post {
         always {
             script {
-                archiveZap()
+                archiveZap(failAllAlerts: 1, failHighAlerts: 0, failMediumAlerts: 0, failLowAlerts: 0, falsePositivesFilePath: "zapFalsePositives.json")
             }
         }
     }
@@ -92,7 +92,7 @@ scanPolicyName (optional): The attack policy to use when running the scan. Loade
 ```
 <br>
 
-**archiveZap** - Reads the alerts found by ZAP, checks if there are any alerts that are higher than the fail build parameters (and fails the build if so), generates a report with differences, and finally shuts down ZAP. This should be the last thing you run.
+**archiveZap** - Reads the alerts found by ZAP, filters out any false positives if a false positives file is provided in the project, checks if there are any alerts that are higher than the fail build parameters (and fails the build if so), generates a report with differences, and finally shuts down ZAP. This should be the last thing you run.
 
 ```groovy
 archiveZap()

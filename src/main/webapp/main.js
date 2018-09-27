@@ -148,6 +148,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
                             lowTotal += 1
                             break
                     }
+                    //TODO: implement changes total
                 } else {
                     suppressedCount += 1
                 }
