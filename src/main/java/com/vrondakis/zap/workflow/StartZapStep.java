@@ -1,6 +1,5 @@
 package com.vrondakis.zap.workflow;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -33,7 +32,7 @@ public class StartZapStep extends Step {
     }
 
     @Override
-    public StepExecution start(StepContext context) throws IOException, InterruptedException {
+    public StepExecution start(StepContext context) {
         return new StartZapExecution(context, zapStepParameters);
     }
 

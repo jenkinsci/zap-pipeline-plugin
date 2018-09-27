@@ -22,39 +22,39 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
     @Override
     public boolean start() {
-        if (ZapDriverController.zapDriverExists(this.build)) {
-            ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+        listener.getLogger().println("zap: Archiving results");
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
 
-            zapDriver.setFailBuild(archiveZapStepParameters.getFailAllAlerts(), archiveZapStepParameters.getFailHighAlerts(),
-                archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
+        zapDriver.setFailBuild(archiveZapStepParameters.getFailAllAlerts(), archiveZapStepParameters.getFailHighAlerts(),
+            archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
 
-            try {
-                ZapArchiver zapArchiver = new ZapArchiver();
+        try {
+            ZapArchiver zapArchiver = new ZapArchiver();
 
-                boolean archiveResult = zapArchiver.archiveRawReport(this.build, this.listener);
-                if (!archiveResult) {
-                    listener.getLogger().println("zap: Failed to archive results");
-                    getContext().onSuccess(true);
-                    return true;
-                }
-
-                // If any of the fail build parameters are set to a value more than 1
-                if (zapDriver.getFailBuild().values().stream().anyMatch(count -> count > 0)) {
-                    if (zapArchiver.shouldFailBuild(this.build, this.listener)) {
-                        listener.getLogger().println(
-                            "zap: Number of detected ZAP alerts is too high, failing build. Check the ZAP scanning report");
-                        build.setResult(Result.FAILURE);
-                        getContext().onFailure(new Throwable(
-                                        "zap: Number of detected ZAP alerts is too high, failing build. Check the ZAP scanning report"));
-                        return false;
-                    }
-                }
-            } finally {
-                boolean success = ZapDriverController.shutdownZap(this.build);
-                if (!success)
-                    listener.getLogger().println("zap: Failed to shutdown ZAP (it's not running?)");
-
+            boolean archiveResult = zapArchiver.archiveRawReport(this.run, this.workspace, this.listener,
+                archiveZapStepParameters.getFalsePositivesFilePath());
+            if (!archiveResult) {
+                listener.getLogger().println("zap: Failed to archive results");
+                getContext().onSuccess(true);
+                return true;
             }
+
+            // If any of the fail run parameters are set to a value more than 1
+            if (zapDriver.getFailBuild().values().stream().anyMatch(count -> count > 0)) {
+                if (zapArchiver.shouldFailBuild(this.run, this.listener)) {
+                    listener.getLogger().println(
+                        "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report");
+                    run.setResult(Result.FAILURE);
+                    getContext().onFailure(new Throwable(
+                                    "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report"));
+                    return false;
+                }
+            }
+
+        } finally {
+            boolean success = ZapDriverController.shutdownZap(this.run);
+            if (!success)
+                listener.getLogger().println("zap: Failed to shutdown ZAP (it's not running?)");
         }
 
         getContext().onSuccess(true);

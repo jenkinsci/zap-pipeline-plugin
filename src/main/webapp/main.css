@@ -29,6 +29,10 @@ html{
 	background-color:rgb(74, 144, 226);
 }
 
+.suppressed{
+	background-color:rgb(128, 128, 128);
+}
+
 .circle{
   height: 25px;
   width: 25px;
@@ -36,7 +40,6 @@ html{
   border-radius: 50%;
   display: inline-block;
 }
-
 
 .logo{
 	width:100px;
@@ -58,7 +61,7 @@ a:hover{
 }
 
 .alerts pre{
-	margin-top:0;
+	margin: 0;
 }
 
 .alerts h6{
@@ -68,7 +71,6 @@ a:hover{
 .alerts h5{
 	margin-bottom:10px;
 }
-
 
 .alert{
 	padding:20px;
@@ -88,12 +90,10 @@ a:hover{
 	padding-right: 30px;
 }
 
-
 .navbar-container{
     padding-left:30px;
     padding-right:30px;
 }
-
 
 .navbar img{
 	height:32px;
@@ -101,11 +101,6 @@ a:hover{
 	margin-top:8px;
 	margin-left:8px;
 }
-
-pre > code{
-	white-space:pre-wrap;
-}
-
 
 pre{
 	display:flex;
@@ -168,6 +163,14 @@ code, pre{
     width:100px;
 }
 
+.button.button-instance-action {
+    height:24px;
+    line-height:24px;
+    transition: background-color 0.5s ease;
+    float:left;
+    margin-right: 5px;
+}
+
 .button.button-warning{
     color:#fff;
     background:#f5a623;
@@ -191,4 +194,19 @@ code, pre{
 
 .button.failure{
     background:#d54c53
+}
+
+.instance-code {
+	overflow-x : auto;
+}
+
+.instance-actions {
+	width : 100%;
+	padding-top : 5px;
+	display : inline-block;
+}
+
+.generated-short {
+	max-height : 50px;
+	overflow-y: hidden;
 }

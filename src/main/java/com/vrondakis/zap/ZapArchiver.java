@@ -7,14 +7,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
@@ -42,6 +40,9 @@ import net.sf.json.JSONObject;
 public class ZapArchiver extends Recorder {
     private static final String RAW_REPORT_FILENAME = "zap-raw.json";
     private static final String RAW_OLD_REPORT_FILENAME = "zap-raw-old.json";
+    private static final String FALSE_POSITIVES_FILENAME = "zap-false-positives.json";
+    private static final String JSON_SITE_KEY = "site";
+    private static final String JSON_ALERTS_KEY = "alerts";
 
     /**
      * Saves index.html to the current build archive
@@ -68,10 +69,10 @@ public class ZapArchiver extends Recorder {
      * @param path - Where to save the file
      * @return If it saved successfully or not
      */
-    private boolean saveZapReport(File path, Run build) {
+    private boolean saveZapReport(File path, Run run) {
         System.out.println("Running saveZapReport()...");
         try {
-            ZapDriver zapDriver = ZapDriverController.getZapDriver(build);
+            ZapDriver zapDriver = ZapDriverController.getZapDriver(run);
             FilePath fp = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME));
             if (zapDriver.getZapHost() == null || zapDriver.getZapPort() == 0)
                 return false;
@@ -95,7 +96,7 @@ public class ZapArchiver extends Recorder {
     }
 
     /**
-     * Retrieves the previous report and copies it to the new build workspace
+     * Retrieves the previous report and copies it to the new build
      *
      * @param path The path to save the old report
      * @param oldPath The path of the old report
@@ -114,38 +115,93 @@ public class ZapArchiver extends Recorder {
     }
 
     /**
-     * Helper function to open report file & parse the JSON
+     * Retrieves the false positives file (if available) from the workspace and saves it to the build
      *
-     * @param path - The path of the report
-     * @return The JSONObject of the report or null
+     * @param falsePositivesFilePath the relative path to the false positives file
+     * @param workspace the workspace for the running build
+     * @param taskListener
      */
-    private JSONObject openReportFile(FilePath path) {
+    private void saveFalsePositives(String falsePositivesFilePath, FilePath workspace, @Nonnull TaskListener taskListener,
+                                    File savePath) {
         try {
-            String report = path.readToString();
-
-            return JSONObject.fromObject(report);
-        } catch (IOException | InterruptedException | JSONException e) {
-            return null;
+            if (workspace != null) {
+                System.out.println("Zap searching for false positives file in workspace: " + workspace.getName());
+                FilePath[] falsePositivesFiles = workspace.list(falsePositivesFilePath);
+                if (falsePositivesFiles.length > 0) {
+                    if (falsePositivesFiles.length > 1) {
+                        taskListener.getLogger()
+                                        .println("zap: More than one file matched the provided false positives file path. Using: '"
+                                                        + falsePositivesFiles[0].getName() + "'.");
+                    }
+                    System.out.println("Zap found false positives file:" + falsePositivesFiles[0].getName());
+                    System.out.println(
+                        "Zap saving false positives file to:" + savePath.toString() + "/" + FALSE_POSITIVES_FILENAME);
+                    FilePath saveAsFile = new FilePath(new File(savePath.toString() + "/" + FALSE_POSITIVES_FILENAME));
+                    falsePositivesFiles[0].copyTo(saveAsFile);
+                }
+                System.out.println("Zap finished saving false positives file");
+            } else {
+                taskListener.getLogger().println(
+                    "zap: Failed to access workspace for false positives file, it may be on a non-connected slave. False positives will not be suppressed.");
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            taskListener.getLogger()
+                            .println("zap: Failed to do archive false positives file. False positives will not be suppressed");
         }
     }
 
     /**
-     * Gets the current builds saved ZAP report - used when comparing the report to the previous report
+     * Helper function to open report file & parse the JSON
      *
-     * @param path - The path of the current report
-     * @param fileName - The filename of the report, eg zap-report.json
-     * @return The JSONObject of the report
+     * @param path - The path of the report
+     * @return The list of Zap Alerts from the JSON
      */
-    private JSONObject getSavedZapReport(File path, String fileName) {
+    private List<ZapAlert> getAlertsFromReportFile(FilePath path) {
+        try {
+            JSONObject report = JSONObject.fromObject(path.readToString());
+
+            // Zap returns either an array of sites, or a single site as an object. Attempt to load as an array, then
+            // fall back to object on fail
+            JSONArray sites;
+            try {
+                sites = report.getJSONArray(JSON_SITE_KEY);
+            } catch (JSONException e) {
+                sites = new JSONArray();
+                sites.add(report.getJSONObject(JSON_SITE_KEY));
+            }
+
+            // Iterate over all sites, and flatten alerts down to a single array
+            List<ZapAlert> alerts = new ArrayList<>();
+            for (Object site : sites) {
+                String alertArrayString = JSONObject.fromObject(site).getJSONArray(JSON_ALERTS_KEY).toString();
+                List<ZapAlert> siteAlerts = new Gson().fromJson(alertArrayString, new TypeToken<List<ZapAlert>>() {
+                }.getType());
+                alerts.addAll(siteAlerts);
+            }
+            return alerts;
+        } catch (IOException | InterruptedException | JSONException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * Gets all the ZapAlerts saved in a ZAP report file
+     *
+     * @param path - The path of the report
+     * @param fileName - The filename of the report, eg zap-report.json
+     * @return List of all the {@code ZapAlert}s from the report
+     */
+    private List<ZapAlert> getSavedZapReport(File path, String fileName) {
         FilePath fp = new FilePath(new File(path.toString() + "/" + fileName));
-        return openReportFile(fp);
+        return getAlertsFromReportFile(fp);
     }
 
     /**
      * Gets the report of the last build, if it is not available try the previous built build, and if that isn't available get the
      * last successful build.
      *
-     * @param run The build
+     * @param run The run
      * @return The file path of the last available report, null if none are found
      */
     private Optional<File> getPreviousReportDir(Run<?, ?> run) {
@@ -156,9 +212,27 @@ public class ZapArchiver extends Recorder {
         return Optional.ofNullable(zapBuildDir);
     }
 
-    private Optional<File> getBuildDir(Run<?, ?> build) {
-        if (build != null) {
-            File buildDir = new File(build.getRootDir(), Constants.DIRECTORY_NAME);
+    /**
+     * Gets the current builds false positives from a saved file
+     *
+     * @param path - The path of the saved false positives file
+     * @param fileName - The filename of the false positives file
+     * @return List of each false positive detailed in the file
+     */
+    private List<ZapFalsePositiveInstance> getSavedFalsePositives(File path, String fileName) {
+        FilePath filePath = new FilePath(new File(path.toString() + "/" + fileName));
+        try {
+            String fileContents = filePath.readToString();
+            return new Gson().fromJson(fileContents, new TypeToken<List<ZapFalsePositiveInstance>>() {
+            }.getType());
+        } catch (IOException | InterruptedException | JSONException e) {
+            return Collections.emptyList();
+        }
+    }
+
+    private Optional<File> getBuildDir(Run<?, ?> run) {
+        if (run != null) {
+            File buildDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
             if (buildDir.exists())
                 return Optional.of(buildDir);
         }
@@ -169,11 +243,12 @@ public class ZapArchiver extends Recorder {
     /**
      * Archives the current raw ZAP JSON report &amp; saves static files
      *
-     * @param run - The current build
+     * @param run - The current run
      * @param taskListener - Logging
      * @return If it was a success or not
      */
-    public boolean archiveRawReport(@Nonnull Run<?, ?> run, @Nonnull TaskListener taskListener) {
+    public boolean archiveRawReport(@Nonnull Run<?, ?> run, @Nonnull FilePath workspace, @Nonnull TaskListener taskListener,
+                                    String falsePositivesFilePath) {
         File zapDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
 
         if (!zapDir.exists()) {
@@ -185,94 +260,75 @@ public class ZapArchiver extends Recorder {
             }
         }
 
+        // Fetches the JSON report from ZAP and saves it
+        if (!saveZapReport(zapDir, run))
+            return false;
+
+        // Saves index.html file
+        if (!saveStaticFiles(run))
+            return false;
+
         // Adds the sidebar menu UI button
         ZapAction action = new ZapAction(run);
         run.addAction(action);
 
-        // Fetches the JSON report from ZAP and saves it
-        if (!saveZapReport(zapDir, run))
-            return false;
+        // Fetches the false positives file (if it exists) and saves it
+        saveFalsePositives(falsePositivesFilePath, workspace, taskListener, zapDir);
 
         // Saves the report of the previous build in the current builds workspace
         Optional<File> oldBuildZapDir = getPreviousReportDir(run);
         oldBuildZapDir.ifPresent(file -> savePreviousZapReport(zapDir, file));
 
-        // Saves index.html file
-        return saveStaticFiles(run);
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<ZapAlert> zapReportToAlertList(Object report) {
-        JSONArray sites;
-
-        // ZAP returns [{site}, {site}] if there are multiple sites, and just {site} if there is one (not an array with one
-        // element);
-        if (report instanceof JSONArray) {
-            sites = (JSONArray) report;
-        } else {
-            sites = new JSONArray();
-            sites.add(report);
-        }
-        System.out.println("sites are this:");
-        System.out.println(sites.toString());
-
-        // Converts all the alerts in the site array into ZapAlerts and adds them to the alerts
-        Function<JSONObject, Stream<? extends ZapAlert>> alerts = site -> ((ArrayList<ZapAlert>) new Gson()
-                        .fromJson(site.getJSONArray("alerts").toString(), new TypeToken<List<ZapAlert>>() {
-                        }.getType())).stream();
-
-        return sites.stream().map(site -> (JSONObject) site).flatMap(alerts).collect(Collectors.toList());
+        return true;
     }
 
     /**
      * Review the report, and fail the build according to given fail build parameters
      *
-     * @param run - The current build
+     * @param run - The current run
      * @param listener - Logging
      * @return If the build should be failed
      */
     public boolean shouldFailBuild(Run<?, ?> run, TaskListener listener) {
         listener.getLogger().println("zap: Checking results...");
-
-        File zapDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
-
         ZapDriver zapDriver = ZapDriverController.getZapDriver(run);
 
-        // JSONObject previousBuildReport = getSavedZapReport(zapDir, RAW_OLD_REPORT_FILENAME);
-        JSONObject currentBuildReport = getSavedZapReport(zapDir, RAW_REPORT_FILENAME);
-
-        // Get alerts in the new report
-        String jsonSiteName = "site";
         try {
-            Object sites = currentBuildReport.get(jsonSiteName);
-            if (sites == null)
-                return false; // No sites in report? did ZAP run correctly?
-
-            List<ZapAlert> currentBuildAlerts = zapReportToAlertList(sites);
+            // Collect the alerts and false positives associated with this build
+            System.out.println("Zap collecting current build and false positives");
+            File zapDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
+            List<ZapAlert> currentBuildAlerts = getSavedZapReport(zapDir, RAW_REPORT_FILENAME);
+            List<ZapFalsePositiveInstance> zapFalsePositiveInstances = getSavedFalsePositives(zapDir, FALSE_POSITIVES_FILENAME);
             Map<Integer, Integer> alertCounts = new HashMap<>();
 
-            // Count the number of alerts
+            // Count the number of alert instances (filtering out false positives)
+            System.out.println("Zap filtering alerts for false positives");
             currentBuildAlerts.forEach(alert -> {
                 int riskCode = Integer.parseInt(alert.getRiskcode());
-                alertCounts.put(riskCode, alertCounts.containsKey(riskCode) ? alertCounts.get(riskCode) + 1 : 1);
+                int filteredInstancesCount = alert.getFalsePositivesFilteredInstances(zapFalsePositiveInstances).size();
+                int newCount = alertCounts.containsKey(riskCode) ? alertCounts.get(riskCode) + filteredInstancesCount
+                                : filteredInstancesCount;
+                alertCounts.put(riskCode, newCount);
             });
 
-            // Total amount of alerts with a risk code more than 1
+            // Total amount of alert instances with a risk code more than 1
+            System.out.println("Zap counting total alerts");
             alertCounts.put(Constants.ALL_ALERT,
                 (int) currentBuildAlerts.stream().filter(alert -> Integer.parseInt(alert.getRiskcode()) > 0).count());
 
-            AtomicBoolean failBuild = new AtomicBoolean(false);
             // Compare the fail build parameter to the amount of alerts in a certain category
+            System.out.println("Zap counting alerts by risk level");
+            AtomicBoolean failBuild = new AtomicBoolean(false);
             zapDriver.getFailBuild().forEach((code, val) -> {
                 if (val > 0 && alertCounts.get(code) >= val) {
                     failBuild.set(true);
                 }
             });
-
+            System.out.println("Zap build fail status: " + failBuild.get());
             return failBuild.get();
 
         } catch (NullPointerException e) {
-            listener.getLogger().println("zap: Could not determine weather build has new alerts.");
+            listener.getLogger().println("zap: Could not determine whether the build has new alerts.");
             return false;
         }
     }

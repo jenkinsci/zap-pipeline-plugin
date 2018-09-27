@@ -8,20 +8,20 @@ import hudson.model.Run;
  * ZapAction Used by jenkins to add the sidebar button
  */
 public class ZapAction extends ZapBuildAction {
-    private final Run<?, ?> build;
+    private final Run<?, ?> run;
 
-    public ZapAction(Run<?, ?> build) {
-        super(build);
-        this.build = build;
+    public ZapAction(Run<?, ?> run) {
+        super(run);
+        this.run = run;
     }
 
     @Override
     protected String getTitle() {
-        return this.build.getDisplayName();
+        return this.run.getDisplayName();
     }
 
     @Override
     protected File dir() {
-        return new File(build.getRootDir(), Constants.DIRECTORY_NAME);
+        return new File(run.getRootDir(), Constants.DIRECTORY_NAME);
     }
 }

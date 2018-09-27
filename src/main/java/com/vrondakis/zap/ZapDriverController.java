@@ -27,28 +27,28 @@ public class ZapDriverController {
 
     private static HashMap<String, ZapDriver> zapDrivers = new HashMap<>();
 
-    public static ZapDriver getZapDriver(Run build) {
-        ZapDriver driver = zapDrivers.get(build.getUrl());
+    public static ZapDriver getZapDriver(Run run) {
+        ZapDriver driver = zapDrivers.get(run.getUrl());
         if (driver != null)
             return driver;
 
-        return newDriver(build);
+        return newDriver(run);
     }
 
-    public static ZapDriver newDriver(Run build) {
+    public static ZapDriver newDriver(Run run) {
         ZapDriver driver = new ZapDriver();
-        zapDrivers.put(build.getUrl(), driver);
+        zapDrivers.put(run.getUrl(), driver);
 
         return driver;
     }
 
-    public static boolean zapDriverExists(Run build) {
-        return zapDrivers.containsKey(build.getUrl());
+    public static boolean zapDriverExists(Run run) {
+        return zapDrivers.containsKey(run.getUrl());
     }
 
-    public static boolean shutdownZap(Run build) {
-        boolean success = getZapDriver(build).shutdownZap();
-        zapDrivers.remove(build.getUrl());
+    public static boolean shutdownZap(Run run) {
+        boolean success = getZapDriver(run).shutdownZap();
+        zapDrivers.remove(run.getUrl());
 
         return success;
     }

@@ -3,6 +3,7 @@ package com.vrondakis.zap;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -18,6 +19,7 @@ public class ZapAlert implements Serializable {
     private String riskcode;
     private String confidence;
     private String sourceid;
+    private String cweid;
     private String wascid;
     private List<ZapAlertInstance> instances;
 
@@ -65,6 +67,13 @@ public class ZapAlert implements Serializable {
         return instances;
     }
 
+    public List<ZapAlertInstance> getFalsePositivesFilteredInstances(List<ZapFalsePositiveInstance> falsePositives) {
+        return instances.stream()
+                        .filter(
+                            instance -> !falsePositives.stream().anyMatch(falsePositive -> falsePositive.matches(this, instance)))
+                        .collect(Collectors.toList());
+    }
+
     public void setInstances(List<ZapAlertInstance> instances) {
         this.instances = instances;
     }
@@ -75,6 +84,14 @@ public class ZapAlert implements Serializable {
 
     public void setSourceid(String sourceid) {
         this.sourceid = sourceid;
+    }
+
+    public String getCweid() {
+        return cweid;
+    }
+
+    public void setCweid(String cweid) {
+        this.cweid = cweid;
     }
 
     public String getWascid() {

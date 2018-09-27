@@ -29,10 +29,10 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
     @Override
     public boolean start() {
         if (node.getNodeName().isEmpty()) {
-            launcher = new Launcher.LocalLauncher(listener, ws.getChannel());
+            launcher = new Launcher.LocalLauncher(listener, workspace.getChannel());
         } else {
             try {
-                launcher = new Launcher.RemoteLauncher(listener, ws.getChannel(), node.toComputer().isUnix());
+                launcher = new Launcher.RemoteLauncher(listener, workspace.getChannel(), node.toComputer().isUnix());
             } catch (NullPointerException e) {
                 this.listener.getLogger().println("zap: Could not start ZAP. Failed to retrieve OS information");
                 getContext().onSuccess(false);
@@ -53,7 +53,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return true;
         }
 
-        ZapDriver zapDriver = ZapDriverController.newDriver(this.build);
+        ZapDriver zapDriver = ZapDriverController.newDriver(this.run);
 
         // Set ZAP properties
         zapDriver.setZapHost(zapStepParameters.getHost());
@@ -61,7 +61,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         zapDriver.setZapTimeout(zapStepParameters.getTimeout());
         zapDriver.setAllowedHosts(zapStepParameters.getAllowedHosts());
 
-        boolean success = zapDriver.startZapProcess(zapStepParameters.getZapHome(), ws, launcher);
+        boolean success = zapDriver.startZapProcess(zapStepParameters.getZapHome(), workspace, launcher);
         if (!success) {
             System.out.println("zap: Failed to start ZAP process");
             getContext().onFailure(new Throwable("zap: Failed to start ZAP process"));

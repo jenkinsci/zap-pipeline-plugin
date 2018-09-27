@@ -25,7 +25,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
     @Override
     public boolean start() {
         listener.getLogger().println("zap: Starting attack...");
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
         boolean changeModeSuccess = zapDriver.setZapMode("attack");
         if (!changeModeSuccess) {
             listener.getLogger().println("zap: Failed to switch to attack mode");
@@ -62,7 +62,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
                 if (status != Constants.COMPLETED_PERCENTAGE)
                     TimeUnit.SECONDS.sleep(Constants.SCAN_SLEEP);
             } catch (InterruptedException e) {
-                // Usually if the Jenkins build is stopped
+                // Usually if the Jenkins run is stopped
             }
         }
 

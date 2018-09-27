@@ -34,7 +34,7 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
 
         this.listener.getLogger().println("zap: Starting crawler on host " + runZapCrawlerParameters.getHost() + "...");
 
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.build);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
         boolean success = zapDriver.startZapCrawler(runZapCrawlerParameters.getHost());
         if (!success) {
             System.out.println("zap: Failed to start ZAP crawler on host " + runZapCrawlerParameters.getHost());
@@ -61,7 +61,7 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
                 if (status != Constants.COMPLETED_PERCENTAGE)
                     TimeUnit.SECONDS.sleep(Constants.SCAN_SLEEP);
             } catch (InterruptedException e) {
-                // Usually if Jenkins build is stopped
+                // Usually if Jenkins run is stopped
             }
         }
 
