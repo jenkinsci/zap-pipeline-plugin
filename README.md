@@ -142,7 +142,7 @@ To aid the generation of a False Positives file, the UI report provides a 'Copy 
 -----
 
 ## Installation
-Download the latest release from the [releases](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases) section. Move the .hpi file into your Jenkins plugin directory - eg /var/lib/jenkins/plugins/
+Download the latest release from the [releases](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases) section. In Jenkins, go to 'Manage Jenkins' -> 'Manage Plugins', and select the 'Advanced' tab. Then under 'Upload Plugin', choose the download hpi file and click upload.
 
 -----
 
