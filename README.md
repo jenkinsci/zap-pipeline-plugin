@@ -114,6 +114,31 @@ By default Java will not proxy localhost, 127.0.0.1, or any common loopback addr
 
 -----
 
+## Generating Zap False Positives file
+You can provide a JSON file of false positive definitions from your workspace to the zap plugin during the archive step (default is 'zapFalsePositives.json'). The file must consist of a single valid JSON array of 'False Positive' objects. Example:
+
+```json
+[
+  {
+    "name": "Cross Site Scripting (Reflected)",
+    "cweid": "79",
+    "wascid": "8",
+    "uri": "https://yourdomain.com/a/certain/url",
+    "method": "POST",
+    "param": "param1",
+    "attack": "<script>alert(1);</script>",
+    "evidence": "<script>alert(1);</script>"
+  },
+  {
+    "uri": "https://yourdomain.com/another/url",
+    "method": "GET"
+  }
+]
+```
+All alert instances that match to a 'False Positive' object are ignored when judging whether to fail a build, and are initially hidden in the UI report. A match is when ALL fields provided in the False Positive object are equal to that in a given alert instance. It is best practice to be as specific as possible (to not hide future true positives that may occur). To aid the generation of a False Positives file, the UI report provides a 'Copy To Clipboard' button under each instance, that copies a json object representation of the alert instance to your clipboard which can be used as a 'False Positive' object.
+
+-----
+
 ## Installation
 Download the latest release from the [releases](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases) section. Move the .hpi file into your Jenkins plugin directory - eg /var/lib/jenkins/plugins/
 

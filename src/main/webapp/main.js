@@ -84,6 +84,18 @@ var setSuppressionFlags = function(alerts, falsePositives) {
     })
 }
 
+// Compares two alerts to check if they are the same
+var alertsAreEqual = function(alert1, alert2) {
+    return alert1.name === alert2.name && alert1.cweid === alert2.cweid && alert1.wascid === alert2.wascid &&
+           alert1.riskCode === alert2.riskCode
+}
+
+// Compares two instances to check if they are the same
+var instancesAreEqual = function(instance1, instance2) {
+    return instance1.uri === instance2.uri && instance1.method === instance2.method &&
+           instance1.param === instance2.param
+}
+
 // Formats a string of the totalcounts, with new/fixed counts
 var formatCountString = function(totalCounts, newCounts, fixedCounts) {
 	if (newCounts > 0 && fixedCounts > 0)
@@ -127,37 +139,95 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
 
 	$scope.updateCounts = (countSuppressed) => {
 		var highTotal = 0
+		var highNew = 0
+		var highFixed = 0
 		var medTotal = 0
+		var medNew = 0
+		var medFixed = 0
 		var lowTotal = 0
+		var lowNew = 0
+		var lowFixed = 0
 		var suppressedCount = 0
+        var previousAlerts = angular.copy($scope.previousAlerts)
 
+        // Loop over all alerts
 		$scope.currentAlerts.forEach(alert => {
 		    alert.showInstances = true
-		    alert.instances.forEach(instance => {
-                instance.showMore = false
+		    // Get any matching previous alert, and remove from array
+		    var prevAlertIndex = previousAlerts.findIndex(prevAlert => alertsAreEqual(prevAlert, alert))
+            var prevAlert = undefined
+            if(prevAlertIndex >= 0) {
+                prevAlert = previousAlerts.splice(prevAlertIndex, 1)[0]
+            }
 
+            // Loop over all instances in current alert
+		    alert.instances.forEach(instance => {
+		        // Find matching previous instance (if there is one) and remove it, and set newAlert flag
+                var prevInstanceIndex = prevAlert ? prevAlert.instances.findIndex(
+                        prevInstance => instancesAreEqual(prevInstance, instance)
+                    ) : -1
+                if (prevInstanceIndex >= 0) {
+                    prevAlert.instances.splice(prevInstanceIndex, 1)
+                }
+                instance.showMore = false
+                instance.newAlert = prevInstanceIndex === -1
+
+                // Increment risk-based counters
                 if (!instance.suppressed) {
                     switch(alert.riskCode) {
                         case "3":
                             highTotal += 1
+                            highNew += instance.newAlert ? 1 : 0
                             break
                         case "2":
                             medTotal += 1
+                            medNew += instance.newAlert ? 1 : 0
                             break
                         case "1":
                             lowTotal += 1
+                            lowNew += instance.newAlert ? 1 : 0
                             break
                     }
-                    //TODO: implement changes total
                 } else {
                     suppressedCount += 1
                 }
 		    })
+
+		    // Add any remaining instances in previous alert to risk-based counters
+		    if (prevAlert) {
+                switch(prevAlert.riskCode) {
+                    case "3":
+                        highFixed += prevAlert.instances.length || 0
+                        break
+                    case "2":
+                        medFixed += prevAlert.instances.length || 0
+                        break
+                    case "1":
+                        lowFixed += prevAlert.instances.length || 0
+                        break
+                }
+            }
 		})
 
-		$scope.counts.high = formatCountString(highTotal, 0, 0)
-		$scope.counts.medium = formatCountString(medTotal, 0, 0)
-		$scope.counts.low = formatCountString(lowTotal, 0, 0)
+		// Loop over any remaining previous alerts, and add to risk based counters
+		previousAlerts.forEach(prevAlert => {
+            switch(prevAlert.riskCode) {
+                case "3":
+                    highFixed += prevAlert.instances.length || 0
+                    break
+                case "2":
+                    medFixed += prevAlert.instances.length || 0
+                    break
+                case "1":
+                    lowFixed += prevAlert.instances.length || 0
+                    break
+            }
+		})
+
+        // Format and set counts
+		$scope.counts.high = formatCountString(highTotal, highNew, highFixed)
+		$scope.counts.medium = formatCountString(medTotal, medNew, medFixed)
+		$scope.counts.low = formatCountString(lowTotal, lowNew, lowFixed)
 		$scope.counts.suppressed = suppressedCount
 	}
 
