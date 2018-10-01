@@ -92,10 +92,10 @@ scanPolicyName (optional): The attack policy to use when running the scan. Loade
 ```
 <br>
 
-**archiveZap** - Reads the alerts found by ZAP, filters out any false positives if a false positives file is provided in the project, checks if there are any alerts that are higher than the fail build parameters (and fails the build if so), generates a report with differences, and finally shuts down ZAP. This should be the last thing you run.
+**archiveZap** - Reads the alerts found by ZAP, filters out any false positives if a false positives file is provided in the project, checks if there are any alerts that are higher than the fail build parameters (and fails the build if so), generates a report, and finally shuts down ZAP. This should be the last thing you run.
 
 ```groovy
-archiveZap()
+archiveZap(failAllAlerts: 1, failHighAlerts: 0, failMediumAlerts: 0, failLowAlerts: 0, falsePositivesFilePath: "zapFalsePositives.json")
 ```
 
 -----
@@ -110,7 +110,7 @@ You may need to exclude some hosts from the proxy. If so use the -Dhttp.nonProxy
 -----
 
 ## Proxying localhost
-By default Java will not proxy localhost, 127.0.0.1, or any common loopback addresses. There is no way to disable this unless you set -Dhttp.nonProxyHosts= (empty). This means it's impossible to proxy just localhost without editing project code. You can mitigate this by changing your applications host to localhost.localdomain, which isn't checked by Java 
+By default Java will not proxy localhost, 127.0.0.1, or any common loopback addresses. There is no way to disable this unless you set -Dhttp.nonProxyHosts= (empty). This means it's impossible to proxy just localhost without editing project code. You can mitigate this by changing your applications host to localhost.localdomain, which isn't checked by Java (NOTE: not all OS's have this hostname as a loopback address by default, you may need to add it to your machine's 'hosts' file).
 
 -----
 
@@ -135,7 +135,9 @@ You can provide a JSON file of false positive definitions from your workspace to
   }
 ]
 ```
-All alert instances that match to a 'False Positive' object are ignored when judging whether to fail a build, and are initially hidden in the UI report. A match is when ALL fields provided in the False Positive object are equal to that in a given alert instance. It is best practice to be as specific as possible (to not hide future true positives that may occur). To aid the generation of a False Positives file, the UI report provides a 'Copy To Clipboard' button under each instance, that copies a json object representation of the alert instance to your clipboard which can be used as a 'False Positive' object.
+All alert instances that match to a 'False Positive' object are ignored when judging whether to fail a build, and are initially hidden in the UI report. A match is when ALL fields provided in the False Positive object are equal to that in a given alert instance. It is best practice to be as specific as possible (to not hide future true positives that may occur).
+
+To aid the generation of a False Positives file, the UI report provides a 'Copy To Clipboard' button under each instance, that copies a json object representation of the alert instance to your clipboard which can be used as a 'False Positive' object.
 
 -----
 
