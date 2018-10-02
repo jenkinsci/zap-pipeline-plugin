@@ -6,6 +6,9 @@ var ZAP_FALSE_POSITIVES = "zap-false-positives.json"
 var parseRawBuild = function(build) {
 	var alerts = []
 
+	if (!build || !build.site)
+		return alerts
+
 	// If there is only one site, it's put into build.site by zap, otherwise [build.site]
 	if (!Array.isArray(build.site)) {
 	 	build.site = [build.site]
@@ -14,7 +17,7 @@ var parseRawBuild = function(build) {
 	build.site.forEach(function(data) {
 		if (data && data.alerts && data.alerts.length != 0) {
 			data.alerts.forEach((alert) => {
-				
+
 				var alertReformatted = {
 					alert:alert.alert,
 					name:alert.name,
@@ -118,13 +121,14 @@ App.controller('mainController', function($scope, $rootScope, $http, $window, $q
 	$scope.counts = {
 		high : "0 (0)",
 		medium : "0 (0)",
-		low : "0 (0)"
+		low : "0 (0)",
+		suppressed : 0
 	}
 	$scope.alerts = []
 	$scope.suppressedAlerts = []
-	$scope.currentAlerts = []
-	$scope.previousAlerts = []
-	$scope.falsePositives = []
+	$scope.currentAlerts = null
+	$scope.previousAlerts = null
+	$scope.falsePositives = null
 	$scope.colors = ['low-alert', 'medium-alert', 'high-alert']
 	$scope.warnings = []
 	$scope.showAll = false
@@ -231,38 +235,45 @@ App.controller('mainController', function($scope, $rootScope, $http, $window, $q
 		$scope.counts.suppressed = suppressedCount
 	}
 
+	$scope.updateData = () => {
+		if ($scope.currentAlerts && $scope.falsePositives && $scope.previousAlerts) {
+	        setSuppressionFlags($scope.currentAlerts, $scope.falsePositives)
+	        $scope.updateCounts()
+	        $scope.showTrueAlerts()
+		}
+	}
+
     // Loads current build, previous build and false positives
 	$scope.load = () => {
-		var loadCurrentBuild = $http({
-	            method: 'get',
-	            url: ZAP_RAW_BUILD,
-	        }).then((response, status) => {
-	            if (response && (response.status==200 || response.status==304) && response.data){
-	                $scope.currentAlerts = parseRawBuild(response.data)
-	            }
-	        })
-        var loadLastBuild = $http({
-                method: 'get',
-                url: ZAP_LAST_RAW_BUILD
-            }).then((response, status) => {
-                if (response && (response.status==200 || response.status==304) && response.data){
-                    $scope.previousAlerts = parseRawBuild(response.data)
-                }
-            })
-        var loadFalsePositives = $http({
-                    method: 'get',
-                    url: ZAP_FALSE_POSITIVES
-                }).then((response, status) => {
-                    if (response && (response.status==200 || response.status==304) && response.data){
-                        $scope.falsePositives = response.data
-                    }
-                })
+		// Collect current build data
+		$http({
+            method: 'get',
+            url: ZAP_RAW_BUILD,
+        }).success(data => {
+            $scope.currentAlerts = parseRawBuild(data)
+        }).error(() => {
+        	$scope.currentAlerts = []
+        }).finally($scope.updateData)
 
-        $q.all([loadCurrentBuild, loadLastBuild, loadFalsePositives]).finally(() => {
-		        setSuppressionFlags($scope.currentAlerts, $scope.falsePositives)
-		        $scope.updateCounts()
-		        $scope.showTrueAlerts()
-		    })
+        // Collect last build data
+        $http({
+            method: 'get',
+            url: ZAP_LAST_RAW_BUILD
+        }).success(data => {
+            $scope.previousAlerts = parseRawBuild(data)
+        }).error(() => {
+        	$scope.previousAlerts = []
+        }).finally($scope.updateData)
+
+        // Collect false positives file
+        $http({
+            method: 'get',
+            url: ZAP_FALSE_POSITIVES
+        }).success(data => {
+            $scope.falsePositives = data || []
+        }).error(() => {
+        	$scope.falsePositives = []
+        }).finally($scope.updateData)
 	}
 
 	$scope.showAllAlerts = () => {
@@ -286,9 +297,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window, $q
 
 		if ($scope.currentAlerts.length <= 0 ){
 		    $scope.addWarning("No alerts for this build", "success")
-		}
-
-		if ($scope.alerts.length <= 0 ){
+		} else if ($scope.alerts.length <= 0 ){
 		    $scope.addWarning("No alerts for this build (false positives hidden).", "success")
 		}
 	}
