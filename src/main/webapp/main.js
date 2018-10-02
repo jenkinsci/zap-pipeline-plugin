@@ -112,7 +112,7 @@ var formatCountString = function(totalCounts, newCounts, fixedCounts) {
 
 // Main App
 var App = angular.module("zap", [])
-App.controller('mainController', function($scope, $rootScope, $http, $window) {
+App.controller('mainController', function($scope, $rootScope, $http, $window, $q) {
 
 	// Initialise variables
 	$scope.counts = {
@@ -233,36 +233,36 @@ App.controller('mainController', function($scope, $rootScope, $http, $window) {
 
     // Loads current build, previous build and false positives
 	$scope.load = () => {
-        $http({
-            method: 'get',
-            url: ZAP_RAW_BUILD,
-        }).then((response, status) => {
-            if (response && (response.status==200 || response.status==304) && response.data){
-                $scope.currentAlerts = parseRawBuild(response.data)
-            }
-        }).finally(
-            $http({
+		var loadCurrentBuild = $http({
+	            method: 'get',
+	            url: ZAP_RAW_BUILD,
+	        }).then((response, status) => {
+	            if (response && (response.status==200 || response.status==304) && response.data){
+	                $scope.currentAlerts = parseRawBuild(response.data)
+	            }
+	        })
+        var loadLastBuild = $http({
                 method: 'get',
                 url: ZAP_LAST_RAW_BUILD
             }).then((response, status) => {
                 if (response && (response.status==200 || response.status==304) && response.data){
                     $scope.previousAlerts = parseRawBuild(response.data)
                 }
-            }).finally(
-                $http({
+            })
+        var loadFalsePositives = $http({
                     method: 'get',
                     url: ZAP_FALSE_POSITIVES
                 }).then((response, status) => {
                     if (response && (response.status==200 || response.status==304) && response.data){
                         $scope.falsePositives = response.data
                     }
-                }).finally(() => {
-			        setSuppressionFlags($scope.currentAlerts, $scope.falsePositives)
-			        $scope.updateCounts()
-			        $scope.showTrueAlerts()
-			    })
-            )
-        )
+                })
+
+        $q.all([loadCurrentBuild, loadLastBuild, loadFalsePositives]).finally(() => {
+		        setSuppressionFlags($scope.currentAlerts, $scope.falsePositives)
+		        $scope.updateCounts()
+		        $scope.showTrueAlerts()
+		    })
 	}
 
 	$scope.showAllAlerts = () => {
