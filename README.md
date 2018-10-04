@@ -35,7 +35,7 @@ pipeline {
     post {
         always {
             script {
-                archiveZap()
+                archiveZap(failAllAlerts: 1, failHighAlerts: 0, failMediumAlerts: 0, failLowAlerts: 0, falsePositivesFilePath: "zapFalsePositives.json")
             }
         }
     }
@@ -48,12 +48,16 @@ This example is a declarative pipeline, but using the functions on a scripted pi
 ## API
 **startZap** - Starts the ZAP process and configures the plugin. 
 ```groovy
-startZap(host: 127.0.0.1, port: 9095, timeout: 900, failBuild:3, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'], sessionPath:"/path/to/session.session")
+startZap(host: 127.0.0.1, port: 9095, timeout: 900, failHighAlert:1, failLowAlert:10, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'], sessionPath:"/path/to/session.session")
 
 host: The host to run the ZAP proxy server on. Passed to ZAP in the -host parameter.
 port: The port to run the proxy on
 timeout (optional): If a scan takes too long it will stop
-failBuild (optional): If a new alert with a risk higher than this, the build will fail (0=Info, 1=Low, 2=Medium, 3=High, 4=None)
+failAllBuild (optional): Maximum amount of alerts that can happen in total before a build will fail
+failHighBuild (optional): Maximum amount of high risk alerts that can happen before a build will fail
+failMediumBuild (optional): Maximum amount of medium risk alerts that can happen before a build will fail
+failLowBuild (optional): Maximum amount of low risk alerts that can happen before a build will fail
+
 allowedHosts (optional): Once the active ZAP scan starts, it won't scan any hosts unless they are here. If you don't set this it will only scan if the host is localhost
 sessionPath (optional): If you want to load a previous ZAP session that you have expored, you can do that here. Useful when you want to run a scan but don't want to run all your tests through ZAP.
 ```
@@ -88,10 +92,10 @@ scanPolicyName (optional): The attack policy to use when running the scan. Loade
 ```
 <br>
 
-**archiveZap** - Reads the alerts found by ZAP, checks if there are any new alerts that are higher than the failBuild parameter (and fails the build if so), generates a report with differences, and finally shuts down ZAP. This should be the last thing you run.
+**archiveZap** - Reads the alerts found by ZAP, filters out any false positives if a false positives file is provided in the project, checks if there are any alerts that are higher than the fail build parameters (and fails the build if so), generates a report, and finally shuts down ZAP. This should be the last thing you run.
 
 ```groovy
-archiveZap()
+archiveZap(failAllAlerts: 1, failHighAlerts: 0, failMediumAlerts: 0, failLowAlerts: 0, falsePositivesFilePath: "zapFalsePositives.json")
 ```
 
 -----
@@ -106,12 +110,39 @@ You may need to exclude some hosts from the proxy. If so use the -Dhttp.nonProxy
 -----
 
 ## Proxying localhost
-By default Java will not proxy localhost, 127.0.0.1, or any common loopback addresses. There is no way to disable this unless you set -Dhttp.nonProxyHosts= (empty). This means it's impossible to proxy just localhost without editing project code. You can mitigate this by changing your applications host to localhost.localdomain, which isn't checked by Java 
+By default Java will not proxy localhost, 127.0.0.1, or any common loopback addresses. There is no way to disable this unless you set -Dhttp.nonProxyHosts= (empty). This means it's impossible to proxy just localhost without editing project code. You can mitigate this by changing your applications host to localhost.localdomain, which isn't checked by Java (NOTE: not all OS's have this hostname as a loopback address by default, you may need to add it to your machine's 'hosts' file).
+
+-----
+
+## Generating Zap False Positives file
+You can provide a JSON file of false positive definitions from your workspace to the zap plugin during the archive step (default is 'zapFalsePositives.json'). The file must consist of a single valid JSON array of 'False Positive' objects. Example:
+
+```json
+[
+  {
+    "name": "Cross Site Scripting (Reflected)",
+    "cweid": "79",
+    "wascid": "8",
+    "uri": "https://yourdomain.com/a/certain/url",
+    "method": "POST",
+    "param": "param1",
+    "attack": "<script>alert(1);</script>",
+    "evidence": "<script>alert(1);</script>"
+  },
+  {
+    "uri": "https://yourdomain.com/another/url",
+    "method": "GET"
+  }
+]
+```
+All alert instances that match to a 'False Positive' object are ignored when judging whether to fail a build, and are initially hidden in the UI report. A match is when ALL fields provided in the False Positive object are equal to that in a given alert instance. It is best practice to be as specific as possible (to not hide future true positives that may occur).
+
+To aid the generation of a False Positives file, the UI report provides a 'Copy To Clipboard' button under each instance, that copies a json object representation of the alert instance to your clipboard which can be used as a 'False Positive' object.
 
 -----
 
 ## Installation
-Download the latest release from the [releases](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases) section. Move the .hpi file into your Jenkins plugin directory - eg /var/lib/jenkins/plugins/
+Download the latest release from the [releases](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases) section. In Jenkins, go to 'Manage Jenkins' -> 'Manage Plugins', and select the 'Advanced' tab. Then under 'Upload Plugin', choose the download hpi file and click upload.
 
 -----
 

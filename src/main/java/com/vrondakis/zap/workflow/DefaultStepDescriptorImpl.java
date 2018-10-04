@@ -1,6 +1,7 @@
-package com.barracuda.zapcomp.workflow;
+package com.vrondakis.zap.workflow;
 
-import org.jenkinsci.plugins.workflow.steps.*;
+import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
+import org.jenkinsci.plugins.workflow.steps.StepExecution;
 
 public abstract class DefaultStepDescriptorImpl<T extends StepExecution> extends AbstractStepDescriptorImpl {
     private final String functionName;

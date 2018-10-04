@@ -1,4 +1,4 @@
-package com.barracuda.zapcomp.workflow;
+package com.vrondakis.zap.workflow;
 
 import javax.annotation.CheckForNull;
 

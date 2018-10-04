@@ -1,26 +1,36 @@
-package com.barracuda.zapcomp;
+package com.vrondakis.zap;
 
-import com.barracuda.zapcomp.workflow.RunZapAttackStepParameters;
-import com.mashape.unirest.http.*;
-import com.mashape.unirest.http.exceptions.*;
-import hudson.*;
-import hudson.model.Run;
-import net.sf.json.*;
-import org.apache.commons.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import java.io.*;
-import java.net.*;
-import java.nio.charset.*;
-import java.nio.file.*;
-import java.util.*;
-import java.util.stream.*;
+import org.apache.commons.io.IOUtils;
+
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.vrondakis.zap.workflow.RunZapAttackStepParameters;
+
+import hudson.FilePath;
+import hudson.Launcher;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 public class ZapDriver {
     private String ZAP_HOST;
     private int ZAP_PORT;
     private int ZAP_TIMEOUT;
-    private int FAIL_BUILD;
-
+    private HashMap<Integer, Integer> FAIL_BUILD = new HashMap<>();
     private List<String> ALLOWED_HOSTS = new ArrayList<>();
     private final List<Integer> STARTED_SCANS = new ArrayList<>();
     private int crawlId;
@@ -119,7 +129,7 @@ public class ZapDriver {
      * @return Success
      */
     public boolean importUrls(String path) {
-        System.out.println("zap-comp: Importing URLs from " + path);
+        System.out.println("zap: Importing URLs from " + path);
         Map<String, String> arguments = Collections.singletonMap("filePath", path);
 
         JSONObject result = zapApi("importurls/action/importurls", arguments);
@@ -133,7 +143,7 @@ public class ZapDriver {
      * @return Success
      */
     public boolean loadSession(String sessionPath) {
-        System.out.println("zap-comp: Loading session from " + sessionPath);
+        System.out.println("zap: Loading session from " + sessionPath);
         Map<String, String> arguments = Collections.singletonMap("name", sessionPath);
         JSONObject result = zapApi("core/action/loadSession", arguments);
 
@@ -150,10 +160,11 @@ public class ZapDriver {
         Map<String, String> arguments = Collections.singletonMap("path", policy);
         JSONObject result = zapApi("ascan/action/importScanPolicy", arguments);
 
-        if (result == null) return false;
+        if (result == null)
+            return false;
 
-        return (result.has("Result") && result.getString("Result").equals("OK")) ||
-                (result.has("code") && result.getString("code").equals("already_exists"));
+        return (result.has("Result") && result.getString("Result").equals("OK"))
+                        || (result.has("code") && result.getString("code").equals("already_exists"));
     }
 
     /**
@@ -188,7 +199,8 @@ public class ZapDriver {
     }
 
     /**
-     * Begins a scan on a selected URL if it is in the allowed hosts parameter or if it is local (and allowed hosts parameter is empty)
+     * Begins a scan on a selected URL if it is in the allowed hosts parameter or if it is local (and allowed hosts parameter is
+     * empty)
      *
      * @param url The URL to scan. Does not include ZAP host prefix
      * @return Success
@@ -197,7 +209,6 @@ public class ZapDriver {
         try {
             List<String> allowedHosts = ALLOWED_HOSTS;
             String host = new URI(url).getHost(); // http://10.0.0.1 becomes 10.0.0.1
-
 
             // If it is in the allowed hosts parameter - or if the url is unset if it is local
             // localhost.localdomain does not resolve properly with INetAddress.getByName, which is why there is an additional check
@@ -210,12 +221,14 @@ public class ZapDriver {
                         e.printStackTrace();
                     }
 
-                    if (addr == null) return false;
+                    if (addr == null)
+                        return false;
 
                     if (!addr.isAnyLocalAddress() && !addr.isLoopbackAddress())
                         return false;
                 } else if (!allowedHosts.contains(host)) {
-                    System.out.println("Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
+                    System.out.println(
+                        "Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
                     return false;
                 }
             }
@@ -225,7 +238,7 @@ public class ZapDriver {
             arguments.put("url", url);
 
             if (zsp.getUser() != 0) {
-                System.out.println("zap-comp: Loading user ID: " + zsp.getUser());
+                System.out.println("zap: Loading user ID: " + zsp.getUser());
                 attackUrl += "AsUser";
                 arguments.put("userId", Integer.toString(zsp.getUser()));
             }
@@ -287,15 +300,16 @@ public class ZapDriver {
     /**
      * Starts the ZAP process
      *
-     * @param zapHome  - The location of the zap.sh file
-     * @param ws       - Passed by step
+     * @param zapHome - The location of the zap.sh file
+     * @param ws - Passed by step
      * @param launcher - Passed by step
      * @return Success
      */
     public boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher) {
         List<String> cmd = new ArrayList<>();
 
-        Path zapPath = Paths.get(zapHome, launcher.isUnix() ? ZapDriverController.ZAP_UNIX_PROGRAM : ZapDriverController.ZAP_WIN_PROGRAM);
+        Path zapPath = Paths.get(zapHome,
+            launcher.isUnix() ? ZapDriverController.ZAP_UNIX_PROGRAM : ZapDriverController.ZAP_WIN_PROGRAM);
         cmd.add(zapPath.toString());
 
         cmd.add(ZapDriverController.CMD_DAEMON);
@@ -320,10 +334,10 @@ public class ZapDriver {
 
         try {
             launcher.launch().cmds(cmd).pwd(ws).start();
-            System.out.println("zap-comp: Started successfully");
+            System.out.println("zap: Started successfully");
             return true;
         } catch (Exception e) {
-            System.out.println("zap-comp: An error occurred while staring ZAP");
+            System.out.println("zap: An error occurred while staring ZAP");
             e.printStackTrace();
             return false;
         }
@@ -332,30 +346,42 @@ public class ZapDriver {
     public void setZapHost(String zapHost) {
         ZAP_HOST = zapHost;
     }
+
     public void setZapPort(int zapPort) {
         ZAP_PORT = zapPort;
     }
-    public void setFailBuild(int fail) {
-        FAIL_BUILD = fail;
+
+    public void setFailBuild(int all, int high, int med, int low) {
+        FAIL_BUILD.put(Constants.ALL_ALERT, all);
+        FAIL_BUILD.put(Constants.HIGH_ALERT, high);
+        FAIL_BUILD.put(Constants.MEDIUM_ALERT, med);
+        FAIL_BUILD.put(Constants.LOW_ALERT, low);
     }
+
     public void setZapTimeout(int timeout) {
         ZAP_TIMEOUT = timeout;
     }
+
     public void setAllowedHosts(List<String> allowedHosts) {
         ALLOWED_HOSTS = allowedHosts;
     }
+
     public int getZapTimeout() {
         return ZAP_TIMEOUT;
     }
+
     public int getZapPort() {
         return ZAP_PORT;
     }
-    public int getFailBuild() {
+
+    public HashMap<Integer, Integer> getFailBuild() {
         return FAIL_BUILD;
     }
+
     public String getZapHost() {
         return ZAP_HOST;
     }
+
     public List<String> getAllowedHosts() {
         return ALLOWED_HOSTS;
     }
