@@ -2,7 +2,6 @@
 	margin-top:50px;
 }
 
-
 html{
     overflow-y:scroll;
     overflow-x:hidden;
@@ -217,3 +216,36 @@ code, pre{
 	max-height : 50px;
 	overflow-y: hidden;
 }
+
+.high-alert .button.button-primary{
+    background-color:#d54c53;
+    border-color:#d54c53;
+}
+
+.high-alert .button.button-primary:hover, .high-alert .button.button-primary:focus{
+    background-color:#a5373d;
+    border-color:#a5373d;
+}
+
+.medium-alert .button.button-primary{
+    background-color:rgb(245,166,35);
+    border-color:rgb(245,166,35);
+}
+
+.medium-alert .button.button-primary:hover, .medium-alert .button.button-primary:focus{
+    background-color:rgb(199, 135, 28);
+    border-color:rgb(199, 135, 28);
+}
+
+
+.low-alert .button.button-primary{
+    background-color:rgb(74, 144, 226);
+    border-color:rgb(74, 144, 226);   
+}
+
+.low-alert .button.button-primary:hover, .low-alert .button.button-primary:focus{
+    background-color: rgb(55, 107, 169);
+    border-color: rgb(55, 107, 169);
+}
+
+
