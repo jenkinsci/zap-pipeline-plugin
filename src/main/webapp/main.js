@@ -38,7 +38,7 @@ var parseRawBuild = function(build) {
 						param: instance.param,
 						attack: instance.attack,
 						evidence: instance.evidence,
-					});
+					})
 				})
 
 				alerts.push(alertReformatted)
@@ -303,18 +303,18 @@ App.controller('mainController', function($scope, $rootScope, $http, $window, $q
 	}
 
 	$scope.copyFalsePositiveToClipboard = (alert, instance) => {
-		var falsePositive = createFalsePositive(alert, instance);
-		var selectBox =  document.createElement("textarea")
-	    selectBox.style.position = 'fixed';
-	    selectBox.style.left = '0';
-	    selectBox.style.top = '0';
-	    selectBox.style.opacity = '0';
-    	selectBox.value = JSON.stringify(falsePositive, null, 2);
-	    document.body.appendChild(selectBox);
-	    selectBox.focus();
-	    selectBox.select();
-	    document.execCommand('copy');
-	    document.body.removeChild(selectBox);
+		var falsePositive = createFalsePositive(alert, instance)
+		var selectBox =  document.createElement('textarea')
+	    selectBox.style.position = 'fixed'
+	    selectBox.style.left = '0'
+	    selectBox.style.top = '0'
+	    selectBox.style.opacity = '0'
+    	selectBox.value = JSON.stringify(falsePositive, null, 2)
+	    document.body.appendChild(selectBox)
+	    selectBox.focus()
+	    selectBox.select()
+	    document.execCommand('copy')
+	    document.body.removeChild(selectBox)
 	}
 
 	$scope.isTargetCollapsable = (id) => {
