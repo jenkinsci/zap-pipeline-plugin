@@ -20,16 +20,33 @@ html{
 	background-color:#d54c53;
 }
 
+.high.instance-code{
+	border-left: 3px solid #d54c53;	
+}
+
 .medium:not(.instance-code){
 	background-color:rgb(245,166,35);
+}
+
+.medium.instance-code{
+	border-left: 3px solid rgb(245,166,35);
 }
 
 .low:not(.instance-code){
 	background-color:rgb(74, 144, 226);
 }
 
+
+.low.instance-code{
+	border-left: 3px solid rgb(74, 144, 226);		
+}
+
 .suppressed:not(.instance-code){
 	background-color:rgb(128, 128, 128);
+}
+
+.suppressed.instance-code{
+	border-left: 3px solid rgb(128, 128, 128);	
 }
 
 .circle{
