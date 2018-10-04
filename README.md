@@ -48,7 +48,7 @@ This example is a declarative pipeline, but using the functions on a scripted pi
 ## API
 **startZap** - Starts the ZAP process and configures the plugin. 
 ```groovy
-startZap(host: 127.0.0.1, port: 9095, timeout: 900, failHighAlert:1, failLowAlert:10, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'], sessionPath:"/path/to/session.session")
+startZap(host: "127.0.0.1", port: 9095, timeout: 900, failHighAlert:1, failLowAlert:10, zapHome: "/opt/zaproxy", allowedHosts:['10.0.0.1'], sessionPath:"/path/to/session.session")
 
 host: The host to run the ZAP proxy server on. Passed to ZAP in the -host parameter.
 port: The port to run the proxy on
