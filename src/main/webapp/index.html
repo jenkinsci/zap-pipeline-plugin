@@ -56,7 +56,7 @@
 	<div data-ng-repeat="alert in alerts" class="row alerts">
 		<div class="column alert {{colors[alert.riskCode-1]}}">
 			<h5><span data-ng-if="alert.isNew">New: </span>{{alert.alert}} ({{alert.instances.length}})</h5>
-			<div data-ng-class="{'generated-short':!alert.showMoreDescription && isTargetCollapsable(alert.id + '-description')}">
+			<div data-ng-class="{'generated-short':!alert.showMoreDescription && alert.riskCode>0 && isTargetCollapsable(alert.id + '-description')}">
 				<div class="description" data-ng-bind-html="alert.description | to_trusted"
 					 ng-attr-id="{{alert.id + '-description'}}"></div>
 			</div>
@@ -64,7 +64,7 @@
 				<a data-ng-click="alert.showMoreDescription=!alert.showMoreDescription"
 				   data-ng-if="isTargetCollapsable(alert.id + '-description')">
 						<span class="button button-instance-action"
-							  data-ng-class="{'button-primary':!alert.showMoreDescription}">
+							  data-ng-class="{'button-primary':!alert.showMoreDescription && alert.riskCode>0}">
 							{{alert.showMoreDescription ? 'Read less' : 'Read more'}}
 						</span>
 				</a>
