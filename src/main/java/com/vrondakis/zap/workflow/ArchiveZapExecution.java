@@ -8,6 +8,8 @@ import com.vrondakis.zap.ZapDriverController;
 
 import hudson.model.Result;
 
+import java.io.IOException;
+
 /**
  * Executor for archiveZap() function in Jenkinsfile
  */
@@ -21,18 +23,20 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start() {
+    public boolean start() throws IOException {
         listener.getLogger().println("zap: Archiving results");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
 
+
         zapDriver.setFailBuild(archiveZapStepParameters.getFailAllAlerts(), archiveZapStepParameters.getFailHighAlerts(),
-            archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
+                archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
+
 
         try {
             ZapArchiver zapArchiver = new ZapArchiver();
 
             boolean archiveResult = zapArchiver.archiveRawReport(this.run, this.workspace, this.listener,
-                archiveZapStepParameters.getFalsePositivesFilePath());
+                    archiveZapStepParameters.getFalsePositivesFilePath());
             if (!archiveResult) {
                 listener.getLogger().println("zap: Failed to archive results");
                 getContext().onSuccess(true);
@@ -43,13 +47,16 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
             if (zapDriver.getFailBuild().values().stream().anyMatch(count -> count > 0)) {
                 if (zapArchiver.shouldFailBuild(this.run, this.listener)) {
                     listener.getLogger().println(
-                        "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report");
+                            "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report");
                     run.setResult(Result.FAILURE);
                     getContext().onFailure(new Throwable(
-                                    "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report"));
+                            "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report"));
+
+                    this.run.setDescription("ZAP result failure. Check ZAP scanning report");
                     return false;
                 }
             }
+
 
         } finally {
             boolean success = ZapDriverController.shutdownZap(this.run);
