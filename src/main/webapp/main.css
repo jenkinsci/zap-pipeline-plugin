@@ -14,22 +14,22 @@ html{
 
 .stats h3{
 	margin-bottom:0;
-	font-size:;
+	font-size:30px;
 }
 
-.high{
+.high:not(.instance-code){
 	background-color:#d54c53;
 }
 
-.medium{
+.medium:not(.instance-code){
 	background-color:rgb(245,166,35);
 }
 
-.low{
+.low:not(.instance-code){
 	background-color:rgb(74, 144, 226);
 }
 
-.suppressed{
+.suppressed:not(.instance-code){
 	background-color:rgb(128, 128, 128);
 }
 
@@ -78,6 +78,7 @@ a:hover{
 	border-radius:1px;
 	border:1px solid #eaeaea;
 	border-top:3px solid #bbb;
+	border-left:3px solid #bbb;
 
 	font-weight:100 !important;
 }
@@ -116,17 +117,23 @@ h6{
 	font-weight:bold;
 }
 
+body{
+	padding-bottom:50px;	
+}
 
 .alert.high-alert{
 	border-top-color: #d54c53;
+	border-left-color: #d54c53;
 }
 
 .alert.medium-alert{
-	border-top-color:rgb(245,166,35);
+	border-top-color: rgb(245,166,35);
+	border-left-color: rgb(245,166,35);
 }
 
 .alert.low-alert{
-	border-top-color:rgb(74, 144, 226);
+	border-top-color: rgb(74, 144, 226);
+	border-left-color: rgb(74, 144, 226);
 }
 
 code, pre{
