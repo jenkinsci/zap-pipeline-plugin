@@ -67,6 +67,7 @@ public class ZapAlert implements Serializable {
         return instances;
     }
 
+    // TODO: readme for this IT FILTERS OUT NOT IN D:
     public List<ZapAlertInstance> getFalsePositivesFilteredInstances(List<ZapFalsePositiveInstance> falsePositives) {
         return instances.stream()
                         .filter(

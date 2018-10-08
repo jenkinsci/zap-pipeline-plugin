@@ -41,6 +41,7 @@ public class ZapArchiver extends Recorder {
     private static final String RAW_REPORT_FILENAME = "zap-raw.json";
     private static final String RAW_OLD_REPORT_FILENAME = "zap-raw-old.json";
     private static final String FALSE_POSITIVES_FILENAME = "zap-false-positives.json";
+    private static final String ALERT_COUNT_FILENAME = "alert-count.json";
     private static final String JSON_SITE_KEY = "site";
     private static final String JSON_ALERTS_KEY = "alerts";
 
@@ -62,6 +63,51 @@ public class ZapArchiver extends Recorder {
             return false;
         }
     }
+
+    private boolean saveAlertCount(File zapDir, @Nonnull Run<?, ?> run){
+        try{
+            ZapAlertCount zapAlertCount = new ZapAlertCount();
+
+
+            List<ZapFalsePositiveInstance> zapFalsePositiveInstances = getSavedFalsePositives(zapDir, FALSE_POSITIVES_FILENAME);
+            System.out.println("got the false positives");
+            System.out.println("the false positive instances size in total is: ");
+            System.out.println(zapFalsePositiveInstances.size());
+
+            List<ZapAlert> alerts = getSavedZapReport(zapDir, RAW_REPORT_FILENAME);
+            alerts.forEach(alert -> {
+                int amountOfInstances = alert.getInstances().size();
+                System.out.println("getting false positive instances on size of "+amountOfInstances);
+                System.out.println("the amount of instances is "+alert.getFalsePositivesFilteredInstances(zapFalsePositiveInstances).size());
+                int falsePositives = amountOfInstances - alert.getFalsePositivesFilteredInstances(zapFalsePositiveInstances).size();
+                amountOfInstances -= falsePositives;
+                zapAlertCount.falsePositives += falsePositives;
+                switch(alert.getRiskcode()){
+                    case "1":
+                        zapAlertCount.lowAlerts += amountOfInstances;
+                    case "2":
+                        zapAlertCount.mediumAlerts += amountOfInstances;
+                    case "3":
+                        zapAlertCount.highAlerts += amountOfInstances;
+                }
+            });
+
+            zapAlertCount.buildName = run.getDisplayName();
+
+
+            Gson gson = new Gson();
+            String json = gson.toJson(zapAlertCount);
+            
+            FilePath fp = new FilePath(new File(zapDir+"/"+ALERT_COUNT_FILENAME));
+            fp.write(json, "UTF-8");
+
+            return true;
+        } catch(IOException | InterruptedException e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 
     /**
      * Retrieves the ZAP report from ZAP and saves it in path
@@ -266,6 +312,10 @@ public class ZapArchiver extends Recorder {
 
         // Saves index.html file
         if (!saveStaticFiles(run))
+            return false;
+
+        // Save the amount of alerts for the chart
+        if (!saveAlertCount(zapDir, run))
             return false;
 
         // Adds the sidebar menu UI button

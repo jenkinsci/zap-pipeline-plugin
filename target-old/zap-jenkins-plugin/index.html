@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>ZAP Scanning Report</title>
+	<link href="/plugin/zap-jenkins-plugin/normalize.css" rel="stylesheet">
+	<link href="/plugin/zap-jenkins-plugin/skeleton.css" rel="stylesheet">
+	<link href="/plugin/zap-jenkins-plugin/main.css" rel="stylesheet">
+
+	<script src="/plugin/zap-jenkins-plugin/angular.min.js"></script>
+	<script src="/plugin/zap-jenkins-plugin/main.js"></script>
+
+</head>
+<body data-ng-app="zap" data-ng-controller="mainController" data-ng-init="load()">
+
+<div class="navbar">
+	<div class="navbar-container">
+		<a data-ng-click="goBack()"><img alt="Back" src="/plugin/zap-jenkins-plugin/back.png"></a>
+	</div>
+</div>
+
+<div class="container">
+	<div class="row warnings" data-ng-if="warnings">
+		<div data-ng-repeat="warning in warnings" class="button button-warning {{warning.type}}">
+			{{warning.warning}}
+		</div>
+	</div>
+
+	<div class="row stats">
+		<div class="three columns">
+
+			<h3><span class="high circle"></span> {{counts.high}}</h3>
+			<h5>High risk</h5>
+
+		</div>
+		<div class="three columns">
+
+			<h3><span class="medium circle"></span> {{counts.medium}} </h3>
+			<h5>Medium risk</h5>
+
+		</div>
+		<div class="three columns">
+
+			<h3><span class="low circle"></span> {{counts.low}}</h3>
+			<h5>Low risk </h5>
+
+		</div>
+		<div class="three columns">
+
+			<h3><span class="suppressed circle"></span> {{counts.suppressed}}</h3>
+			<h5>False Positives </h5>
+
+		</div>
+	</div>
+
+
+	<div data-ng-repeat="alert in alerts" class="row alerts">
+		<div class="column alert {{colors[alert.riskCode-1]}}">
+			<h5><span data-ng-if="alert.isNew">New: </span>{{alert.alert}} ({{alert.instances.length}})</h5>
+			<div data-ng-class="{'generated-short':!alert.showMoreDescription && alert.riskCode>0 && isTargetCollapsable(alert.id + '-description')}">
+				<div class="description" data-ng-bind-html="alert.description | to_trusted"
+					 ng-attr-id="{{alert.id + '-description'}}"></div>
+			</div>
+			<div class="instance-actions">
+				<a data-ng-click="alert.showMoreDescription=!alert.showMoreDescription"
+				   data-ng-if="isTargetCollapsable(alert.id + '-description')">
+						<span class="button button-instance-action"
+							  data-ng-class="{'button-primary':!alert.showMoreDescription && alert.riskCode>0}">
+							{{alert.showMoreDescription ? 'Read less' : 'Read more'}}
+						</span>
+				</a>
+			</div>
+			<h6>
+				Confidence: {{alert.confidence}}
+			</h6>
+			<h6>
+				Instances: {{alert.instances.length}}
+				<a data-ng-click="alert.showInstances=!alert.showInstances">
+						<span class="button button-instance" data-ng-class="{'button-primary':alert.showInstances}">
+							{{!alert.showInstances ? 'Hide' : 'Show'}}
+						</span>
+				</a>
+			</h6>
+
+
+			<div data-ng-show="alert.showInstances" data-ng-repeat="instance in alert.instances track by $index">
+					<pre>
+<code class="instance-code"
+	  data-ng-class="{'suppressed':instance.suppressed, 'low':alert.riskCode==1, 'medium' : alert.riskCode==2, 'high': alert.riskCode==3}"
+	  data-ng-show="instance.showMore"><b>URI:</b> {{instance.uri}}
+<b>Method:</b> {{instance.method}}
+<b>Param:</b> {{instance.param}}
+<b>Evidence:</b> {{instance.evidence}}
+<b>Attack:</b> {{instance.attack}}</code>
+<code class="instance-code"
+	  data-ng-class="{'suppressed':instance.suppressed, 'low':alert.riskCode==1, 'medium' : alert.riskCode==2, 'high': alert.riskCode==3}"
+	  data-ng-show="!instance.showMore"><b>URI:</b> {{instance.uri}}
+<b>Method:</b> {{instance.method}}
+<b>Param:</b> {{instance.param}}</code>
+					</pre>
+				<div class="instance-actions">
+					<a data-ng-click="instance.showMore=!instance.showMore">
+							<span class="button button-instance-action"
+								  data-ng-class="{'button-primary':!instance.showMore}">
+								{{instance.showMore ? 'Show less' : 'Show more'}}
+							</span>
+					</a>
+					<a data-ng-click="copyFalsePositiveToClipboard(alert, instance)">
+							<span class="button button-instance-action">
+								Copy to Clipboard
+							</span>
+					</a>
+				</div>
+			</div>
+
+			<h6>Solution:</h6>
+			<div data-ng-class="{'generated-short':!alert.showMoreSolution && isTargetCollapsable(alert.id + '-solution')}">
+				<div data-ng-bind-html="alert.solution | to_trusted" class="generated"
+					 ng-attr-id="{{alert.id + '-solution'}}"></div>
+			</div>
+			<div class="instance-actions">
+				<a data-ng-click="alert.showMoreSolution=!alert.showMoreSolution"
+				   data-ng-if="isTargetCollapsable(alert.id + '-solution')">
+						<span class="button button-instance-action"
+							  data-ng-class="{'button-primary':!alert.showMoreSolution}">
+							{{alert.showMoreSolution ? 'Read less' : 'Read more'}}
+						</span>
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="row center header" data-ng-if="counts.suppressed > 0">
+		<a class="button" data-ng-click="showAllAlerts()" data-ng-if="!showAll">Show {{counts.suppressed}} false
+			positive alerts for this build</a>
+		<a class="button" data-ng-click="showTrueAlerts()" data-ng-if="showAll">Hide {{counts.suppressed}} false
+			positive alerts for this build</a>
+	</div>
+</div>
+</body>
+</html>
