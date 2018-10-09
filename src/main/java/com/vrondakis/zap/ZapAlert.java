@@ -67,12 +67,11 @@ public class ZapAlert implements Serializable {
         return instances;
     }
 
-    // TODO: readme for this IT FILTERS OUT NOT IN D:
-    public List<ZapAlertInstance> getFalsePositivesFilteredInstances(List<ZapFalsePositiveInstance> falsePositives) {
+    public List<ZapAlertInstance> getFilteredOutFalsePositiveInstances(List<ZapFalsePositiveInstance> falsePositives) {
         return instances.stream()
-                        .filter(
-                            instance -> !falsePositives.stream().anyMatch(falsePositive -> falsePositive.matches(this, instance)))
-                        .collect(Collectors.toList());
+                .filter(
+                        instance -> !falsePositives.stream().anyMatch(falsePositive -> falsePositive.matches(this, instance)))
+                .collect(Collectors.toList());
     }
 
     public void setInstances(List<ZapAlertInstance> instances) {
@@ -112,9 +111,9 @@ public class ZapAlert implements Serializable {
         ZapAlert alert = (ZapAlert) object;
 
         return new EqualsBuilder().append(this.pluginid, alert.pluginid).append(this.alert, alert.alert)
-                        .append(this.name, alert.name).append(this.riskcode, alert.riskcode)
-                        .append(this.confidence, alert.confidence).append(this.sourceid, alert.sourceid)
-                        .append(this.wascid, alert.wascid).append(this.instances.hashCode(), alert.instances.hashCode()).isEquals();
+                .append(this.name, alert.name).append(this.riskcode, alert.riskcode)
+                .append(this.confidence, alert.confidence).append(this.sourceid, alert.sourceid)
+                .append(this.wascid, alert.wascid).append(this.instances.hashCode(), alert.instances.hashCode()).isEquals();
     }
 
     @Override
@@ -125,7 +124,7 @@ public class ZapAlert implements Serializable {
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("pluginid", this.pluginid).append("alert", this.alert)
-                        .append("riskcode", this.riskcode).append("confidence", this.confidence).append("sourceid", this.sourceid)
-                        .append("wascid=" + this.wascid).toString();
+                .append("riskcode", this.riskcode).append("confidence", this.confidence).append("sourceid", this.sourceid)
+                .append("wascid=" + this.wascid).toString();
     }
 }

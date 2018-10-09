@@ -86,21 +86,7 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
         DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(this.dir()), this.getTitle(),
                 "/plugin/zap-jenkins-plugin/logo.png", false);
 
-        //System.out.println("request path is" + req.getRestOfPath());
-       // System.out.println("so we will serve not.html" + new File(run.getRootDir(), "zap/not.html").toString());
-        System.out.println("so wi");
-        System.out.println(req.getRestOfPath());
         if (req.getRestOfPath().equals("")) {
-            try{
-                System.out.println(null == run);
-                System.out.println("does null = run?");
-                System.out.println(run.getRootDir());
-
-            } catch(Exception e){
-                System.out.println("e to string");
-                System.out.println(e.toString());
-            }
-            System.out.println(run.getRootDir().toString());
             File file = new File(run.getRootDir(), "zap/index.html");
             long lastModified = file.lastModified();
             long length = file.length();
@@ -122,7 +108,6 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
 
     private void setOwner(Run<?, ?> owner) {
         this.zapTrendChart = new ZapTrendChart(owner.getParent());
-
     }
 
     @Override
@@ -134,7 +119,6 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
     public void onLoad(Run<?, ?> run) {
         setOwner(run);
     }
-
 
     protected abstract String getTitle();
 
@@ -158,21 +142,14 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
 
     public void doGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
         if (ChartUtil.awtProblemCause != null) {
-            // Not available, send error
-            System.out.println("Error generating graph fix mani");
+            // Problem with rendering the chart
             return;
         }
 
-
-/*a
-        if(req.checkIfModified(run.getTimestamp(), rsp))
-            return;
-*/
-
         CategoryDataset dataset = buildDataSet();
-        new Graph(-1, 500, 200){
+        new Graph(-1, 500, 200) {
             @Override
-            protected JFreeChart createGraph(){
+            protected JFreeChart createGraph() {
                 JFreeChart chart = ChartFactory.createLineChart(
                         "ZAP security scanning", "Build number", "ZAP alert instances", dataset, PlotOrientation.VERTICAL, true, false, false);
                 chart.setBackgroundPaint(Color.white);
@@ -203,9 +180,6 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
                 domainAxis.setUpperMargin(0);
                 domainAxis.setCategoryMargin(20);
 
-                //LegendTitle legend = chart.getLegend();
-                //legend.setPosition(RectangleEdge.RIGHT);
-
                 NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
                 rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
                 rangeAxis.setLowerBound(0);
@@ -218,18 +192,14 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
     private CategoryDataset buildDataSet() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-
         Map<Integer, ZapAlertCount> countAlerts = zapTrendChart.getAlertCounts(run);
         countAlerts.forEach((k, v) -> {
             dataset.addValue(v.highAlerts, "High", k);
             dataset.addValue(v.mediumAlerts, "Medium", k);
             dataset.addValue(v.lowAlerts, "Low", k);
-            dataset.addValue(v.falsePositives, "false-positives", k);
+            dataset.addValue(v.falsePositives, "False positives", k);
         });
 
         return dataset;
     }
-
-
-
 }

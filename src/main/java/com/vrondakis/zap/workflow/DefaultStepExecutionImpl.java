@@ -2,6 +2,7 @@ package com.vrondakis.zap.workflow;
 
 import java.io.IOException;
 
+import hudson.model.Job;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
@@ -17,6 +18,7 @@ public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl
     FilePath workspace;
     Launcher launcher;
     TaskListener listener;
+    Job<?, ?> job;
 
     DefaultStepExecutionImpl(StepContext context) {
         super(context);
@@ -26,6 +28,7 @@ public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl
             this.launcher = context.get(Launcher.class);
             this.workspace = context.get(FilePath.class);
             this.listener = context.get(TaskListener.class);
+            this.job = context.get(Job.class);
         } catch (IOException | InterruptedException e) {
             this.listener.getLogger().println("zap: Failed to run: " + e.getClass());
             getContext().onFailure(e);

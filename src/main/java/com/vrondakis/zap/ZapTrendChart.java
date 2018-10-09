@@ -18,6 +18,7 @@ public final class ZapTrendChart implements Action {
         this.job = job;
     }
 
+    // Gets the amount of alerts for every build in a map
     public Map<Integer, ZapAlertCount> getAlertCounts(Run<?, ?> thisRun) {
         Map<Integer, ZapAlertCount> counts = new HashMap<>();
 
@@ -30,17 +31,14 @@ public final class ZapTrendChart implements Action {
         return counts;
     }
 
-
+    // Gets the amount of alerts for a specific build
     public ZapAlertCount getZapAlertCountForBuild(File zapDir) {
         FilePath filePath = new FilePath(new File(zapDir.toString() + "/" + "alert-count.json"));
 
         try {
             String jsonRaw = filePath.readToString();
-
             Gson gson = new Gson();
-            ZapAlertCount alerts = gson.fromJson(jsonRaw, ZapAlertCount.class);
-
-            return alerts;
+            return gson.fromJson(jsonRaw, ZapAlertCount.class);
         } catch (InterruptedException | IOException e) {
             return null;
         }

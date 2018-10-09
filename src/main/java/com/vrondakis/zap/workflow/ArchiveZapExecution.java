@@ -1,5 +1,6 @@
 package com.vrondakis.zap.workflow;
 
+import com.vrondakis.zap.ZapFailBuildAction;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import com.vrondakis.zap.ZapArchiver;
@@ -7,8 +8,6 @@ import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
 
 import hudson.model.Result;
-
-import java.io.IOException;
 
 /**
  * Executor for archiveZap() function in Jenkinsfile
@@ -23,19 +22,17 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start() throws IOException {
+    public boolean start(){
         listener.getLogger().println("zap: Archiving results");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
 
         zapDriver.setFailBuild(archiveZapStepParameters.getFailAllAlerts(), archiveZapStepParameters.getFailHighAlerts(),
                 archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
 
-
-
         try {
             ZapArchiver zapArchiver = new ZapArchiver();
 
-            boolean archiveResult = zapArchiver.archiveRawReport(this.run, this.workspace, this.listener,
+            boolean archiveResult = zapArchiver.archiveRawReport(this.run, this.job, this.workspace, this.listener,
                     archiveZapStepParameters.getFalsePositivesFilePath());
             if (!archiveResult) {
                 listener.getLogger().println("zap: Failed to archive results");
@@ -52,7 +49,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                     getContext().onFailure(new Throwable(
                             "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report"));
 
-                    this.run.setDescription("ZAP result failure. Check ZAP scanning report");
+                    this.run.addAction(new ZapFailBuildAction());
                     return false;
                 }
             }
