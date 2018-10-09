@@ -164,7 +164,7 @@ public class ZapDriver {
             return false;
 
         return (result.has("Result") && result.getString("Result").equals("OK"))
-                        || (result.has("code") && result.getString("code").equals("already_exists"));
+                || (result.has("code") && result.getString("code").equals("already_exists"));
     }
 
     /**
@@ -208,7 +208,7 @@ public class ZapDriver {
     private boolean beginScan(String url, RunZapAttackStepParameters zsp) {
         try {
             List<String> allowedHosts = ALLOWED_HOSTS;
-            String host = new URI(url).getHost(); // http://10.0.0.1 becomes 10.0.0.1
+            String host = new URI(url).getHost();
 
             // If it is in the allowed hosts parameter - or if the url is unset if it is local
             // localhost.localdomain does not resolve properly with INetAddress.getByName, which is why there is an additional check
@@ -227,11 +227,11 @@ public class ZapDriver {
                     if (!addr.isAnyLocalAddress() && !addr.isLoopbackAddress())
                         return false;
                 } else if (!allowedHosts.contains(host)) {
-                    System.out.println(
-                        "Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
+                    System.out.println("zap: Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
                     return false;
                 }
             }
+
             // Start the scan on a particular site with a particular user
             String attackUrl = "ascan/action/scan";
             Map<String, String> arguments = new HashMap<>();
@@ -300,8 +300,8 @@ public class ZapDriver {
     /**
      * Starts the ZAP process
      *
-     * @param zapHome - The location of the zap.sh file
-     * @param ws - Passed by step
+     * @param zapHome  - The location of the zap.sh file
+     * @param ws       - Passed by step
      * @param launcher - Passed by step
      * @return Success
      */
@@ -309,7 +309,7 @@ public class ZapDriver {
         List<String> cmd = new ArrayList<>();
 
         Path zapPath = Paths.get(zapHome,
-            launcher.isUnix() ? ZapDriverController.ZAP_UNIX_PROGRAM : ZapDriverController.ZAP_WIN_PROGRAM);
+                launcher.isUnix() ? ZapDriverController.ZAP_UNIX_PROGRAM : ZapDriverController.ZAP_WIN_PROGRAM);
         cmd.add(zapPath.toString());
 
         cmd.add(ZapDriverController.CMD_DAEMON);

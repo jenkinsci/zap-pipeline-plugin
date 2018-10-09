@@ -1,14 +1,13 @@
 package com.vrondakis.zap.workflow;
 
+import com.vrondakis.zap.ZapFailBuildAction;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
-import com.vrondakis.zap.ZapArchiver;
+import com.vrondakis.zap.ZapArchive;
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
 
 import hudson.model.Result;
-
-import java.io.IOException;
 
 /**
  * Executor for archiveZap() function in Jenkinsfile
@@ -23,19 +22,17 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start() throws IOException {
+    public boolean start(){
         listener.getLogger().println("zap: Archiving results");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
-
 
         zapDriver.setFailBuild(archiveZapStepParameters.getFailAllAlerts(), archiveZapStepParameters.getFailHighAlerts(),
                 archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
 
-
         try {
-            ZapArchiver zapArchiver = new ZapArchiver();
+            ZapArchive zapArchive = new ZapArchive();
 
-            boolean archiveResult = zapArchiver.archiveRawReport(this.run, this.workspace, this.listener,
+            boolean archiveResult = zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener,
                     archiveZapStepParameters.getFalsePositivesFilePath());
             if (!archiveResult) {
                 listener.getLogger().println("zap: Failed to archive results");
@@ -45,14 +42,14 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
             // If any of the fail run parameters are set to a value more than 1
             if (zapDriver.getFailBuild().values().stream().anyMatch(count -> count > 0)) {
-                if (zapArchiver.shouldFailBuild(this.run, this.listener)) {
+                if (zapArchive.shouldFailBuild(this.run, this.listener)) {
                     listener.getLogger().println(
                             "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report");
                     run.setResult(Result.FAILURE);
                     getContext().onFailure(new Throwable(
                             "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report"));
 
-                    this.run.setDescription("ZAP result failure. Check ZAP scanning report");
+                    this.run.addAction(new ZapFailBuildAction());
                     return false;
                 }
             }

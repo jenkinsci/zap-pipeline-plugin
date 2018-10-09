@@ -62,8 +62,8 @@ public class ZapAlertInstance implements Serializable {
         if (object != null && getClass() == object.getClass()) {
             ZapAlertInstance instance = (ZapAlertInstance) object;
             return new EqualsBuilder().append(this.uri, instance.uri).append(this.method, instance.method)
-                            .append(this.param, instance.param).append(this.attack, instance.attack)
-                            .append(this.evidence, instance.evidence).isEquals();
+                    .append(this.param, instance.param).append(this.attack, instance.attack)
+                    .append(this.evidence, instance.evidence).isEquals();
         }
         return false;
     }
@@ -76,6 +76,6 @@ public class ZapAlertInstance implements Serializable {
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("uri", uri).append("method", method).append("param", param).append("attack", attack)
-                        .append("evidence", evidence).toString();
+                .append("evidence", evidence).toString();
     }
 }
