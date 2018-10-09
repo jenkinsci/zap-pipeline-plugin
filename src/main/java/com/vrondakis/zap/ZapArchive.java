@@ -39,7 +39,7 @@ import net.sf.json.JSONObject;
  * ZapArchiver Main zap class, handles generating report.
  */
 
-public class ZapArchiver extends Recorder {
+public class ZapArchive extends Recorder {
     private static final String RAW_REPORT_FILENAME = "zap-raw.json";
     private static final String RAW_OLD_REPORT_FILENAME = "zap-raw-old.json";
     private static final String FALSE_POSITIVES_FILENAME = "zap-false-positives.json";
@@ -105,7 +105,6 @@ public class ZapArchiver extends Recorder {
             return false;
         }
     }
-
 
     /**
      * Retrieves the ZAP report from ZAP and saves it in path
@@ -309,13 +308,16 @@ public class ZapArchiver extends Recorder {
         // Only show the graph if ZAP has been ran more than twice in the current builds
         AtomicInteger count = new AtomicInteger(0);
         job.getBuildsAsMap().forEach((k, v) -> {
-            FilePath filePath = new FilePath(new File(zapDir.toString() + "/" + "alert-count.json"));
+            File zapDirectory = new File(v.getRootDir(), Constants.DIRECTORY_NAME);
+            FilePath filePath = new FilePath(new File(zapDirectory.toString() + "/" + "alert-count.json"));
+
             try {
                 if (filePath.exists()) {
                     count.getAndIncrement();
                 }
             } catch (InterruptedException | IOException e) {
                 // Just don't count this build
+                e.printStackTrace();
             }
         });
 
@@ -333,8 +335,7 @@ public class ZapArchiver extends Recorder {
             }
         };
 
-        if(count.get() > 0) run.addAction(action);
-
+        if (count.get() > 0) run.addAction(action);
 
         if (!success)
             return false;

@@ -69,8 +69,7 @@ public class ZapAlert implements Serializable {
 
     public List<ZapAlertInstance> getFilteredOutFalsePositiveInstances(List<ZapFalsePositiveInstance> falsePositives) {
         return instances.stream()
-                .filter(
-                        instance -> !falsePositives.stream().anyMatch(falsePositive -> falsePositive.matches(this, instance)))
+                .filter(instance -> !falsePositives.stream().anyMatch(falsePositive -> falsePositive.matches(this, instance)))
                 .collect(Collectors.toList());
     }
 

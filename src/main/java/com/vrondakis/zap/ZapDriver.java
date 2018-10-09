@@ -227,8 +227,7 @@ public class ZapDriver {
                     if (!addr.isAnyLocalAddress() && !addr.isLoopbackAddress())
                         return false;
                 } else if (!allowedHosts.contains(host)) {
-                    System.out.println(
-                            "Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
+                    System.out.println("zap: Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
                     return false;
                 }
             }

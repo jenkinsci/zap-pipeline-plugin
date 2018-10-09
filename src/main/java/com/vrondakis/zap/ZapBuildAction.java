@@ -47,6 +47,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Zap build action Sets up the sidebar Jenkins buttons
@@ -174,6 +175,12 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
                 plot.setRangeGridlinePaint(Color.black);
 
                 CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
+                domainAxis.setMaximumCategoryLabelWidthRatio(1.0f);
+
+
+                LegendTitle legend = chart.getLegend();
+                legend.setPosition(RectangleEdge.BOTTOM);
+
                 plot.setDomainAxis(domainAxis);
                 domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
                 domainAxis.setLowerMargin(0);
@@ -192,13 +199,17 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
     private CategoryDataset buildDataSet() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        Map<Integer, ZapAlertCount> countAlerts = zapTrendChart.getAlertCounts(run);
+        TreeMap<Integer, ZapAlertCount> countAlerts = new TreeMap<Integer, ZapAlertCount>(zapTrendChart.getAlertCounts(run));
+
         countAlerts.forEach((k, v) -> {
-            dataset.addValue(v.highAlerts, "High", k);
-            dataset.addValue(v.mediumAlerts, "Medium", k);
-            dataset.addValue(v.lowAlerts, "Low", k);
-            dataset.addValue(v.falsePositives, "False positives", k);
+            if(!(v.highAlerts <= 0 && v.mediumAlerts <= 0 && v.lowAlerts <= 0 && v.falsePositives <= 0)) {
+                dataset.addValue(v.highAlerts, "High", v.buildName);
+                dataset.addValue(v.mediumAlerts, "Medium", v.buildName);
+                dataset.addValue(v.lowAlerts, "Low", v.buildName);
+                dataset.addValue(v.falsePositives, "False positives", v.buildName);
+            }
         });
+
 
         return dataset;
     }
