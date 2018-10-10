@@ -9,7 +9,7 @@
 ===
 This is a Jenkins pipeline plugin that lets you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. It adds functions such as startZap(), runZapAttack(), archiveZap() and much more. It generates an interactive report and has support for filtering false-positive alert instances. It can optionally fail a build if your failure conditions are not met. 
 It also adds a graph on the job page that shows the amount of ZAP alerts over your builds.
-  -----
+
 <img src="https://i.imgur.com/WtTwQtt.png">
 <br><br>
 
@@ -173,6 +173,3 @@ Download the latest release from the [releases](https://github.com/vrondakis/zap
 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 	SOFTWARE.
-
-## Contributors
-* Contributions are welcome and always appreciated!
