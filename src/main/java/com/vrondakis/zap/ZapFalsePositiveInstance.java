@@ -1,6 +1,8 @@
 package com.vrondakis.zap;
 
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -39,10 +41,18 @@ public class ZapFalsePositiveInstance extends ZapAlertInstance {
     }
 
     public boolean matches(ZapAlert alert, ZapAlertInstance instance) {
+        // Match URL as regex
+        Pattern urlPattern = this.getUri() != null ? Pattern.compile(this.getUri()) : null;
+        if(urlPattern != null){
+            Matcher matcher = urlPattern.matcher(instance.getUri());
+            if(!matcher.find()){
+                return false;
+            }
+        }
+
         return (this.getName() == null || this.getName().equals(alert.getName()))
                         && (this.getCweid() == null || this.getCweid().equals(alert.getCweid()))
                         && (this.getWascid() == null || this.getWascid().equals(alert.getWascid()))
-                        && (this.getUri() == null || this.getUri().equals(instance.getUri()))
                         && (this.getMethod() == null || this.getMethod().equals(instance.getMethod()))
                         && (this.getParam() == null || this.getParam().equals(instance.getParam()))
                         && (this.getAttack() == null || this.getAttack().equals(instance.getAttack()))
