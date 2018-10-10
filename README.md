@@ -7,10 +7,13 @@
 
 <a href='https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project' align="top"><img align="left" src='https://github.com/vrondakis/zap-jenkins-pipeline-plugin/raw/master/src/main/webapp/logo.png'></a>ZAP Jenkins Plugin for pipeline builds
 ===
-This is a Jenkins pipeline plugin that let's you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. It also generates a good-looking report with new alerts (compared to the previous build) and optionally fails the build if any new high-risk alerts are found, and more!
-  
-  -----
+This is a Jenkins pipeline plugin that lets you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. It adds functions such as startZap(), runZapAttack(), archiveZap() and much more. It generates an interactive report and has support for filtering false-positive alert instances. It can optionally fail a build if your failure conditions are not met. 
+It also adds a graph on the job page that shows the amount of ZAP alerts over your builds.
+
 <img src="https://i.imgur.com/WtTwQtt.png">
+<br><br>
+
+<img src="https://i.imgur.com/R8vkzwy.png">
 
 ## Jenkinsfile Usage example
 ```groovy
@@ -57,7 +60,6 @@ failAllBuild (optional): Maximum amount of alerts that can happen in total befor
 failHighBuild (optional): Maximum amount of high risk alerts that can happen before a build will fail
 failMediumBuild (optional): Maximum amount of medium risk alerts that can happen before a build will fail
 failLowBuild (optional): Maximum amount of low risk alerts that can happen before a build will fail
-
 allowedHosts (optional): Once the active ZAP scan starts, it won't scan any hosts unless they are here. If you don't set this it will only scan if the host is localhost
 sessionPath (optional): If you want to load a previous ZAP session that you have expored, you can do that here. Useful when you want to run a scan but don't want to run all your tests through ZAP.
 ```
@@ -114,7 +116,7 @@ By default Java will not proxy localhost, 127.0.0.1, or any common loopback addr
 
 -----
 
-## Generating Zap False Positives file
+## Generating ZAP False Positives file
 You can provide a JSON file of false positive definitions from your workspace to the zap plugin during the archive step (default is 'zapFalsePositives.json'). The file must consist of a single valid JSON array of 'False Positive' objects. Example:
 
 ```json
@@ -123,26 +125,28 @@ You can provide a JSON file of false positive definitions from your workspace to
     "name": "Cross Site Scripting (Reflected)",
     "cweid": "79",
     "wascid": "8",
-    "uri": "https://yourdomain.com/a/certain/url",
+    "uri": "https:\/\/yourdomain.com\/a\/certain\/url",
     "method": "POST",
     "param": "param1",
     "attack": "<script>alert(1);</script>",
     "evidence": "<script>alert(1);</script>"
   },
   {
-    "uri": "https://yourdomain.com/another/url",
+    "uri": "https:\/\/yourdomain.com\/another/url",
     "method": "GET"
   }
 ]
 ```
 All alert instances that match to a 'False Positive' object are ignored when judging whether to fail a build, and are initially hidden in the UI report. A match is when ALL fields provided in the False Positive object are equal to that in a given alert instance. It is best practice to be as specific as possible (to not hide future true positives that may occur).
 
-To aid the generation of a False Positives file, the UI report provides a 'Copy To Clipboard' button under each instance, that copies a json object representation of the alert instance to your clipboard which can be used as a 'False Positive' object.
+To aid the generation of a false positives file, the UI report provides a 'Copy To Clipboard' button under each instance, that copies the alert instance as JSON, which can be used as a false positive object in the false positive file. 
+
+The false positive URI is a regex string, alert instance URIs will be tested against this.
 
 -----
 
 ## Installation
-Download the latest release from the [releases](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases) section. In Jenkins, go to 'Manage Jenkins' -> 'Manage Plugins', and select the 'Advanced' tab. Then under 'Upload Plugin', choose the download hpi file and click upload.
+Download the latest release from the [releases](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases) section. In Jenkins, go to 'Manage Jenkins' -> 'Manage Plugins', and select the 'Advanced' tab. Then under 'Upload Plugin', choose the downloaded hpi file and click upload.
 
 -----
 
