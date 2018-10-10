@@ -45,7 +45,6 @@ public class ZapDriver {
     private JSONObject zapApi(String apiUrl, Map<String, String> params) {
         try {
             String query = ZapDriverController.formatParams(params);
-            System.out.println(apiUrl);
 
             apiUrl = "/JSON/" + apiUrl;
             URI uri = new URI("http", null, getZapHost(), getZapPort(), apiUrl, query, null);
@@ -53,7 +52,6 @@ public class ZapDriver {
             InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
 
             String res = IOUtils.toString(response, StandardCharsets.UTF_8);
-            System.out.println(res);
             return JSONObject.fromObject(res);
         } catch (URISyntaxException | IOException | UnirestException e) {
             // Should be handled in calling function
