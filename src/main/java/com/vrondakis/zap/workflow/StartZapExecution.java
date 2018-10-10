@@ -28,6 +28,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
     @Override
     public boolean start() {
+        // Linux vs Windows & master vs slave
         if (node.getNodeName().isEmpty()) {
             launcher = new Launcher.LocalLauncher(listener, workspace.getChannel());
         } else {
@@ -40,12 +41,14 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             }
         }
 
+        // No parameters
         if (zapStepParameters == null) {
             this.listener.getLogger().println("zap: Could not start ZAP. No parameters are provided - startZap");
             getContext().onFailure(new Throwable("zap: Could not start ZAP. No parameters are provided - startZap"));
             return false;
         }
 
+        // Zap home not set / invalid
         this.listener.getLogger().println("zap: Starting ZAP on port " + zapStepParameters.getPort() + "...");
         if (zapStepParameters.getZapHome() == null || zapStepParameters.getZapHome().isEmpty()) {
             System.out.println("zap: Did not start ZAP process because zapHome is not set");

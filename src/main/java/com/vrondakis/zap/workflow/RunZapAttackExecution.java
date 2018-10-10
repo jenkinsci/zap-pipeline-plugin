@@ -26,21 +26,24 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
     public boolean start() {
         listener.getLogger().println("zap: Starting attack...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
+
+        // Change to attack mode in ZAP
         boolean changeModeSuccess = zapDriver.setZapMode("attack");
         if (!changeModeSuccess) {
             listener.getLogger().println("zap: Failed to switch to attack mode");
             getContext().onSuccess(false);
             return false;
         }
-
         listener.getLogger().println("zap: Set mode to attack mode");
 
+        // Start the attack on the collected urls
         boolean startAttackSuccess = zapDriver.zapAttack(runZapAttackStepParameters);
         if (!startAttackSuccess) {
             listener.getLogger().println("zap: Failed to start attack");
             getContext().onSuccess(false);
             return false;
         }
+
 
         OffsetDateTime startedTime = OffsetDateTime.now();
 

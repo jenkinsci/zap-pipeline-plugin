@@ -58,7 +58,6 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
     private final Run<?, ?> run;
     private transient ZapTrendChart zapTrendChart;
 
-
     ZapBuildAction(Run<?, ?> run) {
         this.run = run;
     }

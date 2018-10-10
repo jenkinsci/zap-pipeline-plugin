@@ -1,5 +1,9 @@
 package com.vrondakis.zap;
 
+/*
+Plugin wide constants
+*/
+
 public class Constants {
     public static final int COMPLETED_PERCENTAGE = 100;
     public static final long SCAN_SLEEP = 10;

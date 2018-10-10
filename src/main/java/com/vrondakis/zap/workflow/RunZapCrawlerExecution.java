@@ -33,8 +33,8 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
         }
 
         this.listener.getLogger().println("zap: Starting crawler on host " + runZapCrawlerParameters.getHost() + "...");
-
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
+
         boolean success = zapDriver.startZapCrawler(runZapCrawlerParameters.getHost());
         if (!success) {
             System.out.println("zap: Failed to start ZAP crawler on host " + runZapCrawlerParameters.getHost());
@@ -62,40 +62,8 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
                     TimeUnit.SECONDS.sleep(Constants.SCAN_SLEEP);
             } catch (InterruptedException e) {
                 // Usually if Jenkins run is stopped
+                System.out.println("zap: Failed to get status of crawler");
             }
-        }
-
-        boolean zapHasStarted = false;
-
-        do {
-            if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(Constants.ZAP_INITIALIZE_TIMEOUT))) {
-                listener.getLogger().println("zap: ZAP failed to start. Socket timed out.");
-                break;
-            }
-
-            try {
-                TimeUnit.SECONDS.sleep(Constants.ZAP_INITIALIZE_WAIT);
-
-                new Socket(zapDriver.getZapHost(), zapDriver.getZapPort());
-                listener.getLogger().println("zap: ZAP successfully initialized on port " + zapDriver.getZapPort());
-                zapHasStarted = true;
-
-            } catch (IOException e) {
-                listener.getLogger().println("zap: Waiting for ZAP to initialize...");
-            } catch (InterruptedException e) {
-                listener.getLogger().println(
-                    "zap: ZAP failed to initialize on host " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort());
-                break;
-            }
-
-        } while (!zapHasStarted);
-
-        if (!zapHasStarted) {
-            System.out.println("zap: Failed to start ZAP on port " + zapDriver.getZapPort());
-            getContext().onFailure(
-                new Throwable("zap: Failed to start ZAP on port " + zapDriver.getZapPort() + ". Socket timed out"));
-
-            return false;
         }
 
         getContext().onSuccess(true);

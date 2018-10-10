@@ -31,7 +31,6 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
         try {
             ZapArchive zapArchive = new ZapArchive();
-
             boolean archiveResult = zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener,
                     archiveZapStepParameters.getFalsePositivesFilePath());
             if (!archiveResult) {
@@ -49,6 +48,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                     getContext().onFailure(new Throwable(
                             "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report"));
 
+                    // Red text on build that shows the build has failed due to ZAP
                     this.run.addAction(new ZapFailBuildAction());
                     return false;
                 }

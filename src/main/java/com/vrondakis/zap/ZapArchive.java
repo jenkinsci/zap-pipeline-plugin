@@ -51,7 +51,7 @@ public class ZapArchive extends Recorder {
      * Saves index.html to the current build archive
      *
      * @param run The current build
-     * @return If it saved successfully or not
+     * @return success
      */
     private boolean saveStaticFiles(@Nonnull Run<?, ?> run) {
         try {
@@ -67,6 +67,12 @@ public class ZapArchive extends Recorder {
         }
     }
 
+    /**
+     * Saves alert-count.json to the zapDir directory (build/x/zap).
+     * @param zapDir The ZAP directory you wish to save to
+     * @param run The build, given by Jenkins
+     * @return success
+     */
     private boolean saveAlertCount(File zapDir, @Nonnull Run<?, ?> run) {
         try {
             ZapAlertCount zapAlertCount = new ZapAlertCount();
