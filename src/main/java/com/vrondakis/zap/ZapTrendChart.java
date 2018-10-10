@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public final class ZapTrendChart implements Action {
     public final Job<?, ?> job;
@@ -19,8 +20,8 @@ public final class ZapTrendChart implements Action {
     }
 
     // Gets the amount of alerts for every build in a map
-    public Map<Integer, ZapAlertCount> getAlertCounts(Run<?, ?> thisRun) {
-        Map<Integer, ZapAlertCount> counts = new HashMap<>();
+    public TreeMap<Integer, ZapAlertCount> getAlertCounts(Run<?, ?> thisRun) {
+        TreeMap<Integer, ZapAlertCount> counts = new TreeMap<>();
 
         job.getBuildsAsMap().forEach((k, v) -> {
             ZapAlertCount count = getZapAlertCountForBuild(new File(v.getRootDir(), Constants.DIRECTORY_NAME));

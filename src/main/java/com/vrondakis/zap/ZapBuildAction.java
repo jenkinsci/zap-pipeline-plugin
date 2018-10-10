@@ -185,7 +185,7 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
     private CategoryDataset buildDataSet() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-        TreeMap<Integer, ZapAlertCount> countAlerts = new TreeMap<Integer, ZapAlertCount>(zapTrendChart.getAlertCounts(run));
+        TreeMap<Integer, ZapAlertCount> countAlerts = zapTrendChart.getAlertCounts(run);
 
         countAlerts.forEach((k, v) -> {
             if(!(v.highAlerts <= 0 && v.mediumAlerts <= 0 && v.lowAlerts <= 0 && v.falsePositives <= 0)) {
