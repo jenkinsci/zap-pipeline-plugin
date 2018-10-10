@@ -72,9 +72,9 @@ public class ZapArchive extends Recorder {
             ZapAlertCount zapAlertCount = new ZapAlertCount();
 
 
-            List<ZapFalsePositiveInstance> zapFalsePositiveInstances = getSavedFalsePositives(zapDir, FALSE_POSITIVES_FILENAME);
+            List<ZapFalsePositiveInstance> zapFalsePositiveInstances = getSavedFalsePositives(zapDir);
 
-            List<ZapAlert> alerts = getSavedZapReport(zapDir, RAW_REPORT_FILENAME);
+            List<ZapAlert> alerts = getSavedZapReport(zapDir);
             alerts.forEach(alert -> {
                 int amountOfInstances = alert.getInstances().size();
                 int falsePositives = amountOfInstances - alert.getFilteredOutFalsePositiveInstances(zapFalsePositiveInstances).size();
@@ -157,7 +157,7 @@ public class ZapArchive extends Recorder {
      *
      * @param falsePositivesFilePath the relative path to the false positives file
      * @param workspace              the workspace for the running build
-     * @param taskListener
+     * @param taskListener           task listener, passed by jenkins
      */
     private void saveFalsePositives(String falsePositivesFilePath, FilePath workspace, @Nonnull TaskListener taskListener,
                                     File savePath) {
@@ -223,11 +223,10 @@ public class ZapArchive extends Recorder {
      * Gets all the ZapAlerts saved in a ZAP report file
      *
      * @param path     - The path of the report
-     * @param fileName - The filename of the report, eg zap-report.json
      * @return List of all the {@code ZapAlert}s from the report
      */
-    private List<ZapAlert> getSavedZapReport(File path, String fileName) {
-        FilePath fp = new FilePath(new File(path.toString() + "/" + fileName));
+    private List<ZapAlert> getSavedZapReport(File path) {
+        FilePath fp = new FilePath(new File(path.toString() + "/" + ZapArchive.RAW_REPORT_FILENAME));
         return getAlertsFromReportFile(fp);
     }
 
@@ -250,11 +249,10 @@ public class ZapArchive extends Recorder {
      * Gets the current builds false positives from a saved file
      *
      * @param path     - The path of the saved false positives file
-     * @param fileName - The filename of the false positives file
      * @return List of each false positive detailed in the file
      */
-    private List<ZapFalsePositiveInstance> getSavedFalsePositives(File path, String fileName) {
-        FilePath filePath = new FilePath(new File(path.toString() + "/" + fileName));
+    private List<ZapFalsePositiveInstance> getSavedFalsePositives(File path) {
+        FilePath filePath = new FilePath(new File(path.toString() + "/" + ZapArchive.FALSE_POSITIVES_FILENAME));
         try {
             String fileContents = filePath.readToString();
             return new Gson().fromJson(fileContents, new TypeToken<List<ZapFalsePositiveInstance>>() {
@@ -364,8 +362,8 @@ public class ZapArchive extends Recorder {
         try {
             // Collect the alerts and false positives associated with this build
             File zapDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
-            List<ZapAlert> currentBuildAlerts = getSavedZapReport(zapDir, RAW_REPORT_FILENAME);
-            List<ZapFalsePositiveInstance> zapFalsePositiveInstances = getSavedFalsePositives(zapDir, FALSE_POSITIVES_FILENAME);
+            List<ZapAlert> currentBuildAlerts = getSavedZapReport(zapDir);
+            List<ZapFalsePositiveInstance> zapFalsePositiveInstances = getSavedFalsePositives(zapDir);
             Map<Integer, Integer> alertCounts = new HashMap<>();
 
             // Count the number of alert instances (filtering out false positives)

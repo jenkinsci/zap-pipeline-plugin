@@ -309,6 +309,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window, $q
 	    selectBox.style.left = '0';
 	    selectBox.style.top = '0';
 	    selectBox.style.opacity = '0';
+	    falsePositive.uri = '^' + falsePositive.uri.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$';
     	selectBox.value = JSON.stringify(falsePositive, null, 2);
 	    document.body.appendChild(selectBox);
 	    selectBox.focus();

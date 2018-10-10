@@ -24,7 +24,7 @@
         <relativePath />
     </parent>
     <groupId>com.vrondakis.zap</groupId>
-    <artifactId>zap-jenkins-plugin</artifactId>
+    <artifactId>zap-pipeline</artifactId>
     <version>1.4.0</version>
     <packaging>hpi</packaging>
     <properties>
@@ -32,8 +32,8 @@
         <java.level>8</java.level>
         <workflow.version>2.16</workflow.version>
     </properties>
-    <name>Zap Jenkins Plugin</name>
-    <description>Runs zap, listens to tests, produces report</description>
+    <name>ZAP Pipeline Plugin</name>
+    <description>Control OWASP ZAP through Pipeline &amp; more</description>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -48,6 +48,14 @@
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     </scm>
     -->
+
+    <developers>
+        <developer>
+            <id>vrondakis</id>
+            <name>Manolis Vrondakis</name>
+            <email>manolisvrondakis@gmail.com</email>
+        </developer>
+    </developers>
 
     <repositories>
         <repository>

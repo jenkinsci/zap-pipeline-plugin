@@ -87,18 +87,6 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
         DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(this.dir()), this.getTitle(),
                 "/plugin/zap-jenkins-plugin/logo.png", false);
 
-        if (req.getRestOfPath().equals("")) {
-            File file = new File(run.getRootDir(), "zap/index.html");
-            long lastModified = file.lastModified();
-            long length = file.length();
-
-            try (InputStream in = new FileInputStream(file)) {
-                rsp.serveFile(req, in, lastModified, length, file.getName());
-            }
-
-            return;
-        }
-
         if (req.getRestOfPath().equals("graph")) {
             doGraph(req, rsp);
             return;
@@ -161,9 +149,9 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
                 BasicStroke stroke = new BasicStroke(4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
                 renderer.setBaseStroke(stroke);
 
-                renderer.setSeriesPaint(0, new Color(0XFF, 0, 0));
-                renderer.setSeriesPaint(1, new Color(41, 72, 255));
-                renderer.setSeriesPaint(2, new Color(0, 117, 0));
+                renderer.setSeriesPaint(0, new Color(213, 76, 83));
+                renderer.setSeriesPaint(1, new Color(245, 166, 35));
+                renderer.setSeriesPaint(2, new Color(74, 144, 226));
                 renderer.setSeriesPaint(3, new Color(41, 41, 41));
 
                 BasicStroke smallStroke = new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
@@ -176,7 +164,6 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
 
                 CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
                 domainAxis.setMaximumCategoryLabelWidthRatio(1.0f);
-
 
                 LegendTitle legend = chart.getLegend();
                 legend.setPosition(RectangleEdge.BOTTOM);
