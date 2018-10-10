@@ -116,7 +116,7 @@ By default Java will not proxy localhost, 127.0.0.1, or any common loopback addr
 -----
 
 ## Generating ZAP False Positives file
-You can provide a JSON file of false positive definitions from your workspace to the zap plugin during the archive step (default is 'zapFalsePositives.json'). The file must consist of a single valid JSON array of 'False Positive' objects. Example:
+You can provide a JSON file of false positive definitions from your workspace to the zap plugin during the archive step (the default is zapFalsePositives.json). The file must consist of a single valid JSON array of false positive objects. Example:
 
 ```json
 [
@@ -136,7 +136,7 @@ You can provide a JSON file of false positive definitions from your workspace to
   }
 ]
 ```
-All alert instances that match to a 'False Positive' object are ignored when judging whether to fail a build, and are initially hidden in the UI report. A match is when ALL fields provided in the False Positive object are equal to that in a given alert instance. It is best practice to be as specific as possible (to not hide future true positives that may occur).
+All alert instances that match to a false positive object are ignored when judging whether to fail a build, and are initially hidden in the UI report. A match is when ALL fields provided in the False Positive object are equal to that in a given alert instance. It is best practice to be as specific as possible (to not hide future true positives that may occur).
 
 To aid the generation of a false positives file, the UI report provides a 'Copy To Clipboard' button under each instance, that copies the alert instance as JSON, which can be used as a false positive object in the false positive file. 
 
