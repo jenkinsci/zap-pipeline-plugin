@@ -6,7 +6,8 @@
 <br />
 
 <a href='https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project' align="top"><img align="left" src='https://github.com/vrondakis/zap-jenkins-pipeline-plugin/raw/master/src/main/webapp/logo.png'></a>ZAP Jenkins Plugin for pipeline builds
-===This is a Jenkins pipeline plugin that lets you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. Unlike the other plugins for ZAP, this generates a report independently which shows new alerts compared to the last build, has the ability to fail a build with user configurable failure parameters, filters out false positives (user configurable) and displays a graph which shows the amount of ZAP alerts over your builds.
+===
+This is a Jenkins pipeline plugin that lets you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP Zed Attack Proxy</a> through Jenkins Pipeline. Unlike the other plugins for ZAP, this generates a report independently which shows new alerts compared to the last build, has the ability to fail a build with user configurable failure parameters, filters out false positives (user configurable) and displays a graph which shows the amount of ZAP alerts over your builds.
 
 
 <img src="https://i.imgur.com/WtTwQtt.png">

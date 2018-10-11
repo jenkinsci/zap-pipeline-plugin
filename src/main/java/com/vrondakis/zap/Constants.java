@@ -1,7 +1,7 @@
 package com.vrondakis.zap;
 
 /*
-Plugin wide constants
+    Plugin wide constants
 */
 
 public class Constants {

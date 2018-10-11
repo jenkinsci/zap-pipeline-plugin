@@ -4,52 +4,36 @@ import hudson.FilePath;
 import hudson.model.Action;
 import hudson.model.DirectoryBrowserSupport;
 import hudson.model.Run;
-import hudson.util.Area;
 import hudson.util.ChartUtil;
-import hudson.util.DataSetBuilder;
 import hudson.util.Graph;
 import hudson.util.ShiftedCategoryAxis;
 import jenkins.model.RunAction2;
 import jenkins.tasks.SimpleBuildStep;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.StrokeMap;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
-import org.jfree.chart.axis.CategoryTick;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.RectangleEdge;
-import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
 import javax.servlet.ServletException;
 import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.TreeMap;
 
-/**
+/**Large
  * Zap build action Sets up the sidebar Jenkins buttons
  */
 
@@ -85,11 +69,6 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
 
         DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(this.dir()), this.getTitle(),
                 "/plugin/zap-jenkins-plugin/logo.png", false);
-
-        if (req.getRestOfPath().equals("graph")) {
-            doGraph(req, rsp);
-            return;
-        }
 
         dbs.generateResponse(req, rsp, this);
     }
@@ -128,14 +107,22 @@ public abstract class ZapBuildAction implements Action, RunAction2, SimpleBuildS
         doGraph(req, rsp);
     }
 
-    public void doGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
+    public void doGraph(StaplerRequest req, StaplerResponse res) throws IOException{
+        doGraph(req, res, 500, 200);
+    }
+
+    public void doGraphLarge(StaplerRequest req, StaplerResponse res) throws IOException{
+        doGraph(req, res, 1000, 400);
+    }
+
+    public void doGraph(StaplerRequest req, StaplerResponse rsp, int width, int height) throws IOException {
         if (ChartUtil.awtProblemCause != null) {
             // Problem with rendering the chart
             return;
         }
 
         CategoryDataset dataset = buildDataSet();
-        new Graph(-1, 500, 200) {
+        new Graph(-1, width, height) {
             @Override
             protected JFreeChart createGraph() {
                 JFreeChart chart = ChartFactory.createLineChart(

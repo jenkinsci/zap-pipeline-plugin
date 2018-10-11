@@ -2,10 +2,10 @@
 <j:jelly  xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
     <div stlye="margin:10px 0 10px 0;">
         <div>
-            <a href="lastBuild/zap/"><img src="zap/graph"/></a>
+            <a href="lastBuild/zap"><img src="zap/graph"/></a>
         </div>
         <div style="text-align:right">
-            <a href="lastBuild/graph/">${%enlarge}</a>
+            <a href="zap/graphLarge">${%enlarge}</a>
         </div>
     </div>
 </j:jelly>

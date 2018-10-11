@@ -8,8 +8,6 @@ import hudson.model.Run;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 public final class ZapTrendChart implements Action {

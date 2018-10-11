@@ -1,17 +1,14 @@
 package com.vrondakis.zap.workflow;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.time.OffsetDateTime;
-import java.util.concurrent.TimeUnit;
-
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-
 import com.vrondakis.zap.Constants;
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Executor for startZap() function in jenkinsfile
