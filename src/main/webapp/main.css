@@ -16,6 +16,10 @@ html{
 	font-size:30px;
 }
 
+span.alert-count-text{
+    vertical-align:text-bottom;
+}
+
 code.instance-code{
     border-radius:0;
 }
