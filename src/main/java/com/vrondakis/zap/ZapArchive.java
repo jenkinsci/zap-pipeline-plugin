@@ -47,6 +47,13 @@ public class ZapArchive extends Recorder {
     private static final String JSON_SITE_KEY = "site";
     private static final String JSON_ALERTS_KEY = "alerts";
 
+    static final int HIGH_ALERT = 3;
+    static final int MEDIUM_ALERT = 2;
+    static final int LOW_ALERT = 1;
+    static final int ALL_ALERT = 4;
+
+    static final String DIRECTORY_NAME = "zap";
+
     /**
      * Saves index.html to the current build archive
      *
@@ -59,7 +66,7 @@ public class ZapArchive extends Recorder {
             String pluginName = "zap-jenkins-plugin";
             FilePath indexFile = new FilePath(new File(
                     Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), indexName));
-            indexFile.copyTo(new FilePath(new File(run.getRootDir(), Constants.DIRECTORY_NAME + "/" + indexName)));
+            indexFile.copyTo(new FilePath(new File(run.getRootDir(), DIRECTORY_NAME + "/" + indexName)));
             return true;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -85,19 +92,18 @@ public class ZapArchive extends Recorder {
                 int amountOfInstances = alert.getInstances().size();
                 int falsePositives = amountOfInstances - alert.getFilteredOutFalsePositiveInstances(zapFalsePositiveInstances).size();
                 amountOfInstances -= falsePositives;
-                zapAlertCount.falsePositives += falsePositives;
+                zapAlertCount.incrementFalsePositives(falsePositives);
                 switch (alert.getRiskcode()) {
                     case "1":
-                        zapAlertCount.lowAlerts += amountOfInstances;
+                        zapAlertCount.incrementLow();
                     case "2":
-                        zapAlertCount.mediumAlerts += amountOfInstances;
+                        zapAlertCount.incrementMedium();
                     case "3":
-                        zapAlertCount.highAlerts += amountOfInstances;
+                        zapAlertCount.incrementHigh();
                 }
             });
 
-            zapAlertCount.buildName = run.getDisplayName();
-
+            zapAlertCount.setBuildName(run.getDisplayName());
 
             Gson gson = new Gson();
             String json = gson.toJson(zapAlertCount);
@@ -276,7 +282,7 @@ public class ZapArchive extends Recorder {
      */
     private Optional<File> getBuildDir(Run<?, ?> run) {
         if (run != null) {
-            File buildDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
+            File buildDir = new File(run.getRootDir(), DIRECTORY_NAME);
             if (buildDir.exists())
                 return Optional.of(buildDir);
         }
@@ -294,7 +300,7 @@ public class ZapArchive extends Recorder {
      */
     public boolean archiveRawReport(@Nonnull Run<?, ?> run, @Nonnull Job<?, ?> job, @Nonnull FilePath workspace, @Nonnull TaskListener taskListener,
                                     String falsePositivesFilePath) {
-        File zapDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
+        File zapDir = new File(run.getRootDir(), DIRECTORY_NAME);
         // Create the zap directory in the workspace if it doesn't already exist
         if (!zapDir.exists()) {
             boolean mResult = zapDir.mkdir();
@@ -312,7 +318,7 @@ public class ZapArchive extends Recorder {
         // Only show the graph if ZAP has been ran more than twice in the current builds
         AtomicInteger count = new AtomicInteger(0);
         job.getBuildsAsMap().forEach((k, v) -> {
-            File zapDirectory = new File(v.getRootDir(), Constants.DIRECTORY_NAME);
+            File zapDirectory = new File(v.getRootDir(), DIRECTORY_NAME);
             FilePath filePath = new FilePath(new File(zapDirectory.toString() + "/" + "alert-count.json"));
 
             try {
@@ -327,17 +333,9 @@ public class ZapArchive extends Recorder {
 
         // If the report was retrieved and saved add the "ZAP scanning report" to the build
         // If it was not saved just add the graph (by hiding the button)
-        ZapAction action = new ZapAction(run) {
-            @Override
-            public String getDisplayName() {
-                return success ? super.getDisplayName() : null;
-            }
+        ZapAction action = new ZapAction(run, success);
 
-            @Override
-            public String getIconFileName() {
-                return success ? super.getIconFileName() : null;
-            }
-        };
+
 
         if (count.get() > 0) run.addAction(action);
 
@@ -367,7 +365,7 @@ public class ZapArchive extends Recorder {
 
         try {
             // Collect the alerts and false positives associated with this build
-            File zapDir = new File(run.getRootDir(), Constants.DIRECTORY_NAME);
+            File zapDir = new File(run.getRootDir(), DIRECTORY_NAME);
             List<ZapAlert> currentBuildAlerts = getSavedZapReport(zapDir);
             List<ZapFalsePositiveInstance> zapFalsePositiveInstances = getSavedFalsePositives(zapDir);
             Map<Integer, Integer> alertCounts = new HashMap<>();
@@ -382,7 +380,7 @@ public class ZapArchive extends Recorder {
             });
 
             // Total amount of alert instances with a risk code more than 1
-            alertCounts.put(Constants.ALL_ALERT,
+            alertCounts.put(ALL_ALERT,
                     (int) currentBuildAlerts.stream().filter(alert -> Integer.parseInt(alert.getRiskcode()) > 0).count());
 
             // Compare the fail build parameter to the amount of alerts in a certain category

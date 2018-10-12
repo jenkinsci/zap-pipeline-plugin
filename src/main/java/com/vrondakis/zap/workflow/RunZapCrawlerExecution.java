@@ -1,6 +1,5 @@
 package com.vrondakis.zap.workflow;
 
-import com.vrondakis.zap.Constants;
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -43,7 +42,7 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
         int timeoutSeconds = zapDriver.getZapTimeout();
 
         int status = zapDriver.zapCrawlerStatus();
-        while (status < Constants.COMPLETED_PERCENTAGE) {
+        while (status < ZapDriver.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
                 listener.getLogger().println("zap: Crawler timed out before it could complete the scan");
                 break;
@@ -55,8 +54,8 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
             try {
                 // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
                 // when the scan is complete.
-                if (status != Constants.COMPLETED_PERCENTAGE)
-                    TimeUnit.SECONDS.sleep(Constants.SCAN_SLEEP);
+                if (status != ZapDriver.COMPLETED_PERCENTAGE)
+                    TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
             } catch (InterruptedException e) {
                 // Usually if Jenkins run is stopped
                 System.out.println("zap: Failed to get status of crawler");

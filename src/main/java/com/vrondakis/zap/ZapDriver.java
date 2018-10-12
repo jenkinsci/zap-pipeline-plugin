@@ -35,6 +35,13 @@ public class ZapDriver {
     private final List<Integer> STARTED_SCANS = new ArrayList<>();
     private int crawlId;
 
+    public static final int COMPLETED_PERCENTAGE = 100;
+    public static final long ZAP_SCAN_SLEEP = 10;
+    public static final int ZAP_INITIALIZE_TIMEOUT = 100;
+    public static final int ZAP_INITIALIZE_WAIT = 20;
+
+
+
     /**
      * Calls the ZAP api
      *
@@ -112,11 +119,11 @@ public class ZapDriver {
             if (json != null) {
                 return json.getInt("status");
             } else {
-                return Constants.COMPLETED_PERCENTAGE; // Failed to retrieve status so skip it
+                return COMPLETED_PERCENTAGE; // Failed to retrieve status so skip it
             }
 
         } catch (JSONException e) {
-            return Constants.COMPLETED_PERCENTAGE;
+            return COMPLETED_PERCENTAGE;
         }
     }
 
@@ -270,7 +277,7 @@ public class ZapDriver {
 
         if (STARTED_SCANS.isEmpty()) {
             // Called but no scans running
-            return Constants.COMPLETED_PERCENTAGE;
+            return COMPLETED_PERCENTAGE;
         }
 
         for (Integer startedScan : STARTED_SCANS) {
@@ -283,10 +290,10 @@ public class ZapDriver {
                     int status = json.getInt("status");
                     totalScanProgress += status;
                 } else {
-                    totalScanProgress = Constants.COMPLETED_PERCENTAGE; // Failed to retrieve status so skip it
+                    totalScanProgress = COMPLETED_PERCENTAGE; // Failed to retrieve status so skip it
                 }
             } catch (JSONException e) {
-                totalScanProgress = Constants.COMPLETED_PERCENTAGE;
+                totalScanProgress = COMPLETED_PERCENTAGE;
             }
 
             totalProgress += totalScanProgress;
@@ -350,10 +357,10 @@ public class ZapDriver {
     }
 
     public void setFailBuild(int all, int high, int med, int low) {
-        FAIL_BUILD.put(Constants.ALL_ALERT, all);
-        FAIL_BUILD.put(Constants.HIGH_ALERT, high);
-        FAIL_BUILD.put(Constants.MEDIUM_ALERT, med);
-        FAIL_BUILD.put(Constants.LOW_ALERT, low);
+        FAIL_BUILD.put(ZapArchive.ALL_ALERT, all);
+        FAIL_BUILD.put(ZapArchive.HIGH_ALERT, high);
+        FAIL_BUILD.put(ZapArchive.MEDIUM_ALERT, med);
+        FAIL_BUILD.put(ZapArchive.LOW_ALERT, low);
     }
 
     public void setZapTimeout(int timeout) {

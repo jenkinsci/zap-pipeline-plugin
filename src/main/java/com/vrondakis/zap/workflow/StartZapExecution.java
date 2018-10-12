@@ -8,8 +8,6 @@ import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
 import org.jenkinsci.plugins.workflow.steps.StepContext;
-
-import com.vrondakis.zap.Constants;
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
 
@@ -75,14 +73,15 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         OffsetDateTime startedTime = OffsetDateTime.now();
         listener.getLogger().println("zap: Waiting for ZAP to initialize...");
         boolean zapHasStarted = false;
+
         do {
-            if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(Constants.ZAP_INITIALIZE_TIMEOUT))) {
+            if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(ZapDriver.ZAP_INITIALIZE_TIMEOUT))) {
                 listener.getLogger().println("zap: ZAP failed to start. Socket timed out.");
                 break;
             }
 
             try {
-                TimeUnit.SECONDS.sleep(Constants.ZAP_INITIALIZE_WAIT);
+                TimeUnit.SECONDS.sleep(ZapDriver.ZAP_INITIALIZE_WAIT);
 
                 new Socket(zapDriver.getZapHost(), zapDriver.getZapPort());
                 listener.getLogger().println("zap: ZAP successfully initialized on port " + zapDriver.getZapPort());
