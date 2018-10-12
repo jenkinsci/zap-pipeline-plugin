@@ -28,25 +28,25 @@
 	<div class="row stats">
 		<div class="three columns">
 
-			<h3><span class="high circle"></span> {{counts.high}}</h3>
+			<h3><span class="high circle"></span><span class="alert-count-text"> {{counts.high}}</span></h3>
 			<h5>High risk</h5>
 
 		</div>
 		<div class="three columns">
 
-			<h3><span class="medium circle"></span> {{counts.medium}} </h3>
+			<h3><span class="medium circle"></span><span class="alert-count-text"> {{counts.medium}}</span></h3>
 			<h5>Medium risk</h5>
 
 		</div>
 		<div class="three columns">
 
-			<h3><span class="low circle"></span> {{counts.low}}</h3>
+			<h3><span class="low circle"></span><span class="alert-count-text"> {{counts.low}}</span></h3>
 			<h5>Low risk </h5>
 
 		</div>
 		<div class="three columns">
 
-			<h3><span class="suppressed circle"></span> {{counts.suppressed}}</h3>
+			<h3><span class="suppressed circle"></span><span class="alert-count-text"> {{counts.suppressed}}</span></h3>
 			<h5>False Positives </h5>
 
 		</div>
@@ -55,7 +55,7 @@
 
 	<div data-ng-repeat="alert in alerts" class="row alerts">
 		<div class="column alert {{colors[alert.riskCode-1]}}">
-			<h5><span data-ng-if="alert.isNew">New: </span>{{alert.alert}} ({{alert.instances.length}})</h5>
+			<h5><span data-ng-if="alert.isNew">New: </span>{{alert.alert}}</h5>
 			<div data-ng-class="{'generated-short':!alert.showMoreDescription && alert.riskCode>0 && isTargetCollapsable(alert.id + '-description')}">
 				<div class="description" data-ng-bind-html="alert.description | to_trusted"
 					 data-ng-attr-id="{{alert.id + '-description'}}"></div>
@@ -70,10 +70,6 @@
 						</span>
 				</a>
 			</div>
-
-			<h6>
-				Confidence: {{alert.confidence}}
-			</h6>
 
 			<h6>
 				Instances: {{alert.instances.length}}
@@ -100,7 +96,7 @@
 				<div class="instance-actions">
 					<a data-ng-click="instance.showMore=!instance.showMore">
 							<span class="button button-instance-action"
-								  data-ng-class="{'button-primary':!instance.showMore}">
+								  data-ng-class="{'button-primary':instance.showMore}">
 								{{instance.showMore ? 'Show less' : 'Show more'}}
 							</span>
 					</a>
@@ -116,12 +112,17 @@
 			<div data-ng-class="{'generated-short':!alert.showMoreSolution && isTargetCollapsable(alert.id + '-solution')}">
 				<div data-ng-bind-html="alert.solution | to_trusted" class="generated"
 					 data-ng-attr-id="{{alert.id + '-solution'}}"></div>
+
+					<h6>
+						Confidence: {{alert.confidence}}
+					</h6>
+
 			</div>
 			<div class="instance-actions">
 				<a data-ng-click="alert.showMoreSolution=!alert.showMoreSolution"
 				   data-ng-if="isTargetCollapsable(alert.id + '-solution')">
 						<span class="button button-instance-action"
-							  data-ng-class="{'button-primary':!alert.showMoreSolution}">
+							  data-ng-class="{'button-primary':alert.showMoreSolution}">
 							{{alert.showMoreSolution ? 'Read less' : 'Read more'}}
 						</span>
 				</a>

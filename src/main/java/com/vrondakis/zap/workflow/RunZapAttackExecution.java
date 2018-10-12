@@ -1,15 +1,13 @@
 package com.vrondakis.zap.workflow;
 
+import com.vrondakis.zap.ZapDriver;
+import com.vrondakis.zap.ZapDriverController;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
-
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-
-import com.vrondakis.zap.Constants;
-import com.vrondakis.zap.ZapDriver;
-import com.vrondakis.zap.ZapDriverController;
 
 /**
  * Executor for zapAttack() function in jenkinsfile
@@ -50,7 +48,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
         int timeoutSeconds = zapDriver.getZapTimeout();
         int status = zapDriver.zapAttackStatus();
 
-        while (status < Constants.COMPLETED_PERCENTAGE) {
+        while (status < ZapDriver.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
                 listener.getLogger().println("zap: Scan timed out before it could complete");
                 break;
@@ -62,8 +60,8 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
             try {
                 // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
                 // when the scan is complete
-                if (status != Constants.COMPLETED_PERCENTAGE)
-                    TimeUnit.SECONDS.sleep(Constants.SCAN_SLEEP);
+                if (status != ZapDriver.COMPLETED_PERCENTAGE)
+                    TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
             } catch (InterruptedException e) {
                 // Usually if the Jenkins run is stopped
             }

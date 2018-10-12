@@ -16,6 +16,10 @@ html{
 	font-size:30px;
 }
 
+span.alert-count-text{
+    vertical-align:text-bottom;
+}
+
 code.instance-code{
     border-radius:0;
 }
@@ -59,7 +63,7 @@ code.instance-code{
 
   border-radius: 50%;
   display: inline-block;
-}button button-instance-action ng-binding button-primary
+}
 
 .logo{
 	width:100px;

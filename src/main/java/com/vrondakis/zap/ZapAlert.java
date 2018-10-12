@@ -107,7 +107,6 @@ public class ZapAlert implements Serializable {
         if (object == null || this.getClass() != object.getClass())
             return false;
 
-        // findbugs
         ZapAlert alert = (ZapAlert) object;
 
         return new EqualsBuilder().append(this.pluginid, alert.pluginid).append(this.alert, alert.alert)

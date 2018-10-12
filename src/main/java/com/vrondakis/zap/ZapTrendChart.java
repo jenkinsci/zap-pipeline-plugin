@@ -13,16 +13,16 @@ import java.util.TreeMap;
 public final class ZapTrendChart implements Action {
     public final Job<?, ?> job;
 
-    public ZapTrendChart(Job<?, ?> job) {
+    ZapTrendChart(Job<?, ?> job) {
         this.job = job;
     }
 
     // Gets the amount of alerts for every build in a map
-    public TreeMap<Integer, ZapAlertCount> getAlertCounts(Run<?, ?> thisRun) {
+    TreeMap<Integer, ZapAlertCount> getAlertCounts(Run<?, ?> thisRun) {
         TreeMap<Integer, ZapAlertCount> counts = new TreeMap<>();
 
         job.getBuildsAsMap().forEach((k, v) -> {
-            ZapAlertCount count = getZapAlertCountForBuild(new File(v.getRootDir(), Constants.DIRECTORY_NAME));
+            ZapAlertCount count = getZapAlertCountForBuild(new File(v.getRootDir(), ZapArchive.DIRECTORY_NAME));
             if (null != count)
                 counts.put(k, count);
         });
@@ -31,7 +31,7 @@ public final class ZapTrendChart implements Action {
     }
 
     // Gets the amount of alerts for a specific build
-    public ZapAlertCount getZapAlertCountForBuild(File zapDir) {
+    private ZapAlertCount getZapAlertCountForBuild(File zapDir) {
         FilePath filePath = new FilePath(new File(zapDir.toString() + "/" + "alert-count.json"));
 
         try {
@@ -52,7 +52,7 @@ public final class ZapTrendChart implements Action {
     }
 
     public String getUrlName() {
-        return Constants.DIRECTORY_NAME;
+        return ZapArchive.DIRECTORY_NAME;
     }
 
 }
