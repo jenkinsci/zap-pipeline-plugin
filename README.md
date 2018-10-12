@@ -11,7 +11,7 @@ ZAP Jenkins Plugin for pipeline builds
 This is a Jenkins pipeline plugin that lets you control <a href="https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project">OWASP ZAP</a> through Jenkins Pipeline. Unlike other plugins for ZAP, this generates a report which shows new alerts compared to the last build, has the ability to fail a build with configurable failure parameters, filters out false positives and displays a graph which shows the amount of ZAP alerts over your builds.
 
 <p align="center">
-<img src="https://i.imgur.com/ixx38zy.png">
+<img src="https://i.imgur.com/QSlls97.png">
 <br><br>
 
 <img src="https://i.imgur.com/R8vkzwy.png">
