@@ -8,15 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 
-import hudson.FilePath;
-import hudson.model.Action;
-import hudson.model.DirectoryBrowserSupport;
-import hudson.model.Run;
-import hudson.util.ChartUtil;
-import hudson.util.Graph;
-import hudson.util.ShiftedCategoryAxis;
-import jenkins.model.RunAction2;
-import jenkins.tasks.SimpleBuildStep;
+import javax.servlet.ServletException;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -32,7 +25,15 @@ import org.jfree.ui.RectangleEdge;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-import javax.servlet.ServletException;
+import hudson.FilePath;
+import hudson.model.Action;
+import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Run;
+import hudson.util.ChartUtil;
+import hudson.util.Graph;
+import hudson.util.ShiftedCategoryAxis;
+import jenkins.model.RunAction2;
+import jenkins.tasks.SimpleBuildStep;
 
 /**
  * ZapAction Used by jenkins to add the sidebar button
@@ -61,7 +62,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
         System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", ""); // Allow JS scripts to be run (content security policy)
 
         DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(this.dir()), this.getTitle(),
-                "/plugin/zap-jenkins-plugin/logo.png", false);
+                "/plugin/zap-pipeline/logo.png", false);
 
         dbs.generateResponse(req, rsp, this);
     }
@@ -98,7 +99,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
             @Override
             protected JFreeChart createGraph() {
                 JFreeChart chart = ChartFactory.createLineChart(
-                        "ZAP security scanning", "Build number", "ZAP alert instances", dataset, PlotOrientation.VERTICAL, true, false, false);
+                    null, "Build number", "ZAP alert instances", dataset, PlotOrientation.VERTICAL, true, false, false);
                 chart.setBackgroundPaint(Color.white);
 
                 CategoryPlot plot = chart.getCategoryPlot();
@@ -130,7 +131,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
                 domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
                 domainAxis.setLowerMargin(0);
                 domainAxis.setUpperMargin(0);
-                domainAxis.setCategoryMargin(20);
+                domainAxis.setCategoryMargin(0);
 
                 NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
                 rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
@@ -143,18 +144,14 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
 
     private CategoryDataset buildDataSet() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
         TreeMap<Integer, ZapAlertCount> countAlerts = zapTrendChart.getAlertCounts(run);
 
         countAlerts.forEach((k, v) -> {
-            if(v.hasValues()) {
-                dataset.addValue(v.getHighAlerts(), "High", v.getBuildName());
-                dataset.addValue(v.getMediumAlerts(), "Medium", v.getBuildName());
-                dataset.addValue(v.getLowAlerts(), "Low", v.getBuildName());
-                dataset.addValue(v.getFalsePositives(), "False positives", v.getBuildName());
-            }
+            dataset.addValue(v.getHighAlerts(), "High", v.getBuildName());
+            dataset.addValue(v.getMediumAlerts(), "Medium", v.getBuildName());
+            dataset.addValue(v.getLowAlerts(), "Low", v.getBuildName());
+            dataset.addValue(v.getFalsePositives(), "False positives", v.getBuildName());
         });
-
 
         return dataset;
     }
@@ -176,7 +173,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
 
     @Override
     public String getIconFileName() {
-        return showButton ? "/plugin/zap-jenkins-plugin/logo.png" : null;
+        return showButton ? "/plugin/zap-pipeline/logo.png" : null;
     }
 
     protected String getTitle() {

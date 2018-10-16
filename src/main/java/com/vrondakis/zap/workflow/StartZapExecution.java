@@ -62,12 +62,15 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         zapDriver.setZapTimeout(zapStepParameters.getTimeout());
         zapDriver.setAllowedHosts(zapStepParameters.getAllowedHosts());
 
+
         boolean success = zapDriver.startZapProcess(zapStepParameters.getZapHome(), workspace, launcher);
         if (!success) {
             System.out.println("zap: Failed to start ZAP process");
             getContext().onFailure(new Throwable("zap: Failed to start ZAP process"));
             return false;
         }
+
+        System.out.println("zap: Checking ZAP is alive at " + zapStepParameters.getHost() + ":" + zapStepParameters.getPort());
 
         // Wait for ZAP to start before continuing...
         OffsetDateTime startedTime = OffsetDateTime.now();
@@ -82,6 +85,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
             try {
                 TimeUnit.SECONDS.sleep(ZapDriver.ZAP_INITIALIZE_WAIT);
+                System.out.println("zap: Attempting to connect to ZAP at " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort());
 
                 new Socket(zapDriver.getZapHost(), zapDriver.getZapPort());
                 listener.getLogger().println("zap: ZAP successfully initialized on port " + zapDriver.getZapPort());

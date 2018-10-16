@@ -32,6 +32,8 @@ public class ZapDriverController {
         if (driver != null)
             return driver;
 
+
+        System.out.println("zap: Creating new ZAP driver for build URL: "+run.getUrl());
         return newDriver(run);
     }
 

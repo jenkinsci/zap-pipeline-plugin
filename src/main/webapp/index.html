@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
 	<title>ZAP Scanning Report</title>
-	<link href="/plugin/zap-jenkins-plugin/normalize.css" rel="stylesheet">
-	<link href="/plugin/zap-jenkins-plugin/skeleton.css" rel="stylesheet">
-	<link href="/plugin/zap-jenkins-plugin/main.css" rel="stylesheet">
+	<link href="/plugin/zap-pipeline/normalize.css" rel="stylesheet">
+	<link href="/plugin/zap-pipeline/skeleton.css" rel="stylesheet">
+	<link href="/plugin/zap-pipeline/main.css" rel="stylesheet">
 
-	<script src="/plugin/zap-jenkins-plugin/angular.min.js"></script>
-	<script src="/plugin/zap-jenkins-plugin/main.js"></script>
+	<script src="/plugin/zap-pipeline/angular.min.js"></script>
+	<script src="/plugin/zap-pipeline/main.js"></script>
 
 </head>
 <body data-ng-app="zap" data-ng-controller="mainController" data-ng-init="load()">
 
-<div class="navbar">
+<div class="navbar" ng-class="{'low' : counts.low > 0, 'medium' : counts.medium > 0, 'high': counts.high > 0}">
 	<div class="navbar-container">
-		<a data-ng-click="goBack()"><img alt="Back" src="/plugin/zap-jenkins-plugin/back.png"></a>
+		<a data-ng-click="goBack()"><img alt="Back" src="/plugin/zap-pipeline/back.png"></a>
 	</div>
 </div>
 
@@ -113,9 +113,9 @@
 				<div data-ng-bind-html="alert.solution | to_trusted" class="generated"
 					 data-ng-attr-id="{{alert.id + '-solution'}}"></div>
 
-					<h6>
-						Confidence: {{alert.confidence}}
-					</h6>
+				<h6>
+					Confidence: {{alert.confidence}}
+				</h6>
 
 			</div>
 			<div class="instance-actions">
@@ -136,6 +136,7 @@
 		<a class="button" data-ng-click="showTrueAlerts()" data-ng-if="showAll">Hide {{counts.suppressed}} false
 			positive alerts for this build</a>
 	</div>
+
 </div>
 </body>
 </html>
