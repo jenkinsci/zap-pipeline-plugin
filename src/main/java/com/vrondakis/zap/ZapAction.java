@@ -8,15 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeMap;
 
-import hudson.FilePath;
-import hudson.model.Action;
-import hudson.model.DirectoryBrowserSupport;
-import hudson.model.Run;
-import hudson.util.ChartUtil;
-import hudson.util.Graph;
-import hudson.util.ShiftedCategoryAxis;
-import jenkins.model.RunAction2;
-import jenkins.tasks.SimpleBuildStep;
+import javax.servlet.ServletException;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -32,7 +25,15 @@ import org.jfree.ui.RectangleEdge;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
-import javax.servlet.ServletException;
+import hudson.FilePath;
+import hudson.model.Action;
+import hudson.model.DirectoryBrowserSupport;
+import hudson.model.Run;
+import hudson.util.ChartUtil;
+import hudson.util.Graph;
+import hudson.util.ShiftedCategoryAxis;
+import jenkins.model.RunAction2;
+import jenkins.tasks.SimpleBuildStep;
 
 /**
  * ZapAction Used by jenkins to add the sidebar button
@@ -98,7 +99,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
             @Override
             protected JFreeChart createGraph() {
                 JFreeChart chart = ChartFactory.createLineChart(
-                        "ZAP security scanning", "Build number", "ZAP alert instances", dataset, PlotOrientation.VERTICAL, true, false, false);
+                    null, "Build number", "ZAP alert instances", dataset, PlotOrientation.VERTICAL, true, false, false);
                 chart.setBackgroundPaint(Color.white);
 
                 CategoryPlot plot = chart.getCategoryPlot();
@@ -130,7 +131,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
                 domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
                 domainAxis.setLowerMargin(0);
                 domainAxis.setUpperMargin(0);
-                domainAxis.setCategoryMargin(20);
+                domainAxis.setCategoryMargin(0);
 
                 NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
                 rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
