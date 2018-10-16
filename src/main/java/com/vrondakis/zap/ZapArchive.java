@@ -77,6 +77,7 @@ public class ZapArchive extends Recorder {
 
     /**
      * Saves alert-count.json to the zapDir directory (build/x/zap).
+     *
      * @param zapDir The ZAP directory you wish to save to
      * @param run    The build, given by Jenkins
      * @return success
@@ -246,23 +247,25 @@ public class ZapArchive extends Recorder {
 
     /**
      * Gets the directory of the last build that ran ZAP
+     *
      * @param run The run
      * @return The file path of the last available report, null if none are found
      */
     private Optional<File> getPreviousReportDir(Run<?, ?> run, Job<?, ?> job) {
-        return job.getBuilds().stream().filter((Run<?, ?> build) -> {
-            FilePath filePath = new FilePath(new File(build.getRootDir(), ZapArchive.DIRECTORY_NAME + "/" + "alert-count.json"));
-            try {
-                return filePath.exists();
-            } catch (InterruptedException | IOException e) {
-                return false;
-            }
-        })
-        .map(Run::getRootDir)
-        .skip(1)
-        .findFirst();
-    }
+        return job.getBuilds().stream()
+                .map(build -> new File(build.getRootDir(), ZapArchive.DIRECTORY_NAME))
+                .filter((File build) -> {
+                    FilePath filePath = new FilePath(new File(build, "alert-count.json"));
 
+                    try {
+                        return filePath.exists();
+                    } catch (InterruptedException | IOException e) {
+                        return false;
+                    }
+                })
+                .skip(1)
+                .findFirst();
+    }
 
     /**
      * Gets the current builds false positives from a saved file
