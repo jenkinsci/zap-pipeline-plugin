@@ -18,12 +18,12 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>3.19</version>
+        <version>3.19-SNAPSHOT</version>
         <relativePath/>
     </parent>
     <groupId>com.vrondakis.zap</groupId>
     <artifactId>zap-pipeline</artifactId>
-    <version>1.4.2</version>
+    <version>1.4.2-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
         <jenkins.version>2.7.3</jenkins.version>
@@ -38,14 +38,13 @@
             <url>https://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
-    <!-- Assuming you want to host on @jenkinsci:
-    <url>https://wiki.jenkins.io/display/JENKINS/TODO+Plugin</url>
+
+    <url>https://wiki.jenkins.io/display/JENKINS/Zap+Pipeline+Plugin</url>
     <scm>
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     </scm>
-    -->
 
     <developers>
         <developer>
