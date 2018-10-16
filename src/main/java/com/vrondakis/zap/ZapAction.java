@@ -61,7 +61,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
         System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", ""); // Allow JS scripts to be run (content security policy)
 
         DirectoryBrowserSupport dbs = new DirectoryBrowserSupport(this, new FilePath(this.dir()), this.getTitle(),
-                "/plugin/zap-jenkins-plugin/logo.png", false);
+                "/plugin/zap-pipeline/logo.png", false);
 
         dbs.generateResponse(req, rsp, this);
     }
@@ -143,18 +143,14 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
 
     private CategoryDataset buildDataSet() {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
         TreeMap<Integer, ZapAlertCount> countAlerts = zapTrendChart.getAlertCounts(run);
 
         countAlerts.forEach((k, v) -> {
-            if(v.hasValues()) {
-                dataset.addValue(v.getHighAlerts(), "High", v.getBuildName());
-                dataset.addValue(v.getMediumAlerts(), "Medium", v.getBuildName());
-                dataset.addValue(v.getLowAlerts(), "Low", v.getBuildName());
-                dataset.addValue(v.getFalsePositives(), "False positives", v.getBuildName());
-            }
+            dataset.addValue(v.getHighAlerts(), "High", v.getBuildName());
+            dataset.addValue(v.getMediumAlerts(), "Medium", v.getBuildName());
+            dataset.addValue(v.getLowAlerts(), "Low", v.getBuildName());
+            dataset.addValue(v.getFalsePositives(), "False positives", v.getBuildName());
         });
-
 
         return dataset;
     }
@@ -176,7 +172,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
 
     @Override
     public String getIconFileName() {
-        return showButton ? "/plugin/zap-jenkins-plugin/logo.png" : null;
+        return showButton ? "/plugin/zap-pipeline/logo.png" : null;
     }
 
     protected String getTitle() {

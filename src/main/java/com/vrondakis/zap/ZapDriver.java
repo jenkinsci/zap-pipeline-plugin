@@ -27,12 +27,12 @@ import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 public class ZapDriver {
-    private String ZAP_HOST;
-    private int ZAP_PORT;
-    private int ZAP_TIMEOUT;
-    private HashMap<Integer, Integer> FAIL_BUILD = new HashMap<>();
-    private List<String> ALLOWED_HOSTS = new ArrayList<>();
-    private final List<Integer> STARTED_SCANS = new ArrayList<>();
+    private String zapHost;
+    private int zapPort;
+    private int zapTimeout;
+    private HashMap<Integer, Integer> failBuild = new HashMap<>();
+    private List<String> allowedHosts = new ArrayList<>();
+    private final List<Integer> startedScans = new ArrayList<>();
     private int crawlId;
 
     public static final int COMPLETED_PERCENTAGE = 100;
@@ -180,7 +180,7 @@ public class ZapDriver {
      */
     public boolean zapAttack(RunZapAttackStepParameters zsp) {
         // Reset scans
-        STARTED_SCANS.clear();
+        startedScans.clear();
 
         JSONObject sitesObj = zapApi("core/view/sites");
         if (sitesObj == null)
@@ -212,13 +212,13 @@ public class ZapDriver {
      */
     private boolean beginScan(String url, RunZapAttackStepParameters zsp) {
         try {
-            List<String> allowedHosts = ALLOWED_HOSTS;
+            List<String> allowedHosts = this.allowedHosts;
             String host = new URI(url).getHost();
 
             // If it is in the allowed hosts parameter - or if the url is unset if it is local
             // localhost.localdomain does not resolve properly with INetAddress.getByName, which is why there is an additional check
             if (!host.equals("localhost.localdomain")) {
-                if (ALLOWED_HOSTS.isEmpty()) {
+                if (this.allowedHosts.isEmpty()) {
                     InetAddress addr = null;
                     try {
                         addr = InetAddress.getByName(host);
@@ -255,7 +255,7 @@ public class ZapDriver {
             JSONObject result = zapApi(attackUrl, arguments);
             if (result != null) {
                 int zapScanId = result.getInt("scan");
-                STARTED_SCANS.add(zapScanId);
+                startedScans.add(zapScanId);
                 return true;
             }
 
@@ -272,15 +272,15 @@ public class ZapDriver {
      * @return The % complete
      */
     public int zapAttackStatus() {
-        int totalScans = STARTED_SCANS.size();
+        int totalScans = startedScans.size();
         int totalProgress = 0;
 
-        if (STARTED_SCANS.isEmpty()) {
+        if (startedScans.isEmpty()) {
             // Called but no scans running
             return COMPLETED_PERCENTAGE;
         }
 
-        for (Integer startedScan : STARTED_SCANS) {
+        for (Integer startedScan : startedScans) {
             int totalScanProgress = 0;
 
             Map<String, String> arguments = Collections.singletonMap("scanId", Integer.toString(startedScan));
@@ -320,10 +320,10 @@ public class ZapDriver {
         cmd.add(ZapDriverController.CMD_DAEMON);
 
         cmd.add(ZapDriverController.CMD_HOST);
-        cmd.add(ZAP_HOST);
+        cmd.add(zapHost);
 
         cmd.add(ZapDriverController.CMD_PORT);
-        cmd.add(Integer.toString(ZAP_PORT));
+        cmd.add(Integer.toString(zapPort));
 
         cmd.add(ZapDriverController.CMD_CONFIG);
         cmd.add(ZapDriverController.CMD_DISABLEKEY);
@@ -349,45 +349,45 @@ public class ZapDriver {
     }
 
     public void setZapHost(String zapHost) {
-        ZAP_HOST = zapHost;
+        this.zapHost = zapHost;
     }
 
     public void setZapPort(int zapPort) {
-        ZAP_PORT = zapPort;
+        this.zapPort = zapPort;
     }
 
     public void setFailBuild(int all, int high, int med, int low) {
-        FAIL_BUILD.put(ZapArchive.ALL_ALERT, all);
-        FAIL_BUILD.put(ZapArchive.HIGH_ALERT, high);
-        FAIL_BUILD.put(ZapArchive.MEDIUM_ALERT, med);
-        FAIL_BUILD.put(ZapArchive.LOW_ALERT, low);
+        failBuild.put(ZapArchive.ALL_ALERT, all);
+        failBuild.put(ZapArchive.HIGH_ALERT, high);
+        failBuild.put(ZapArchive.MEDIUM_ALERT, med);
+        failBuild.put(ZapArchive.LOW_ALERT, low);
     }
 
     public void setZapTimeout(int timeout) {
-        ZAP_TIMEOUT = timeout;
+        zapTimeout = timeout;
     }
 
     public void setAllowedHosts(List<String> allowedHosts) {
-        ALLOWED_HOSTS = allowedHosts;
+        this.allowedHosts = allowedHosts;
     }
 
     public int getZapTimeout() {
-        return ZAP_TIMEOUT;
+        return zapTimeout;
     }
 
     public int getZapPort() {
-        return ZAP_PORT;
+        return zapPort;
     }
 
     public HashMap<Integer, Integer> getFailBuild() {
-        return FAIL_BUILD;
+        return failBuild;
     }
 
     public String getZapHost() {
-        return ZAP_HOST;
+        return zapHost;
     }
 
     public List<String> getAllowedHosts() {
-        return ALLOWED_HOSTS;
+        return allowedHosts;
     }
 }

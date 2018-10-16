@@ -62,8 +62,9 @@ public class ZapArchive extends Recorder {
      */
     private boolean saveStaticFiles(@Nonnull Run<?, ?> run) {
         try {
+            System.out.println("zap: Saving static files to build...");
             String indexName = "index.html";
-            String pluginName = "zap-jenkins-plugin";
+            String pluginName = "zap-pipeline";
             FilePath indexFile = new FilePath(new File(
                     Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), indexName));
             indexFile.copyTo(new FilePath(new File(run.getRootDir(), DIRECTORY_NAME + "/" + indexName)));
@@ -77,7 +78,7 @@ public class ZapArchive extends Recorder {
     /**
      * Saves alert-count.json to the zapDir directory (build/x/zap).
      * @param zapDir The ZAP directory you wish to save to
-     * @param run The build, given by Jenkins
+     * @param run    The build, given by Jenkins
      * @return success
      */
     private boolean saveAlertCount(File zapDir, @Nonnull Run<?, ?> run) {
@@ -126,6 +127,7 @@ public class ZapArchive extends Recorder {
      */
     private boolean saveZapReport(File path, Run run) {
         try {
+            System.out.println("zap: Fetching and saving report...");
             ZapDriver zapDriver = ZapDriverController.getZapDriver(run);
             FilePath fp = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME));
             if (zapDriver.getZapHost() == null || zapDriver.getZapPort() == 0)
@@ -234,7 +236,7 @@ public class ZapArchive extends Recorder {
     /**
      * Gets all the ZapAlerts saved in a ZAP report file
      *
-     * @param path     - The path of the report
+     * @param path - The path of the report
      * @return List of all the {@code ZapAlert}s from the report
      */
     private List<ZapAlert> getSavedZapReport(File path) {
@@ -243,24 +245,29 @@ public class ZapArchive extends Recorder {
     }
 
     /**
-     * Gets the report of the last build, if it is not available try the previous built build, and if that isn't available get the
-     * last successful build.
-     *
+     * Gets the directory of the last build that ran ZAP
      * @param run The run
      * @return The file path of the last available report, null if none are found
      */
-    private Optional<File> getPreviousReportDir(Run<?, ?> run) {
-
-        File zapBuildDir = getBuildDir(run.getPreviousBuild()).orElseGet(() -> getBuildDir(run.getPreviousBuiltBuild())
-                .orElseGet(() -> getBuildDir(run.getPreviousSuccessfulBuild()).orElse(null)));
-
-        return Optional.ofNullable(zapBuildDir);
+    private Optional<File> getPreviousReportDir(Run<?, ?> run, Job<?, ?> job) {
+        return job.getBuilds().stream().filter((Run<?, ?> build) -> {
+            FilePath filePath = new FilePath(new File(build.getRootDir(), ZapArchive.DIRECTORY_NAME + "/" + "alert-count.json"));
+            try {
+                return filePath.exists();
+            } catch (InterruptedException | IOException e) {
+                return false;
+            }
+        })
+        .map(Run::getRootDir)
+        .skip(1)
+        .findFirst();
     }
+
 
     /**
      * Gets the current builds false positives from a saved file
      *
-     * @param path     - The path of the saved false positives file
+     * @param path - The path of the saved false positives file
      * @return List of each false positive detailed in the file
      */
     private List<ZapFalsePositiveInstance> getSavedFalsePositives(File path) {
@@ -334,9 +341,6 @@ public class ZapArchive extends Recorder {
         // If the report was retrieved and saved add the "ZAP scanning report" to the build
         // If it was not saved just add the graph (by hiding the button)
         ZapAction action = new ZapAction(run, success);
-
-
-
         if (count.get() > 0) run.addAction(action);
 
         if (!success)
@@ -345,8 +349,8 @@ public class ZapArchive extends Recorder {
         // Fetches the false positives file (if it exists) and saves it
         saveFalsePositives(falsePositivesFilePath, workspace, taskListener, zapDir);
 
-        // Saves the report of the previous build in the current builds workspace
-        Optional<File> oldBuildZapDir = getPreviousReportDir(run);
+        // Saves the report of the previous build in the current builds workspace (to compare new/old reports)
+        Optional<File> oldBuildZapDir = getPreviousReportDir(run, job);
         oldBuildZapDir.ifPresent(file -> savePreviousZapReport(zapDir, file));
 
         return true;
@@ -386,7 +390,7 @@ public class ZapArchive extends Recorder {
             // Compare the fail build parameter to the amount of alerts in a certain category
             AtomicBoolean failBuild = new AtomicBoolean(false);
             zapDriver.getFailBuild().forEach((code, val) -> {
-                if (val > 0 && alertCounts.get(code) >= val) {
+                if (code != null && val > 0 && alertCounts.get(code) != null && alertCounts.get(code) >= val) {
                     failBuild.set(true);
                 }
             });
@@ -394,6 +398,7 @@ public class ZapArchive extends Recorder {
 
         } catch (NullPointerException e) {
             listener.getLogger().println("zap: Could not determine whether the build has new alerts.");
+            e.printStackTrace();
             return false;
         }
     }

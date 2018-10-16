@@ -24,12 +24,13 @@ code.instance-code{
     border-radius:0;
 }
 
-.high:not(.instance-code){
-	background-color:#d54c53;
+
+.low:not(.instance-code){
+	background-color:rgb(74, 144, 226);
 }
 
-.high.instance-code{
-	border-left: 3px solid #d54c53;	
+.low.instance-code{
+	border-left: 3px solid rgb(74, 144, 226);		
 }
 
 .medium:not(.instance-code){
@@ -40,13 +41,12 @@ code.instance-code{
 	border-left: 3px solid rgb(245,166,35);
 }
 
-.low:not(.instance-code){
-	background-color:rgb(74, 144, 226);
+.high:not(.instance-code){
+	background-color:#d54c53;
 }
 
-
-.low.instance-code{
-	border-left: 3px solid rgb(74, 144, 226);		
+.high.instance-code{
+	border-left: 3px solid #d54c53;
 }
 
 .suppressed:not(.instance-code){
@@ -111,13 +111,6 @@ a:hover{
 	height:48px;
 	width:100%;
 	background:#78b037;
-	padding-left:30px;
-	padding-right: 30px;
-}
-
-.navbar-container{
-    padding-left:30px;
-    padding-right:30px;
 }
 
 .navbar img{
