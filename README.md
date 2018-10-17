@@ -1,5 +1,5 @@
 <a href='https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project' align="top"><img align="left" src='https://github.com/vrondakis/zap-jenkins-pipeline-plugin/raw/master/src/main/webapp/logo.png'></a>
-ZAP Jenkins Plugin for pipeline builds. 
+ZAP Jenkins Plugin for pipeline builds
 ===
 Please see the [ZAP pipeline plugin page](https://plugins.jenkins.io/zap-pipeline) for more information.
 
