@@ -1,20 +1,20 @@
 <a href='https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project' align="top"><img align="left" src='https://github.com/vrondakis/zap-jenkins-pipeline-plugin/raw/master/src/main/webapp/logo.png'></a>
-ZAP Jenkins Plugin for pipeline builds. Please see the [ZAP pipeline plugin page](https://plugins.jenkins.io/zap-pipeline) for more information.
+ZAP Jenkins Plugin for pipeline builds. 
 ===
 
 
--------
+Please see the [ZAP pipeline plugin page](https://plugins.jenkins.io/zap-pipeline) for more information.
 
-Building the plugin
-===
+
+## Building the plugin
+
 This will generate a .hpi file in the target directory that you can install on your Jenkins installation.
 
 ```groovy
 mvn clean install
 ```
 
-Contributing to the plugin
-===
+## Contributing to the plugin
 New feature proposals and bug fix proposals should be submitted as [pull requests](https://help.github.com/articles/creating-a-pull-request). Fork the repository, prepare your change on your forked copy, and submit a pull request. Your pull request will be evaludated by a developer.
 
 -----
