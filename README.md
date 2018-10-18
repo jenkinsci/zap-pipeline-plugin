@@ -6,11 +6,27 @@ Please see the [ZAP pipeline plugin page](https://plugins.jenkins.io/zap-pipelin
 <br><br>
 ## Building the plugin
 
-This will generate a .hpi file in the target directory that you can install on your Jenkins installation.
+This will generate a .hpi file in the target directory that you can install on your Jenkins installation. 
 
 ```groovy
 mvn clean install
 ```
+
+## Installation
+Copy the ./target/zap-pipeline.hpi file to the $JENKINS_HOME/plugins directory and restart Jenkins.
+You can also use the plugin management console (Manage Jenkins -> Manage Plugins -> Advanced -> Upload Plugin)
+
+Below is a shell script you can use to automatically build and install the plugin
+
+```sh
+sudo service jenkins stop
+mvn install
+cp ./target/zap-pipeline.hpi /var/lib/jenkins/plugins/zap-pipeline.hpi
+sudo service jenkins start
+```
+
+
+
 
 ## Contributing to the plugin
 New feature proposals and bug fix proposals should be submitted as [pull requests](https://help.github.com/articles/creating-a-pull-request). Fork the repository, prepare your change on your forked copy, and submit a pull request. Your pull request will be evaluated by a developer and merged
