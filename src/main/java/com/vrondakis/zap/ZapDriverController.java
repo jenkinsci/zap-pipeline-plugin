@@ -28,6 +28,7 @@ public class ZapDriverController {
     private static HashMap<String, ZapDriver> zapDrivers = new HashMap<>();
 
     public static ZapDriver getZapDriver(Run run) {
+        System.out.println(run.getUrl());
         ZapDriver driver = zapDrivers.get(run.getUrl());
         if (driver != null)
             return driver;
@@ -38,7 +39,7 @@ public class ZapDriverController {
     }
 
     public static ZapDriver newDriver(Run run) {
-        ZapDriver driver = new ZapDriver();
+        ZapDriver driver = new ZapDriverImpl();
         zapDrivers.put(run.getUrl(), driver);
 
         return driver;

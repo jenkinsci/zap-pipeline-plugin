@@ -63,8 +63,7 @@ var createFalsePositive = function(alert, instance) {
 		uri: instance.uri,
 		method: instance.method,
 		param: instance.param,
-		attack: instance.attack,
-		evidence: instance.evidence
+		attack: instance.attack
 	}
 }
 
@@ -310,6 +309,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window, $q
 	  selectBox.style.top = '0'
 	  selectBox.style.opacity = '0'
 	  falsePositive.uri = '^' + falsePositive.uri.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '$'
+
     selectBox.value = JSON.stringify(falsePositive, null, 2)
 	  document.body.appendChild(selectBox)
 	  selectBox.focus()

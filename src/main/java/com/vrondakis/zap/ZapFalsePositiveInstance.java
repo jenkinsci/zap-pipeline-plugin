@@ -55,8 +55,7 @@ public class ZapFalsePositiveInstance extends ZapAlertInstance {
                         && (this.getWascid() == null || this.getWascid().equals(alert.getWascid()))
                         && (this.getMethod() == null || this.getMethod().equals(instance.getMethod()))
                         && (this.getParam() == null || this.getParam().equals(instance.getParam()))
-                        && (this.getAttack() == null || this.getAttack().equals(instance.getAttack()))
-                        && (this.getEvidence() == null || this.getEvidence().equals(instance.getEvidence()));
+                        && (this.getAttack() == null || this.getAttack().equals(instance.getAttack()));
     }
 
     public boolean equals(Object object) {
@@ -64,8 +63,8 @@ public class ZapFalsePositiveInstance extends ZapAlertInstance {
             ZapFalsePositiveInstance instance = (ZapFalsePositiveInstance) object;
             return new EqualsBuilder().append(getName(), instance.getName()).append(getCweid(), instance.getCweid())
                             .append(getWascid(), instance.getCweid()).append(getUri(), instance.getUri())
-                            .append(getMethod(), instance.getMethod()).append(getParam(), instance.getParam())
-                            .append(getAttack(), instance.getAttack()).append(getEvidence(), instance.getEvidence()).isEquals();
+                            .append(getMethod(), instance.getMethod()).append(getParam(), instance.getParam()).isEquals();
+
         }
         return false;
     }
@@ -79,6 +78,6 @@ public class ZapFalsePositiveInstance extends ZapAlertInstance {
     public String toString() {
         return new ToStringBuilder(this).append("name", name).append("cweid", cweid).append("wascid", wascid)
                         .append("uri", getUri()).append("method", getMethod()).append("param", getParam())
-                        .append("attack", getAttack()).append("evidence", getEvidence()).toString();
+                        .append("attack", getAttack()).toString();
     }
 }
