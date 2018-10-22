@@ -5,12 +5,19 @@ import hudson.console.ConsoleNote;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 public class TaskListenerStub implements hudson.model.TaskListener {
 
     @Override
     public PrintStream getLogger() {
-        return new PrintStream(System.out);
+        try {
+            return new PrintStream(System.out, false, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Unsupported encoding...
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override

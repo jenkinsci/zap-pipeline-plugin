@@ -167,7 +167,7 @@ public class ZapArchiveTest {
         Assert.assertFalse(zapArchiveA.shouldFailBuild(taskListener));
     }
 
-    void saveFalsePositives(Run<?, ?> run) throws IOException, InterruptedException {
+    private void saveFalsePositives(Run<?, ?> run) throws IOException, InterruptedException {
         URL url = Resources.getResource("false-positives.json");
         // TODO: can use Resources.copy but it requries an outputstream, how to use output stream straight to a file?
 

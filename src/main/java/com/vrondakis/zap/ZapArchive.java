@@ -88,7 +88,7 @@ public class ZapArchive extends Recorder {
     }
 
     private ZapAlertCount getAlertCount(List<ZapAlert> alerts, List<ZapFalsePositiveInstance> zapFalsePositiveInstances){
-        ZapAlertCount zapAlertCount = new ZapAlertCount();
+        ZapAlertCount zapAlertCount = new ZapAlertCount(0, 0, 0, 0, "Unknown");
 
         alerts.forEach(alert -> {
             int amountOfInstances = alert.getInstances().size();

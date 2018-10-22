@@ -93,4 +93,9 @@ class ZapAlertCount {
                 falsePositives == that.falsePositives &&
                 Objects.equals(buildName, that.buildName);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(highAlerts, mediumAlerts, lowAlerts, falsePositives, buildName);
+    }
 }
