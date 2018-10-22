@@ -68,7 +68,6 @@
         </pluginRepository>
     </pluginRepositories>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -85,7 +84,6 @@
             <artifactId>unirest-java</artifactId>
             <version>1.4.9</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -140,23 +138,18 @@
             </exclusions>
         </dependency>
 
-
-
         <dependency>
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-job</artifactId>
             <version>${workflow.version}</version>
             <scope>test</scope>
-
-
-
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.0.3</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 </project>
