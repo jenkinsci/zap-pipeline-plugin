@@ -54,6 +54,7 @@ public class ZapDriverImpl implements ZapDriver {
 
             String res = IOUtils.toString(response, StandardCharsets.UTF_8);
             return JSONObject.fromObject(res);
+
         } catch (URISyntaxException | IOException | UnirestException e) {
             // Should be handled in calling function
             e.printStackTrace();
@@ -66,6 +67,8 @@ public class ZapDriverImpl implements ZapDriver {
     }
 
     public boolean shutdownZap() {
+        if(0 == zapPort || null == zapHost) return false;
+
         return zapApi("core/action/shutdown") != null;
     }
 

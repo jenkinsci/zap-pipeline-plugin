@@ -223,7 +223,6 @@ public class ZapArchive extends Recorder {
     private List<ZapAlert> getAlertsFromZap() {
         try {
             JSONObject report = JSONObject.fromObject(zapDriver.getZapReport());
-
             // Zap returns either an array of sites, or a single site as an object. Attempt to load as an array, then
             // fall back to object on fail
             JSONArray sites;
@@ -236,17 +235,16 @@ public class ZapArchive extends Recorder {
 
             // Iterate over all sites, and flatten alerts down to a single array
             List<ZapAlert> alerts = new ArrayList<>();
-            for (Object site : sites) {
-                String alertArrayString = JSONObject.fromObject(site).getJSONArray(JSON_ALERTS_KEY).toString();
-                List<ZapAlert> siteAlerts = new Gson().fromJson(alertArrayString, new TypeToken<List<ZapAlert>>() {
-                }.getType());
-                alerts.addAll(siteAlerts);
-            }
+            if(!sites.isEmpty())
+                for (Object site : sites) {
+                    if(site=="null") continue;
+                    String alertArrayString = JSONObject.fromObject(site).getJSONArray(JSON_ALERTS_KEY).toString();
+                    List<ZapAlert> siteAlerts = new Gson().fromJson(alertArrayString, new TypeToken<List<ZapAlert>>() {
+                    }.getType());
+                    alerts.addAll(siteAlerts);
+                }
             return alerts;
         } catch (IOException | UnirestException | URISyntaxException | JSONException e) {
-
-            e.printStackTrace();
-
             return Collections.emptyList();
         }
     }
