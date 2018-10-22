@@ -5,7 +5,6 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -31,12 +30,15 @@ public class ZapActionTest {
     }
 
     @Test
-    public void verifyDisplayName() {
+    public void verifyActionData() {
+        // If displayName, iconFileName are not null then there will be an additional button on the sidebar
         Assert.assertNull(chart.getDisplayName());
+        Assert.assertNull(chart.getIconFileName());
+        Assert.assertEquals(ZapArchive.DIRECTORY_NAME, chart.getUrlName());
     }
 
     @Test
-    public void verifyAction() {
+    public void verifyActionAdded() {
         job.addAction(chart);
         Assert.assertNotNull(job.getAction(ZapTrendChart.class));
     }
