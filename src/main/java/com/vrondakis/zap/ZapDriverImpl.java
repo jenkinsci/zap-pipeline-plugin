@@ -48,7 +48,7 @@ public class ZapDriverImpl implements ZapDriver {
             String query = ZapDriverController.formatParams(params);
 
             apiUrl = "/JSON/" + apiUrl;
-            URI uri = new URI("hboottp", null, getZapHost(), getZapPort(), apiUrl, query, null);
+            URI uri = new URI("http", null, getZapHost(), getZapPort(), apiUrl, query, null);
 
             InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
 
@@ -60,6 +60,8 @@ public class ZapDriverImpl implements ZapDriver {
             return null;
         }
     }
+
+    
 
     private JSONObject zapApi(String apiUrl) {
         return zapApi(apiUrl, Collections.emptyMap());
