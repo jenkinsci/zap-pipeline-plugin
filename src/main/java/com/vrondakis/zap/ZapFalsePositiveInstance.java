@@ -43,27 +43,27 @@ public class ZapFalsePositiveInstance extends ZapAlertInstance {
     public boolean matches(ZapAlert alert, ZapAlertInstance instance) {
         // Match URL as regex
         Pattern urlPattern = this.getUri() != null ? Pattern.compile(this.getUri()) : null;
-        if(urlPattern != null){
+        if (urlPattern != null) {
             Matcher matcher = urlPattern.matcher(instance.getUri());
-            if(!matcher.find()){
+            if (!matcher.find()) {
                 return false;
             }
         }
 
         return (this.getName() == null || this.getName().equals(alert.getName()))
-                        && (this.getCweid() == null || this.getCweid().equals(alert.getCweid()))
-                        && (this.getWascid() == null || this.getWascid().equals(alert.getWascid()))
-                        && (this.getMethod() == null || this.getMethod().equals(instance.getMethod()))
-                        && (this.getParam() == null || this.getParam().equals(instance.getParam()))
-                        && (this.getAttack() == null || this.getAttack().equals(instance.getAttack()));
+                && (this.getCweid() == null || this.getCweid().equals(alert.getCweid()))
+                && (this.getWascid() == null || this.getWascid().equals(alert.getWascid()))
+                && (this.getMethod() == null || this.getMethod().equals(instance.getMethod()))
+                && (this.getParam() == null || this.getParam().equals(instance.getParam()))
+                && (this.getAttack() == null || this.getAttack().equals(instance.getAttack()));
     }
 
     public boolean equals(Object object) {
         if (object != null && getClass() == object.getClass()) {
             ZapFalsePositiveInstance instance = (ZapFalsePositiveInstance) object;
             return new EqualsBuilder().append(getName(), instance.getName()).append(getCweid(), instance.getCweid())
-                            .append(getWascid(), instance.getCweid()).append(getUri(), instance.getUri())
-                            .append(getMethod(), instance.getMethod()).append(getParam(), instance.getParam()).isEquals();
+                    .append(getWascid(), instance.getCweid()).append(getUri(), instance.getUri())
+                    .append(getMethod(), instance.getMethod()).append(getParam(), instance.getParam()).isEquals();
 
         }
         return false;
@@ -77,7 +77,7 @@ public class ZapFalsePositiveInstance extends ZapAlertInstance {
     @Override
     public String toString() {
         return new ToStringBuilder(this).append("name", name).append("cweid", cweid).append("wascid", wascid)
-                        .append("uri", getUri()).append("method", getMethod()).append("param", getParam())
-                        .append("attack", getAttack()).toString();
+                .append("uri", getUri()).append("method", getMethod()).append("param", getParam())
+                .append("attack", getAttack()).toString();
     }
 }

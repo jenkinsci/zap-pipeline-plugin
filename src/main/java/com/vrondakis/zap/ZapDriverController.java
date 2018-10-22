@@ -28,13 +28,11 @@ public class ZapDriverController {
     private static HashMap<String, ZapDriver> zapDrivers = new HashMap<>();
 
     public static ZapDriver getZapDriver(Run run) {
-        System.out.println(run.getUrl());
         ZapDriver driver = zapDrivers.get(run.getUrl());
         if (driver != null)
             return driver;
 
-
-        System.out.println("zap: Creating new ZAP driver for build URL: "+run.getUrl());
+        System.out.println("zap: Creating new ZAP driver for build URL: " + run.getUrl());
         return newDriver(run);
     }
 

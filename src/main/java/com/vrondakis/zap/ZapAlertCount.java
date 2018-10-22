@@ -13,7 +13,7 @@ class ZapAlertCount {
     private int falsePositives;
     private String buildName;
 
-    public ZapAlertCount(int highAlerts, int mediumAlerts, int lowAlerts, int falsePositives, String buildName){
+    public ZapAlertCount(int highAlerts, int mediumAlerts, int lowAlerts, int falsePositives, String buildName) {
         this.highAlerts = highAlerts;
         this.mediumAlerts = mediumAlerts;
         this.lowAlerts = lowAlerts;
@@ -26,7 +26,7 @@ class ZapAlertCount {
     }
 
     void incrementHigh(int amount) {
-        highAlerts+=amount;
+        highAlerts += amount;
     }
 
     void incrementMedium(int amount) {

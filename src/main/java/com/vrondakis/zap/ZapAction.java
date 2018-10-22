@@ -80,11 +80,11 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
         return actions;
     }
 
-    public void doGraph(StaplerRequest req, StaplerResponse res) throws IOException{
+    public void doGraph(StaplerRequest req, StaplerResponse res) throws IOException {
         doGraph(req, res, 500, 200);
     }
 
-    public void doGraphLarge(StaplerRequest req, StaplerResponse res) throws IOException{
+    public void doGraphLarge(StaplerRequest req, StaplerResponse res) throws IOException {
         doGraph(req, res, 1000, 400);
     }
 
@@ -99,7 +99,7 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
             @Override
             protected JFreeChart createGraph() {
                 JFreeChart chart = ChartFactory.createLineChart(
-                    null, "Build number", "ZAP alert instances", dataset, PlotOrientation.VERTICAL, true, false, false);
+                        null, "Build number", "Alerts", dataset, PlotOrientation.VERTICAL, true, false, false);
                 chart.setBackgroundPaint(Color.white);
 
                 CategoryPlot plot = chart.getCategoryPlot();

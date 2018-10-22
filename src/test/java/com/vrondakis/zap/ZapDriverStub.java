@@ -131,8 +131,6 @@ public class ZapDriverStub implements ZapDriver {
     @Override
     public String getZapReport() throws IOException, UnirestException, URISyntaxException {
         URL url = Resources.getResource("zap-raw.json");
-        System.out.println("loaded from url ");
-        System.out.println(url.toString());
         return Resources.toString(url, Charsets.UTF_8);
     }
 }

@@ -4,13 +4,10 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.vrondakis.zap.workflow.RunZapAttackStepParameters;
 import hudson.FilePath;
 import hudson.Launcher;
-import net.sf.json.JSONObject;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public interface ZapDriver {
     int COMPLETED_PERCENTAGE = 100;
@@ -19,29 +16,43 @@ public interface ZapDriver {
     int ZAP_INITIALIZE_WAIT = 20;
 
     boolean shutdownZap();
+
     boolean setZapMode(String zapMode);
 
     boolean startZapCrawler(String host);
+
     int zapCrawlerStatus();
 
     boolean importUrls(String path);
+
     boolean loadSession(String sessionPath);
 
     boolean loadPolicy(String policy);
+
     boolean zapAttack(RunZapAttackStepParameters zsp);
 
     int zapAttackStatus();
 
     boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher);
+
     void setZapHost(String zapHost);
+
     void setZapPort(int zapPort);
+
     void setFailBuild(int all, int hihg, int med, int low);
+
     void setZapTimeout(int timeout);
+
     void setAllowedHosts(List<String> allowedHosts);
+
     int getZapTimeout();
+
     int getZapPort();
+
     HashMap<Integer, Integer> getFailBuild();
+
     String getZapHost();
+
     List<String> getAllowedHosts();
 
     String getZapReport() throws IOException, UnirestException, URISyntaxException;

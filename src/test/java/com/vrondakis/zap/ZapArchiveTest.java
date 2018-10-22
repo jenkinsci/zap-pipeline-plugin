@@ -31,9 +31,7 @@ public class ZapArchiveTest {
     @Rule
     public TemporaryFolder tmp = new TemporaryFolder();
 
-
     private static TaskListener taskListener;
-
     private WorkflowJob job;
     private WorkflowRun zapRunA;
     private WorkflowRun zapRunB;
@@ -41,19 +39,16 @@ public class ZapArchiveTest {
     private ZapArchive zapArchiveB;
     private FilePath zapDirectoryA;
     private FilePath zapDirectoryB;
-
-
     private ZapDriver zapDriver = new ZapDriverStub();
 
-
     @BeforeClass
-    public static void setup() throws IOException, ExecutionException, InterruptedException {
-        // Create the project in Jenkins
+    public static void setup() {
+        // For fake-logging
         taskListener = new TaskListenerStub();
     }
 
     @Before
-    public void setupBuild() throws ExecutionException, InterruptedException, IOException {
+    public void setupBuild() throws ExecutionException, InterruptedException, IOException, NullPointerException {
         // Setup a build
         job = rule.jenkins.createProject(WorkflowJob.class, "zap-project");
 
@@ -64,8 +59,8 @@ public class ZapArchiveTest {
         zapArchiveA = new ZapArchive(zapRunA, zapDriver);
         zapArchiveB = new ZapArchive(zapRunB, zapDriver);
 
-        zapDirectoryA =  new FilePath(new File(zapRunA.getRootDir() + "/zap"));
-        zapDirectoryB =  new FilePath(new File(zapRunB.getRootDir() + "/zap"));
+        zapDirectoryA = new FilePath(new File(zapRunA.getRootDir() + "/zap"));
+        zapDirectoryB = new FilePath(new File(zapRunB.getRootDir() + "/zap"));
     }
 
     @After
@@ -90,7 +85,6 @@ public class ZapArchiveTest {
         Assert.assertEquals(zapIndexFile.readToString(), index);
     }
 
-
     @Test
     public void testAlertCounts() throws IOException, InterruptedException {
         // Archive both of the reports
@@ -104,7 +98,6 @@ public class ZapArchiveTest {
 
         Assert.assertEquals(zapAlertCountA, new ZapAlertCount(0, 10, 6, 0, zapRunA.getDisplayName()));
     }
-
 
     @Test
     public void testAlertCountsFalsePositive() throws IOException, InterruptedException {
@@ -136,7 +129,7 @@ public class ZapArchiveTest {
     }
 
     @Test
-    public void testActionCreated() throws IOException, InterruptedException, ExecutionException {
+    public void testActionCreated() {
         // Archive both builds
         zapArchiveA.archiveRawReport(zapRunA, job, taskListener, "false-positives.json");
 
@@ -144,8 +137,9 @@ public class ZapArchiveTest {
         zapArchiveB.archiveRawReport(zapRunB, job, taskListener, "false-positives.json");
         Assert.assertNotNull(zapRunB.getAction(ZapAction.class));
     }
+
     @Test
-    public void testActionNotCreated() throws IOException, InterruptedException, ExecutionException {
+    public void testActionNotCreated() {
         // Archive both builds
         zapArchiveA.archiveRawReport(zapRunA, job, taskListener, "false-positives.json");
         Assert.assertNull(zapRunA.getParent().getAction(ZapAction.class));
@@ -169,7 +163,6 @@ public class ZapArchiveTest {
 
     private void saveFalsePositives(Run<?, ?> run) throws IOException, InterruptedException {
         URL url = Resources.getResource("false-positives.json");
-        // TODO: can use Resources.copy but it requries an outputstream, how to use output stream straight to a file?
 
         // Create a false-positives file in one of the workspaces
         String falsePositivesFile = Resources.toString(url, Charsets.UTF_8);
@@ -177,8 +170,7 @@ public class ZapArchiveTest {
         fp.write(falsePositivesFile, "UTF-8");
     }
 
-
-    private FilePath getZapDirectory(Run<?, ?> run){
+    private FilePath getZapDirectory(Run<?, ?> run) {
         return new FilePath(new File(run.getRootDir() + "/zap"));
     }
 

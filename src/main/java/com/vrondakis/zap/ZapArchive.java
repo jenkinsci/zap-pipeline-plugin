@@ -1,31 +1,10 @@
 package com.vrondakis.zap;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.Nonnull;
-
-import hudson.model.Job;
-import org.apache.commons.io.IOUtils;
-
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-
 import hudson.FilePath;
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepMonitor;
@@ -34,6 +13,19 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+
+import javax.annotation.Nonnull;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * ZapArchiver Main zap class, handles generating report.
@@ -87,7 +79,7 @@ public class ZapArchive extends Recorder {
         }
     }
 
-    private ZapAlertCount getAlertCount(List<ZapAlert> alerts, List<ZapFalsePositiveInstance> zapFalsePositiveInstances){
+    private ZapAlertCount getAlertCount(List<ZapAlert> alerts, List<ZapFalsePositiveInstance> zapFalsePositiveInstances) {
         ZapAlertCount zapAlertCount = new ZapAlertCount(0, 0, 0, 0, "Unknown");
 
         alerts.forEach(alert -> {
@@ -110,7 +102,6 @@ public class ZapArchive extends Recorder {
                     break;
             }
         });
-
 
 
         return zapAlertCount;
@@ -339,7 +330,6 @@ public class ZapArchive extends Recorder {
         }
 
 
-
         // Fetches the false positives file (if it exists) and saves it
         saveFalsePositives(falsePositivesFilePath, dir.getRootDir(), taskListener, zapDir);
 
@@ -353,15 +343,9 @@ public class ZapArchive extends Recorder {
             File zapDirectory = new File(v.getRootDir(), DIRECTORY_NAME);
             FilePath filePath = new FilePath(new File(zapDirectory.toString() + "/" + "alert-count.json"));
 
-            System.out.println("we are looking in "+v.getRootDir()+"/zap/alert-count.json");
-
-
             try {
-                if (filePath.exists()) {
+                if (filePath.exists())
                     count.getAndIncrement();
-                } else{
-                    System.out.println("does not exist");
-                }
             } catch (InterruptedException | IOException e) {
                 // Just don't count this build
                 e.printStackTrace();
