@@ -61,8 +61,6 @@ public class ZapDriverImpl implements ZapDriver {
         }
     }
 
-    
-
     private JSONObject zapApi(String apiUrl) {
         return zapApi(apiUrl, Collections.emptyMap());
     }
@@ -210,7 +208,6 @@ public class ZapDriverImpl implements ZapDriver {
         try {
             List<String> allowedHosts = this.allowedHosts;
             String host = new URI(url).getHost();
-
             // If it is in the allowed hosts parameter - or if the url is unset if it is local
             // localhost.localdomain does not resolve properly with INetAddress.getByName, which is why there is an additional check
             if (!host.equals("localhost.localdomain")) {
