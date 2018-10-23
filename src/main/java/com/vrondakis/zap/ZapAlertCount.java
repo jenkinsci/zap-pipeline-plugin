@@ -83,10 +83,10 @@ class ZapAlertCount {
     }
 
     @Override
-    public boolean equals(Object alertCount) {
-        if (this == alertCount) return true;
-        if (alertCount == null || getClass() != alertCount.getClass()) return false;
-        ZapAlertCount that = (ZapAlertCount) alertCount;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ZapAlertCount that = (ZapAlertCount) o;
         return highAlerts == that.highAlerts &&
                 mediumAlerts == that.mediumAlerts &&
                 lowAlerts == that.lowAlerts &&

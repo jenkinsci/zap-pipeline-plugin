@@ -96,7 +96,7 @@ public class ZapArchiveTest extends ZapTests {
         Gson gson = new Gson();
         ZapAlertCount zapAlertCountA = gson.fromJson(zapAlertCountRawA, ZapAlertCount.class);
 
-        Assert.assertEquals(zapAlertCountA, new ZapAlertCount(0, 8, 6, 2, zapRunA.getDisplayName()));
+        Assert.assertEquals(new ZapAlertCount(0, 8, 6, 2, zapRunA.getDisplayName()), zapAlertCountA);
     }
 
     @Test
