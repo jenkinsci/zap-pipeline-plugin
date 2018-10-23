@@ -99,7 +99,16 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
             @Override
             protected JFreeChart createGraph() {
                 JFreeChart chart = ChartFactory.createLineChart(
-                        null, "Build number", "Alert instances", dataset, PlotOrientation.VERTICAL, true, false, false);
+                    null, 
+                    "Build number", 
+                    "Alert instances", 
+                    dataset, 
+                    PlotOrientation.VERTICAL, 
+                    true, 
+                    false, 
+                    false
+                );
+      
                 chart.setBackgroundPaint(Color.white);
 
                 CategoryPlot plot = chart.getCategoryPlot();
