@@ -66,7 +66,6 @@ public class ZapArchive extends Recorder {
      */
     private boolean saveStaticFiles(File dir) {
         try {
-            System.out.println("saving static files.....");
             String indexName = "index.html";
             String pluginName = "zap-pipeline";
             FilePath indexFile = new FilePath(new File(
@@ -228,9 +227,9 @@ public class ZapArchive extends Recorder {
 
             // Iterate over all sites, and flatten alerts down to a single array
             List<ZapAlert> alerts = new ArrayList<>();
-            if(!sites.isEmpty())
+            if (!sites.isEmpty())
                 for (Object site : sites) {
-                    if(site=="null") continue;
+                    if (site == "null") continue;
                     String alertArrayString = JSONObject.fromObject(site).getJSONArray(JSON_ALERTS_KEY).toString();
                     List<ZapAlert> siteAlerts = new Gson().fromJson(alertArrayString, new TypeToken<List<ZapAlert>>() {
                     }.getType());

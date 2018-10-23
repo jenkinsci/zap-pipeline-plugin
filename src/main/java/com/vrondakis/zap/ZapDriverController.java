@@ -61,7 +61,7 @@ public class ZapDriverController {
     public static boolean shutdownZap(Run run) {
         boolean success = getZapDriver(run).shutdownZap();
 
-        if(zapDrivers.get(run.getUrl()) instanceof ZapDriverImpl)
+        if (zapDrivers.get(run.getUrl()) instanceof ZapDriverImpl)
             zapDrivers.remove(run.getUrl());
 
         return success;
@@ -72,7 +72,7 @@ public class ZapDriverController {
         return params.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&"));
     }
 
-    public static <T extends ZapDriver> void setZapDriverClass(Class<T> zapDriver){
+    public static <T extends ZapDriver> void setZapDriverClass(Class<T> zapDriver) {
         zapDriverClass = zapDriver;
     }
 

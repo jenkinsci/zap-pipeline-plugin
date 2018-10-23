@@ -24,7 +24,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start(){
+    public boolean start() {
         listener.getLogger().println("zap: Archiving results...");
         System.out.println("zap: Archiving results...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);

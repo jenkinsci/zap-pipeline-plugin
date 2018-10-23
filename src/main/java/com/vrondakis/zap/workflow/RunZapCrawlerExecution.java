@@ -39,9 +39,9 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
         }
 
         boolean completed = zapDriver.zapCrawlerSuccess();
-        if(!success){
+        if (!completed)
             listener.getLogger().println("zap: Could not complete ZAP crawl due to the timeout");
-        }
+
 
         getContext().onSuccess(true);
         return true;

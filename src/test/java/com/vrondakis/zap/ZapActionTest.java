@@ -1,17 +1,13 @@
 package com.vrondakis.zap;
 
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public class ZapActionTest extends ZapTests{
+public class ZapActionTest extends ZapTests {
 
     private ZapTrendChart chart;
 

@@ -78,7 +78,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         if (!zapHasStarted) {
             System.out.println("zap: Failed to start ZAP on port " + zapDriver.getZapPort());
             getContext().onFailure(
-                new Throwable("zap: Failed to start ZAP on " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort() + ". Socket timed out"));
+                    new Throwable("zap: Failed to start ZAP on " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort() + ". Socket timed out"));
 
             return false;
         }

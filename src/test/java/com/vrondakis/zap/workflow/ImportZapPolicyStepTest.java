@@ -26,8 +26,6 @@ public class ImportZapPolicyStepTest extends ZapWorkflow {
         ));
 
         run = job.scheduleBuild2(0).get();
-        System.out.println("parameter provided pass");
-
         r.assertBuildStatus(Result.SUCCESS, run);
     }
 }

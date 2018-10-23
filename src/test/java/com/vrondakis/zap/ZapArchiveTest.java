@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
-public class ZapArchiveTest extends ZapTests{
+public class ZapArchiveTest extends ZapTests {
     private WorkflowRun zapRunA;
     private WorkflowRun zapRunB;
     private ZapArchive zapArchiveA;
