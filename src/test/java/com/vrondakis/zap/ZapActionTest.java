@@ -1,6 +1,5 @@
 package com.vrondakis.zap;
 
-
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.After;
 import org.junit.Assert;
@@ -10,23 +9,16 @@ import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
-public class ZapActionTest {
-    @Rule
-    public JenkinsRule rule = new JenkinsRule();
+public class ZapActionTest extends ZapTests{
 
-    WorkflowJob job;
-    ZapTrendChart chart;
+    private ZapTrendChart chart;
 
     @Before
-    public void setup() throws IOException {
-        job = rule.jenkins.createProject(WorkflowJob.class, "zap-project");
+    public void setup() throws IOException, ExecutionException, InterruptedException {
+        super.setup();
         chart = new ZapTrendChart(job);
-    }
-
-    @After
-    public void cleanup() throws IOException, InterruptedException {
-        job.delete();
     }
 
     @Test

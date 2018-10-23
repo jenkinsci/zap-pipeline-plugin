@@ -47,9 +47,8 @@ public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl
         }
     }
 
-
     @Override
     public void stop(@Nonnull Throwable throwable) throws Exception {
-
+        // findbugs
     }
 }

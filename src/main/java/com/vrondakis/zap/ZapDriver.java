@@ -31,6 +31,8 @@ public interface ZapDriver {
 
     boolean zapAttack(RunZapAttackStepParameters zsp);
 
+    boolean zapCrawlerSuccess();
+
     int zapAttackStatus();
 
     boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher);
@@ -56,4 +58,6 @@ public interface ZapDriver {
     List<String> getAllowedHosts();
 
     String getZapReport() throws IOException, UnirestException, URISyntaxException;
+
+    boolean zapAliveCheck();
 }

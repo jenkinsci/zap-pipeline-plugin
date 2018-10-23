@@ -57,7 +57,6 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                 }
             }
 
-
         } finally {
             boolean success = ZapDriverController.shutdownZap(this.run);
             if (!success)
@@ -67,5 +66,4 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
         getContext().onSuccess(true);
         return true;
     }
-
 }

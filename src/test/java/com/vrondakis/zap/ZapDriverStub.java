@@ -2,26 +2,30 @@ package com.vrondakis.zap;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.vrondakis.zap.workflow.RunZapAttackStepParameters;
 import hudson.FilePath;
 import hudson.Launcher;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 
 public class ZapDriverStub implements ZapDriver {
-    HashMap<Integer, Integer> failBuild = new HashMap<>();
+    private int port;
+    private int timeout;
+    private String host;
+    private String loadedSessionPath = "";
+    private List<String> allowedHosts;
+    private HashMap<Integer, Integer> failBuild = new HashMap<>();
 
-    public ZapDriverStub(){
+
+    public ZapDriverStub() {
         super();
-        failBuild.put(1, 0);
-        failBuild.put(2, 9);
-        failBuild.put(3, 0);
-        failBuild.put(4, 0);
+    }
+
+    public String getLoadedSessionPath() {
+        return loadedSessionPath;
     }
 
     @Override
@@ -36,33 +40,38 @@ public class ZapDriverStub implements ZapDriver {
 
     @Override
     public boolean startZapCrawler(String host) {
-        return false;
+        return true;
     }
 
     @Override
     public int zapCrawlerStatus() {
-        return 0;
+        return 100;
     }
 
     @Override
     public boolean importUrls(String path) {
-
-        return false;
+        return true;
     }
 
     @Override
     public boolean loadSession(String sessionPath) {
-        return false;
+        loadedSessionPath = sessionPath;
+        return true;
     }
 
     @Override
     public boolean loadPolicy(String policy) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean zapAttack(RunZapAttackStepParameters zsp) {
         return false;
+    }
+
+    @Override
+    public boolean zapCrawlerSuccess() {
+        return true;
     }
 
     @Override
@@ -72,46 +81,45 @@ public class ZapDriverStub implements ZapDriver {
 
     @Override
     public boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher) {
-        return false;
+        return true;
     }
 
     @Override
     public void setZapHost(String zapHost) {
-
+        host = zapHost;
     }
 
     @Override
     public void setZapPort(int zapPort) {
-
+        port = zapPort;
     }
 
     @Override
     public void setFailBuild(int all, int high, int med, int low) {
-        failBuild = new HashMap<>();
-        failBuild.put(4, 0);
-        failBuild.put(3, high);
-        failBuild.put(2, med);
-        failBuild.put(1, low);
+        failBuild.put(ZapArchive.ALL_ALERT, all);
+        failBuild.put(ZapArchive.HIGH_ALERT, high);
+        failBuild.put(ZapArchive.MEDIUM_ALERT, med);
+        failBuild.put(ZapArchive.LOW_ALERT, low);
     }
 
     @Override
     public void setZapTimeout(int timeout) {
-
+        this.timeout = timeout;
     }
 
     @Override
     public void setAllowedHosts(List<String> allowedHosts) {
-
+        this.allowedHosts = allowedHosts;
     }
 
     @Override
     public int getZapTimeout() {
-        return 30;
+        return timeout;
     }
 
     @Override
     public int getZapPort() {
-        return 1234;
+        return port;
     }
 
     @Override
@@ -121,17 +129,22 @@ public class ZapDriverStub implements ZapDriver {
 
     @Override
     public String getZapHost() {
-        return "localhost";
+        return host;
     }
 
     @Override
     public List<String> getAllowedHosts() {
-        return null;
+        return this.allowedHosts;
     }
 
     @Override
-    public String getZapReport() throws IOException, UnirestException, URISyntaxException {
+    public String getZapReport() throws IOException {
         URL url = Resources.getResource("zap-raw.json");
         return Resources.toString(url, Charsets.UTF_8);
+    }
+
+    @Override
+    public boolean zapAliveCheck() {
+        return true;
     }
 }

@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 public class TaskListenerStub implements hudson.model.TaskListener {
-
     @Override
     public PrintStream getLogger() {
         try {

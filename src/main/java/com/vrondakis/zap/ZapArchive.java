@@ -39,10 +39,10 @@ public class ZapArchive extends Recorder {
     private static final String JSON_SITE_KEY = "site";
     private static final String JSON_ALERTS_KEY = "alerts";
 
-    static final int HIGH_ALERT = 3;
-    static final int MEDIUM_ALERT = 2;
-    static final int LOW_ALERT = 1;
-    static final int ALL_ALERT = 4;
+    public static final int HIGH_ALERT = 3;
+    public static final int MEDIUM_ALERT = 2;
+    public static final int LOW_ALERT = 1;
+    public static final int ALL_ALERT = 4;
 
     static final String DIRECTORY_NAME = "zap";
 
@@ -66,11 +66,11 @@ public class ZapArchive extends Recorder {
      */
     private boolean saveStaticFiles(File dir) {
         try {
+            System.out.println("saving static files.....");
             String indexName = "index.html";
             String pluginName = "zap-pipeline";
             FilePath indexFile = new FilePath(new File(
                     Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), indexName));
-
             indexFile.copyTo(new FilePath(new File(dir, indexName)));
             return true;
         } catch (IOException | InterruptedException e) {
@@ -84,11 +84,9 @@ public class ZapArchive extends Recorder {
 
         alerts.forEach(alert -> {
             int amountOfInstances = alert.getInstances().size();
-
             int falsePositives = amountOfInstances - alert.getFilteredOutFalsePositiveInstances(zapFalsePositiveInstances).size();
             amountOfInstances -= falsePositives;
             zapAlertCount.incrementFalsePositives(falsePositives);
-
 
             switch (alert.getRiskcode()) {
                 case "1":
@@ -102,7 +100,6 @@ public class ZapArchive extends Recorder {
                     break;
             }
         });
-
 
         return zapAlertCount;
     }
@@ -120,14 +117,12 @@ public class ZapArchive extends Recorder {
             List<ZapFalsePositiveInstance> zapFalsePositiveInstances = getSavedFalsePositives(zapDir);
 
             ZapAlertCount zapAlertCount = getAlertCount(alerts, zapFalsePositiveInstances);
-
             zapAlertCount.setBuildName(run.getDisplayName());
 
             Gson gson = new Gson();
             String json = gson.toJson(zapAlertCount);
 
             FilePath fp = new FilePath(new File(zapDir + "/" + ALERT_COUNT_FILENAME));
-
             fp.write(json, "UTF-8");
 
             return true;
@@ -150,9 +145,7 @@ public class ZapArchive extends Recorder {
                 return false;
 
             String res = zapDriver.getZapReport();
-
             fp.write(res, "UTF-8");
-
 
             return true;
         } catch (URISyntaxException | IOException | UnirestException | InterruptedException e) {
@@ -249,7 +242,6 @@ public class ZapArchive extends Recorder {
         }
     }
 
-
     /**
      * Gets the directory of the last build that ran ZAP
      *
@@ -327,13 +319,11 @@ public class ZapArchive extends Recorder {
             }
         }
 
-
         // Fetches the false positives file (if it exists) and saves it
         saveFalsePositives(falsePositivesFilePath, dir.getRootDir(), taskListener, zapDir);
 
         // Fetches the JSON report from ZAP and saves it
         boolean success = saveZapReport(zapDir) && saveStaticFiles(zapDir) && saveAlertCount(zapDir);
-
 
         // Only show the graph if ZAP has been ran more than twice in the current builds
         AtomicInteger count = new AtomicInteger(0);
@@ -353,7 +343,6 @@ public class ZapArchive extends Recorder {
         // If the report was retrieved and saved add the "ZAP scanning report" to the build
         // If it was not saved just add the graph (by hiding the button)
         ZapAction action = new ZapAction(run, success);
-
 
         if (count.get() > 0) run.addAction(action);
 
@@ -392,7 +381,7 @@ public class ZapArchive extends Recorder {
                 alertCounts.put(riskCode, newCount);
             });
 
-            // Total amount of alert instances with a risk code more than 1
+            // Total amount of alert instances with a risk code more than 0
             alertCounts.put(ALL_ALERT,
                     (int) currentBuildAlerts.stream().filter(alert -> Integer.parseInt(alert.getRiskcode()) > 0).count());
 
@@ -403,8 +392,8 @@ public class ZapArchive extends Recorder {
                     failBuild.set(true);
                 }
             });
-            return failBuild.get();
 
+            return failBuild.get();
         } catch (NullPointerException e) {
             listener.getLogger().println("zap: Could not determine whether the build has new alerts.");
             e.printStackTrace();

@@ -22,7 +22,7 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
 
     @Override
     public boolean start() {
-        if (runZapCrawlerParameters == null) {
+        if (runZapCrawlerParameters == null || runZapCrawlerParameters.getHost().equals("")) {
             this.listener.getLogger().println("zap: Could not run ZAP crawler, no host has been provided");
             getContext().onSuccess(false);
             return false;
@@ -34,32 +34,13 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
         boolean success = zapDriver.startZapCrawler(runZapCrawlerParameters.getHost());
         if (!success) {
             System.out.println("zap: Failed to start ZAP crawler on host " + runZapCrawlerParameters.getHost());
-            getContext().onFailure(new Throwable("zap: Failed ot start ZAP crawler on host " + runZapCrawlerParameters.getHost()));
+            getContext().onFailure(new Throwable("zap: Failed to start ZAP crawler on host " + runZapCrawlerParameters.getHost()));
             return false;
         }
 
-        OffsetDateTime startedTime = OffsetDateTime.now();
-        int timeoutSeconds = zapDriver.getZapTimeout();
-
-        int status = zapDriver.zapCrawlerStatus();
-        while (status < ZapDriver.COMPLETED_PERCENTAGE) {
-            if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
-                listener.getLogger().println("zap: Crawler timed out before it could complete the scan");
-                break;
-            }
-
-            status = zapDriver.zapCrawlerStatus();
-            listener.getLogger().println("zap: Crawler progress is: " + status + "%");
-
-            try {
-                // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
-                // when the scan is complete.
-                if (status != ZapDriver.COMPLETED_PERCENTAGE)
-                    TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
-            } catch (InterruptedException e) {
-                // Usually if Jenkins run is stopped
-                System.out.println("zap: Failed to get status of crawler");
-            }
+        boolean completed = zapDriver.zapCrawlerSuccess();
+        if(!success){
+            listener.getLogger().println("zap: Could not complete ZAP crawl due to the timeout");
         }
 
         getContext().onSuccess(true);

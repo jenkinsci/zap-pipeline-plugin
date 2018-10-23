@@ -3,16 +3,19 @@ package com.vrondakis.zap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 
@@ -67,7 +70,7 @@ public class ZapDriverImpl implements ZapDriver {
     }
 
     public boolean shutdownZap() {
-        if(0 == zapPort || null == zapHost) return false;
+        if (0 == zapPort || null == zapHost) return false;
 
         return zapApi("core/action/shutdown") != null;
     }
@@ -123,6 +126,34 @@ public class ZapDriverImpl implements ZapDriver {
             return COMPLETED_PERCENTAGE;
         }
     }
+
+    public boolean zapCrawlerSuccess() {
+        OffsetDateTime startedTime = OffsetDateTime.now();
+        int timeoutSeconds = this.getZapTimeout();
+
+        int status = this.zapCrawlerStatus();
+        while (status < ZapDriver.COMPLETED_PERCENTAGE) {
+            if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
+                return false;
+            }
+
+            status = this.zapCrawlerStatus();
+            System.out.println("zap: Crawler progress is: " + status + "%");
+
+            try {
+                // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
+                // when the scan is complete.
+                if (status != ZapDriver.COMPLETED_PERCENTAGE)
+                    TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
+            } catch (InterruptedException e) {
+                // Usually if Jenkins run is stopped
+                System.out.println("zap: Failed to get status of crawler");
+            }
+        }
+
+        return true;
+    }
+
 
     /**
      * Imports URLs from a text file
@@ -342,6 +373,26 @@ public class ZapDriverImpl implements ZapDriver {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public boolean zapAliveCheck() {
+        OffsetDateTime startedTime = OffsetDateTime.now();
+        while (!OffsetDateTime.now().isAfter(startedTime.plusSeconds(ZapDriver.ZAP_INITIALIZE_TIMEOUT))) {
+            try {
+                TimeUnit.SECONDS.sleep(ZapDriver.ZAP_INITIALIZE_WAIT);
+                System.out.println("zap: Attempting to connect to ZAP at " + this.getZapHost() + ":" + this.getZapPort());
+
+                new Socket(this.getZapHost(), this.getZapPort());
+                return true;
+            } catch (IOException e) {
+                // Do nothing, just means ZAP hasn't started yet - we want to wait for the timeout
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+
+        return false;
     }
 
     public String getZapReport() throws IOException, UnirestException, URISyntaxException {

@@ -1,38 +1,24 @@
 package com.vrondakis.zap;
 
-
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import hudson.FilePath;
 import hudson.model.Run;
-import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
-public class ZapArchiveTest {
-    @Rule
-    public JenkinsRule rule = new JenkinsRule();
-
-    @Rule
-    public TemporaryFolder tmp = new TemporaryFolder();
-
-    private static TaskListener taskListener;
-    private WorkflowJob job;
+public class ZapArchiveTest extends ZapTests{
     private WorkflowRun zapRunA;
     private WorkflowRun zapRunB;
     private ZapArchive zapArchiveA;
@@ -41,16 +27,10 @@ public class ZapArchiveTest {
     private FilePath zapDirectoryB;
     private ZapDriver zapDriver = new ZapDriverStub();
 
-    @BeforeClass
-    public static void setup() {
-        // For fake-logging
-        taskListener = new TaskListenerStub();
-    }
 
     @Before
-    public void setupBuild() throws ExecutionException, InterruptedException, IOException, NullPointerException {
-        // Setup a build
-        job = rule.jenkins.createProject(WorkflowJob.class, "zap-project");
+    public void setup() throws ExecutionException, InterruptedException, IOException, NullPointerException {
+        super.setup();
 
         // Setup two builds
         zapRunA = job.scheduleBuild2(0).get();
@@ -61,6 +41,9 @@ public class ZapArchiveTest {
 
         zapDirectoryA = new FilePath(new File(zapRunA.getRootDir() + "/zap"));
         zapDirectoryB = new FilePath(new File(zapRunB.getRootDir() + "/zap"));
+
+        zapDriver.setZapHost("localhost");
+        zapDriver.setZapPort(1234);
     }
 
     @After
@@ -104,7 +87,7 @@ public class ZapArchiveTest {
         // Save the false positives file for zapRunA, so the alert counts will be different
         saveFalsePositives(zapRunA);
 
-        // Archive both of the reports
+        // Archive the reports
         zapArchiveA.archiveRawReport(zapRunA, job, taskListener, "false-positives.json");
 
         // Read alert-count files
@@ -169,9 +152,4 @@ public class ZapArchiveTest {
         FilePath fp = new FilePath(new FilePath(zapRunA.getRootDir()), "false-positives.json");
         fp.write(falsePositivesFile, "UTF-8");
     }
-
-    private FilePath getZapDirectory(Run<?, ?> run) {
-        return new FilePath(new File(run.getRootDir() + "/zap"));
-    }
-
 }

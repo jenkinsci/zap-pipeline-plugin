@@ -1,45 +1,25 @@
 package com.vrondakis.zap;
 
-import hudson.model.TaskListener;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public class ZapDriverControllerTest {
-    private static TaskListener taskListener;
-    private WorkflowJob job;
+public class ZapDriverControllerTest extends ZapTests {
+
     private WorkflowRun run;
 
-    @Rule
-    public JenkinsRule rule = new JenkinsRule();
-
-    @BeforeClass
-    public static void setup(){
-        taskListener = new TaskListenerStub();
-    }
-
     @Before
-    public void setupBuild() throws ExecutionException, InterruptedException, IOException {
-        job = rule.jenkins.createProject(WorkflowJob.class, "zap-project");
+    public void setup() throws IOException, ExecutionException, InterruptedException {
+        super.setup();
         run = job.scheduleBuild2(0).get();
     }
 
-    @After
-    public void cleanup() throws IOException, InterruptedException {
-        job.delete();
-    }
-
     @Test
-    public void testNewZapDriver(){
+    public void testNewZapDriver() {
         ZapDriver firstDriver = ZapDriverController.newDriver(run, ZapDriverStub.class);
         ZapDriver secondDriver = ZapDriverController.getZapDriver(run);
 

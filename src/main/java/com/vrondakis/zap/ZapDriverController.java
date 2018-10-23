@@ -27,8 +27,6 @@ public class ZapDriverController {
     static final String ZAP_WIN_PROGRAM = "zap.bat";
 
     static Class<? extends ZapDriver> zapDriverClass = ZapDriverImpl.class;
-
-
     private static HashMap<String, ZapDriver> zapDrivers = new HashMap<>();
 
     public static ZapDriver getZapDriver(Run run) {
@@ -54,7 +52,6 @@ public class ZapDriverController {
 
     public static ZapDriver newDriver(Run run) {
         return ZapDriverController.newDriver(run, zapDriverClass);
-
     }
 
     public static boolean zapDriverExists(Run run) {
@@ -63,7 +60,9 @@ public class ZapDriverController {
 
     public static boolean shutdownZap(Run run) {
         boolean success = getZapDriver(run).shutdownZap();
-        zapDrivers.remove(run.getUrl());
+
+        if(zapDrivers.get(run.getUrl()) instanceof ZapDriverImpl)
+            zapDrivers.remove(run.getUrl());
 
         return success;
     }
@@ -75,5 +74,9 @@ public class ZapDriverController {
 
     public static <T extends ZapDriver> void setZapDriverClass(Class<T> zapDriver){
         zapDriverClass = zapDriver;
+    }
+
+    public static void clearAll() {
+        zapDrivers.clear();
     }
 }
