@@ -13,7 +13,7 @@ public class ZapFailBuildAction implements Serializable, RunAction2 {
 
     private static final long serialVersionUID = 1L;
 
-    public ZapFailBuildAction(){
+    public ZapFailBuildAction() {
 
     }
 
@@ -23,12 +23,12 @@ public class ZapFailBuildAction implements Serializable, RunAction2 {
     }
 
     @Override
-    public String getDisplayName(){
+    public String getDisplayName() {
         return null;
     }
 
     @Override
-    public String getUrlName(){
+    public String getUrlName() {
         return null;
     }
 

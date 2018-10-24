@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StartZapStepParameters {
-    private static String DEFAULT_HOST = "localhost";
-    private static int DEFAULT_PORT = 9092;
     private static int DEFAULT_TIMEOUT = 1000;
     private static String DEFAULT_ZAP_HOME = System.getProperty("ZAP_HOME");
     private static List<String> DEFAULT_ALLOWED_HOSTS = new ArrayList<>();
@@ -18,8 +16,8 @@ public class StartZapStepParameters {
 
     public StartZapStepParameters(String host, int port, int timeout, String zapHome, List<String> allowedHosts,
                                   String sessionPath) {
-        this.host = host == null ? DEFAULT_HOST : host;
-        this.port = port == 0 ? DEFAULT_PORT : port;
+        this.host = host;
+        this.port = port;
         this.timeout = timeout == 0 ? DEFAULT_TIMEOUT : timeout;
         this.zapHome = (zapHome == null || zapHome.isEmpty()) ? DEFAULT_ZAP_HOME : zapHome;
         this.allowedHosts = (allowedHosts == null || allowedHosts.isEmpty()) ? DEFAULT_ALLOWED_HOSTS : allowedHosts;

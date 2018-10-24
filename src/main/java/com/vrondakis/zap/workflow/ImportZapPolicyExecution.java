@@ -29,7 +29,7 @@ public class ImportZapPolicyExecution extends DefaultStepExecutionImpl {
         if (!success) {
             listener.getLogger().println("zap: Failed to load attack policy at " + importZapPolicyStepParameters.getPolicyPath());
             getContext().onFailure(
-                new Throwable("zap: Failed to load attack policy at " + importZapPolicyStepParameters.getPolicyPath()));
+                    new Throwable("zap: Failed to load attack policy at " + importZapPolicyStepParameters.getPolicyPath()));
             return false;
         }
 

@@ -1,5 +1,6 @@
 package com.vrondakis.zap;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ public class ZapDriverController {
     static final String ZAP_UNIX_PROGRAM = "zap.sh";
     static final String ZAP_WIN_PROGRAM = "zap.bat";
 
+    static Class<? extends ZapDriver> zapDriverClass = ZapDriverImpl.class;
     private static HashMap<String, ZapDriver> zapDrivers = new HashMap<>();
 
     public static ZapDriver getZapDriver(Run run) {
@@ -32,16 +34,24 @@ public class ZapDriverController {
         if (driver != null)
             return driver;
 
-
-        System.out.println("zap: Creating new ZAP driver for build URL: "+run.getUrl());
+        System.out.println("zap: Creating new ZAP driver for build URL: " + run.getUrl());
         return newDriver(run);
     }
 
-    public static ZapDriver newDriver(Run run) {
-        ZapDriver driver = new ZapDriver();
-        zapDrivers.put(run.getUrl(), driver);
+    public static <T extends ZapDriver> ZapDriver newDriver(Run run, Class<T> zapDriver) {
+        ZapDriver zDriver = null;
+        try {
+            zDriver = zapDriver.getDeclaredConstructor().newInstance();
+            zapDrivers.put(run.getUrl(), zDriver);
+            return zDriver;
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-        return driver;
+    public static ZapDriver newDriver(Run run) {
+        return ZapDriverController.newDriver(run, zapDriverClass);
     }
 
     public static boolean zapDriverExists(Run run) {
@@ -50,7 +60,9 @@ public class ZapDriverController {
 
     public static boolean shutdownZap(Run run) {
         boolean success = getZapDriver(run).shutdownZap();
-        zapDrivers.remove(run.getUrl());
+
+        if (zapDrivers.get(run.getUrl()) instanceof ZapDriverImpl)
+            zapDrivers.remove(run.getUrl());
 
         return success;
     }
@@ -58,5 +70,13 @@ public class ZapDriverController {
     // Converts map of parameters to URL parameters
     static String formatParams(Map<String, String> params) {
         return params.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).collect(Collectors.joining("&"));
+    }
+
+    public static <T extends ZapDriver> void setZapDriverClass(Class<T> zapDriver) {
+        zapDriverClass = zapDriver;
+    }
+
+    public static void clearAll() {
+        zapDrivers.clear();
     }
 }

@@ -22,12 +22,12 @@
     </parent>
     <groupId>com.vrondakis.zap</groupId>
     <artifactId>zap-pipeline</artifactId>
-    <version>1.4.3-SNAPSHOT</version>
+    <version>1.5.0-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
         <jenkins.version>2.7.3</jenkins.version>
         <java.level>8</java.level>
-        <workflow.version>2.16</workflow.version>
+        <workflow.version>2.2</workflow.version>
     </properties>
     <name>ZAP Pipeline Plugin</name>
     <description>Control OWASP ZAP through Pipeline &amp; more</description>
@@ -43,8 +43,8 @@
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <developers>
         <developer>
@@ -68,7 +68,6 @@
         </pluginRepository>
     </pluginRepositories>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -86,7 +85,6 @@
             <version>1.4.9</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -97,6 +95,13 @@
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-step-api</artifactId>
             <version>${workflow.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <version>${workflow.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -118,6 +123,20 @@
                     <artifactId>maven-aether-provider</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <version>${workflow.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.0.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

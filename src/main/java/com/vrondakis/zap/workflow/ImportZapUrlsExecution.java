@@ -30,6 +30,8 @@ public class ImportZapUrlsExecution extends DefaultStepExecutionImpl {
         boolean success = zapDriver.importUrls(importZapUrlsStepParameters.getPath());
         if (!success) {
             listener.getLogger().println("zap: Failed to load list of URLs at " + importZapUrlsStepParameters.getPath());
+            getContext().onFailure(new Throwable("zap: Failed to load list of URLs at " + importZapUrlsStepParameters.getPath()));
+            return false;
         }
 
         getContext().onSuccess(true);

@@ -12,6 +12,8 @@ import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
+import javax.annotation.Nonnull;
+
 public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl {
     Run run;
     Node node;
@@ -43,5 +45,10 @@ public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl
         } catch (Exception e) {
             this.listener.getLogger().println("zap: Failed to run: " + e.getClass());
         }
+    }
+
+    @Override
+    public void stop(@Nonnull Throwable throwable) throws Exception {
+        // findbugs
     }
 }

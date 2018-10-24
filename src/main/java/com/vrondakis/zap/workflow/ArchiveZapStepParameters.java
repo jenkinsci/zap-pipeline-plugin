@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class ArchiveZapStepParameters implements Serializable {
     private static int DEFAULT_FAIL_ALL = 0;
-    private static int DEFAULT_FAIL_HIGH = 1;
+    private static int DEFAULT_FAIL_HIGH = 0;
     private static int DEFAULT_FAIL_MED = 0;
     private static int DEFAULT_FAIL_LOW = 0;
     private static String DEFAULT_FALSE_POSITIVES_FILE_PATH = "zapFalsePositives.json";

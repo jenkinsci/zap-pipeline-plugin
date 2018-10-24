@@ -1,0 +1,15 @@
+[
+  {
+
+    "uri": ".*",
+    "method": "GET",
+    "attack": "https://localhost.localdomain:443/application/192.168.0.123 - Copy (3).6",
+    "evidence": "A backup of [https://localhost.localdomain:443/application/192.168.0.123.6] is available at [https://localhost.localdomain:443/application/192.168.0.123 - Copy (3).6]"
+  },
+
+  {
+    "name": "Example Passive Scanner: Denial of Service",
+    "uri": "^https:\\/\\/localhost\\.localdomain:443\\/management\\/application\\/manolis\\/exemption\\/192\\.168\\.0\\.1$",
+    "method": "DELETE"
+  }
+]

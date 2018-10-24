@@ -50,12 +50,11 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         this.listener.getLogger().println("zap: Starting ZAP on port " + zapStepParameters.getPort() + "...");
         if (zapStepParameters.getZapHome() == null || zapStepParameters.getZapHome().isEmpty()) {
             System.out.println("zap: Did not start ZAP process because zapHome is not set");
-            getContext().onSuccess(true);
-            return true;
+            getContext().onFailure(new Throwable("zap: Did not start ZAP process because zapHome is not set"));
+            return false;
         }
 
         ZapDriver zapDriver = ZapDriverController.newDriver(this.run);
-
         // Set ZAP properties
         zapDriver.setZapHost(zapStepParameters.getHost());
         zapDriver.setZapPort(zapStepParameters.getPort());
@@ -73,38 +72,13 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         System.out.println("zap: Checking ZAP is alive at " + zapStepParameters.getHost() + ":" + zapStepParameters.getPort());
 
         // Wait for ZAP to start before continuing...
-        OffsetDateTime startedTime = OffsetDateTime.now();
         listener.getLogger().println("zap: Waiting for ZAP to initialize...");
-        boolean zapHasStarted = false;
-
-        do {
-            if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(ZapDriver.ZAP_INITIALIZE_TIMEOUT))) {
-                listener.getLogger().println("zap: ZAP failed to start. Socket timed out.");
-                break;
-            }
-
-            try {
-                TimeUnit.SECONDS.sleep(ZapDriver.ZAP_INITIALIZE_WAIT);
-                System.out.println("zap: Attempting to connect to ZAP at " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort());
-
-                new Socket(zapDriver.getZapHost(), zapDriver.getZapPort());
-                listener.getLogger().println("zap: ZAP successfully initialized on port " + zapDriver.getZapPort());
-                zapHasStarted = true;
-
-            } catch (IOException e) {
-                listener.getLogger().println("zap: Waiting for ZAP to initialize...");
-            } catch (InterruptedException e) {
-                listener.getLogger().println(
-                    "zap: ZAP failed to initialize on host " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort());
-                break;
-            }
-
-        } while (!zapHasStarted);
+        boolean zapHasStarted = zapDriver.zapAliveCheck();
 
         if (!zapHasStarted) {
             System.out.println("zap: Failed to start ZAP on port " + zapDriver.getZapPort());
             getContext().onFailure(
-                new Throwable("zap: Failed to start ZAP on port " + zapDriver.getZapPort() + ". Socket timed out"));
+                    new Throwable("zap: Failed to start ZAP on " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort() + ". Socket timed out"));
 
             return false;
         }

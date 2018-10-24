@@ -9,6 +9,8 @@ import com.vrondakis.zap.ZapDriverController;
 
 import hudson.model.Result;
 
+import javax.annotation.Nonnull;
+
 /**
  * Executor for archiveZap() function in Jenkinsfile
  */
@@ -22,7 +24,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start(){
+    public boolean start() {
         listener.getLogger().println("zap: Archiving results...");
         System.out.println("zap: Archiving results...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
@@ -31,8 +33,8 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                 archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
 
         try {
-            ZapArchive zapArchive = new ZapArchive();
-            boolean archiveResult = zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener,
+            ZapArchive zapArchive = new ZapArchive(this.run);
+            boolean archiveResult = zapArchive.archiveRawReport(this.run, this.job, this.listener,
                     archiveZapStepParameters.getFalsePositivesFilePath());
             if (!archiveResult) {
                 listener.getLogger().println("zap: Failed to archive results");
@@ -42,7 +44,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
             // If any of the fail run parameters are set to a value more than 1
             if (zapDriver.getFailBuild().values().stream().anyMatch(count -> count > 0)) {
-                if (zapArchive.shouldFailBuild(this.run, this.listener)) {
+                if (zapArchive.shouldFailBuild(this.listener)) {
                     listener.getLogger().println(
                             "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report");
                     run.setResult(Result.FAILURE);
@@ -54,7 +56,6 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                     return false;
                 }
             }
-
 
         } finally {
             boolean success = ZapDriverController.shutdownZap(this.run);
