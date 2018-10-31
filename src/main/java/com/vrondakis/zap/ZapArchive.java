@@ -72,7 +72,7 @@ public class ZapArchive extends Recorder {
                     Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), indexName));
             indexFile.copyTo(new FilePath(new File(dir, indexName)));
             return true;
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException | InterruptedException | NullPointerException e) {
             e.printStackTrace();
             return false;
         }
@@ -343,7 +343,9 @@ public class ZapArchive extends Recorder {
         // If it was not saved just add the graph (by hiding the button)
         ZapAction action = new ZapAction(run, success);
 
-        if (count.get() > 0) run.addAction(action);
+        if(run.getAction(ZapAction.class) == null) {
+            if (count.get() > 0) run.addAction(action);
+        }
 
         if (!success)
             return false;
