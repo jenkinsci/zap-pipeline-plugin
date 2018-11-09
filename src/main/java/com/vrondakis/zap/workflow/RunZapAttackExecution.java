@@ -52,6 +52,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
                 listener.getLogger().println("zap: Scan timed out before it could complete");
                 getContext().setResult(Result.UNSTABLE);
+                getContext().onSuccess(true);
                 return true;
             }
 
