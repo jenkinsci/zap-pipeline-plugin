@@ -1,3 +1,9 @@
+[![GitHub release](https://img.shields.io/github/release/vrondakis/zap-jenkins-pipeline-plugin.svg?style=for-the-badge)](https://github.com/vrondakis/zap-jenkins-pipeline-plugin/releases)
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/vrondakis/zap-jenkins-pipeline-plugin.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/vrondakis/zap-jenkins-pipeline-plugin/context:java)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/vrondakis/zap-jenkins-pipeline-plugin.svg?logo=lgtm&logoWidth=18&style=for-the-badge)](https://lgtm.com/projects/g/vrondakis/zap-jenkins-pipeline-plugin/context:javascript)
+
+<br />
+
 <a href='https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project' align="top"><img align="left" src='https://github.com/vrondakis/zap-jenkins-pipeline-plugin/raw/master/src/main/webapp/logo.png'></a>
 ZAP Jenkins Plugin for pipeline builds
 ===
