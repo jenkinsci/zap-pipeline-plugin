@@ -2,6 +2,7 @@ package com.vrondakis.zap.workflow;
 
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
+import hudson.model.Result;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import java.io.ObjectInputStream;
@@ -42,7 +43,6 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-
         OffsetDateTime startedTime = OffsetDateTime.now();
 
         int timeoutSeconds = zapDriver.getZapTimeout();
@@ -51,7 +51,8 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
         while (status < ZapDriver.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
                 listener.getLogger().println("zap: Scan timed out before it could complete");
-                break;
+                getContext().setResult(Result.UNSTABLE);
+                return true;
             }
 
             status = zapDriver.zapAttackStatus();
