@@ -1,4 +1,5 @@
 var ZAP_RAW_BUILD = "zap-raw.json"
+var ZAP_RAW_XML = "zap-raw.xml"
 var ZAP_LAST_RAW_BUILD = "zap-raw-old.json"
 var ZAP_FALSE_POSITIVES = "zap-false-positives.json"
 

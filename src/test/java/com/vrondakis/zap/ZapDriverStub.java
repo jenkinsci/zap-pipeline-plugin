@@ -144,6 +144,12 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
+    public String getZapReportXML() throws IOException {
+        URL url = Resources.getResource("zap-raw.xml");
+        return Resources.toString(url, Charsets.UTF_8);
+    }
+
+    @Override
     public boolean zapAliveCheck() {
         return true;
     }

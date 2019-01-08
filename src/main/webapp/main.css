@@ -266,4 +266,6 @@ code, pre{
     border-color: rgb(55, 107, 169);
 }
 
-
+.export-buttons{
+    margin-top: 50px;
+}

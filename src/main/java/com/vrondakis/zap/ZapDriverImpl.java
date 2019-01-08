@@ -403,6 +403,14 @@ public class ZapDriverImpl implements ZapDriver {
         return IOUtils.toString(response, StandardCharsets.UTF_8);
     }
 
+    public String getZapReportXML() throws IOException, UnirestException, URISyntaxException {
+        URI uri = new URI("http", null, zapHost, zapPort, "/other/core/other/xmlreport",
+                "formMethod=GET", null);
+
+        InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
+        return IOUtils.toString(response, StandardCharsets.UTF_8);
+    }
+
     public void setZapHost(String zapHost) {
         this.zapHost = zapHost;
     }

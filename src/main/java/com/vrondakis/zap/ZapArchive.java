@@ -33,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ZapArchive extends Recorder {
     static final String RAW_REPORT_FILENAME = "zap-raw.json";
+    static final String RAW_REPORT_FILENAME_XML = "zap-raw.xml";
     static final String RAW_OLD_REPORT_FILENAME = "zap-raw-old.json";
     private static final String FALSE_POSITIVES_FILENAME = "zap-false-positives.json";
     private static final String ALERT_COUNT_FILENAME = "alert-count.json";
@@ -143,8 +144,12 @@ public class ZapArchive extends Recorder {
             if (zapDriver.getZapHost() == null || zapDriver.getZapPort() == 0)
                 return false;
 
-            String res = zapDriver.getZapReport();
-            fp.write(res, "UTF-8");
+            String report = zapDriver.getZapReport();
+            fp.write(report, "UTF-8");
+
+            String xmlReport = zapDriver.getZapReportXML();
+            FilePath fpXml = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME_XML));
+            fpXml.write(xmlReport, "UTF-8");
 
             return true;
         } catch (URISyntaxException | IOException | UnirestException | InterruptedException e) {
