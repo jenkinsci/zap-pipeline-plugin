@@ -20,7 +20,7 @@ public class ZapDriverController {
     static final String CMD_CONFIG = "-config";
     static final String CMD_DISABLEKEY = "api.disablekey=true";
     static final String CMD_REGEX = "api.addrs.addr.regex=true";
-    static final String CMD_NAME = "api.addrs.addr.name=10.*";
+    static final String CMD_NAME = "api.addrs.addr.name=.*";
     static final String CMD_TIMEOUT = "connection.timeoutInSecs=600";
 
     static final String ZAP_UNIX_PROGRAM = "zap.sh";
@@ -39,7 +39,7 @@ public class ZapDriverController {
     }
 
     public static <T extends ZapDriver> ZapDriver newDriver(Run run, Class<T> zapDriver) {
-        ZapDriver zDriver = null;
+        ZapDriver zDriver;
         try {
             zDriver = zapDriver.getDeclaredConstructor().newInstance();
             zapDrivers.put(run.getUrl(), zDriver);
