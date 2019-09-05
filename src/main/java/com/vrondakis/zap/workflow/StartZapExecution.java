@@ -49,7 +49,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         // Zap home not set / invalid
         this.listener.getLogger().println("zap: Starting ZAP on port " + zapStepParameters.getPort() + "...");
         if (zapStepParameters.getZapHome() == null || zapStepParameters.getZapHome().isEmpty()) {
-            System.out.println("zap: Did not start ZAP process because zapHome is not set");
+            this.listener.getLogger().println("zap: Did not start ZAP process because zapHome is not set");
             getContext().onFailure(new Throwable("zap: Did not start ZAP process because zapHome is not set"));
             return false;
         }
@@ -64,19 +64,19 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
         boolean success = zapDriver.startZapProcess(zapStepParameters.getZapHome(), workspace, launcher);
         if (!success) {
-            System.out.println("zap: Failed to start ZAP process");
+            this.listener.getLogger().println("zap: Failed to start ZAP process");
             getContext().onFailure(new Throwable("zap: Failed to start ZAP process"));
             return false;
         }
 
-        System.out.println("zap: Checking ZAP is alive at " + zapStepParameters.getHost() + ":" + zapStepParameters.getPort());
+        this.listener.getLogger().println("zap: Checking ZAP is alive at " + zapStepParameters.getHost() + ":" + zapStepParameters.getPort());
 
         // Wait for ZAP to start before continuing...
         listener.getLogger().println("zap: Waiting for ZAP to initialize...");
         boolean zapHasStarted = zapDriver.zapAliveCheck();
 
         if (!zapHasStarted) {
-            System.out.println("zap: Failed to start ZAP on port " + zapDriver.getZapPort());
+            this.listener.getLogger().println("zap: Failed to start ZAP on port " + zapDriver.getZapPort());
             getContext().onFailure(
                     new Throwable("zap: Failed to start ZAP on " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort() + ". Socket timed out"));
 
@@ -85,7 +85,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
         // Load session
         if (zapStepParameters.getSessionPath() != null && !zapStepParameters.getSessionPath().isEmpty()) {
-            System.out.println("zap: Loading session " + zapStepParameters.getSessionPath());
+            this.listener.getLogger().println("zap: Loading session " + zapStepParameters.getSessionPath());
             boolean loadedSession = zapDriver.loadSession(zapStepParameters.getSessionPath());
             if (!loadedSession)
                 getContext().onFailure(new Throwable("zap: Could not load session file"));

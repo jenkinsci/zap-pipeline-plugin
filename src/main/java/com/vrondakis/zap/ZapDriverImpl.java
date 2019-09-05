@@ -366,10 +366,10 @@ public class ZapDriverImpl implements ZapDriver {
 
         try {
             launcher.launch().cmds(cmd).pwd(ws).start();
-            System.out.println("zap: Started successfully");
+            launcher.getListener().getLogger().println("zap: Started successfully");
             return true;
         } catch (Exception e) {
-            System.out.println("zap: An error occurred while staring ZAP");
+            launcher.getListener().getLogger().println("zap: An error occurred while staring ZAP" + e.toString());
             e.printStackTrace();
             return false;
         }
