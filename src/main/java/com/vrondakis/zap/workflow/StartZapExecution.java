@@ -54,6 +54,19 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
+        // Make sure workspace dir exists before launching Zap
+        // See https://github.com/jenkinsci/zap-pipeline-plugin/issues/8
+        try {
+            if (!workspace.exists()) {
+                launcher.getListener().getLogger().println("Creating workspace directory...");
+                workspace.mkdirs();
+            }
+        } catch (Exception e) {
+            launcher.getListener().getLogger().println("Unable to create workspace dir: " + e.toString());
+            e.printStackTrace();
+            return false;
+        }
+
         ZapDriver zapDriver = ZapDriverController.newDriver(this.run);
         // Set ZAP properties
         zapDriver.setZapHost(zapStepParameters.getHost());
