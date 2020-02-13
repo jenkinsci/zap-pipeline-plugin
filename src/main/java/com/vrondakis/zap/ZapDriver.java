@@ -62,4 +62,6 @@ public interface ZapDriver {
     String getZapReportXML() throws IOException, UnirestException, URISyntaxException;
 
     boolean zapAliveCheck();
+    
+    int zapRecordsToScan();
 }
