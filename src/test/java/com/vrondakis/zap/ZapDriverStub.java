@@ -153,4 +153,9 @@ public class ZapDriverStub implements ZapDriver {
     public boolean zapAliveCheck() {
         return true;
     }
+
+	@Override
+	public int zapRecordsToScan() {
+		return 0;
+	}
 }
