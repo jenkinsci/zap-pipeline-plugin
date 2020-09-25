@@ -38,7 +38,6 @@ public class ZapDriverImpl implements ZapDriver {
     private final List<Integer> startedScans = new ArrayList<>();
     private int crawlId;
 
-
     /**
      * Calls the ZAP api
      *
@@ -70,7 +69,8 @@ public class ZapDriverImpl implements ZapDriver {
     }
 
     public boolean shutdownZap() {
-        if (0 == zapPort || null == zapHost) return false;
+        if (0 == zapPort || null == zapHost)
+            return false;
 
         return zapApi("core/action/shutdown") != null;
     }
@@ -154,7 +154,6 @@ public class ZapDriverImpl implements ZapDriver {
         return true;
     }
 
-
     /**
      * Imports URLs from a text file
      *
@@ -197,7 +196,7 @@ public class ZapDriverImpl implements ZapDriver {
             return false;
 
         return (result.has("Result") && result.getString("Result").equals("OK"))
-                || (result.has("code") && result.getString("code").equals("already_exists"));
+                        || (result.has("code") && result.getString("code").equals("already_exists"));
     }
 
     /**
@@ -259,7 +258,8 @@ public class ZapDriverImpl implements ZapDriver {
                     if (!addr.isAnyLocalAddress() && !addr.isLoopbackAddress())
                         return false;
                 } else if (!allowedHosts.contains(host)) {
-                    System.out.println("zap: Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
+                    System.out.println(
+                        "zap: Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
                     return false;
                 }
             }
@@ -332,8 +332,8 @@ public class ZapDriverImpl implements ZapDriver {
     /**
      * Starts the ZAP process
      *
-     * @param zapHome  - The location of the zap.sh file
-     * @param ws       - Passed by step
+     * @param zapHome - The location of the zap.sh file
+     * @param ws - Passed by step
      * @param launcher - Passed by step
      * @return Success
      */
@@ -341,7 +341,7 @@ public class ZapDriverImpl implements ZapDriver {
         List<String> cmd = new ArrayList<>();
 
         Path zapPath = Paths.get(zapHome,
-                launcher.isUnix() ? ZapDriverController.ZAP_UNIX_PROGRAM : ZapDriverController.ZAP_WIN_PROGRAM);
+            launcher.isUnix() ? ZapDriverController.ZAP_UNIX_PROGRAM : ZapDriverController.ZAP_WIN_PROGRAM);
         cmd.add(zapPath.toString());
 
         cmd.add(ZapDriverController.CMD_DAEMON);
@@ -396,16 +396,14 @@ public class ZapDriverImpl implements ZapDriver {
     }
 
     public String getZapReport() throws IOException, UnirestException, URISyntaxException {
-        URI uri = new URI("http", null, zapHost, zapPort, "/OTHER/core/other/jsonreport",
-                "formMethod=GET", null);
+        URI uri = new URI("http", null, zapHost, zapPort, "/OTHER/core/other/jsonreport", "formMethod=GET", null);
 
         InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
         return IOUtils.toString(response, StandardCharsets.UTF_8);
     }
 
     public String getZapReportXML() throws IOException, UnirestException, URISyntaxException {
-        URI uri = new URI("http", null, zapHost, zapPort, "/other/core/other/xmlreport",
-                "formMethod=GET", null);
+        URI uri = new URI("http", null, zapHost, zapPort, "/other/core/other/xmlreport", "formMethod=GET", null);
 
         InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
         return IOUtils.toString(response, StandardCharsets.UTF_8);
@@ -453,4 +451,17 @@ public class ZapDriverImpl implements ZapDriver {
     public List<String> getAllowedHosts() {
         return allowedHosts;
     }
+
+    /**
+     * Gets the number of records the passive scanner still has to scan
+     *
+     * @return The number of records the passive scanner still has so scan
+     */
+    @Override
+    public int zapRecordsToScan() {
+        Map<String, String> arguments = Collections.emptyMap();
+        JSONObject recordsToScan = zapApi("pscan/view/recordsToScan", arguments);
+        return recordsToScan.getInt("recordsToScan");
+    }
+
 }
