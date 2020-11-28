@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root generated="Fri, 19 Oct 2018 03:36:23" version="Dev Build">
+    <site host="localhost.localdomain" name="https://localhost.localdomain" port="443" ssl="true">
+        <alerts>
+            <element>
+                <alert>Incomplete or No Cache-control and Pragma HTTP Header Set</alert>
+                <confidence>2</confidence>
+                <count>6</count>
+                <cweid>525</cweid>
+                <desc>&lt;p&gt;The cache-control and pragma HTTP header have not been set properly or are missing allowing the browser and proxies to cache content.&lt;/p&gt;</desc>
+                <instances>
+                    <element>
+                        <evidence>no-cache, no-store, max-age=0, must-revalidate</evidence>
+                        <method>POST</method>
+                        <param>Cache-Control</param>
+                        <uri>https://localhost.localdomain:443/management/application/manolis</uri>
+                    </element>
+                    <element>
+                        <evidence>no-cache, no-store, max-age=0, must-revalidate</evidence>
+                        <method>GET</method>
+                        <param>Cache-Control</param>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption</uri>
+                    </element>
+                    <element>
+                        <evidence>no-cache, no-store, max-age=0, must-revalidate</evidence>
+                        <method>GET</method>
+                        <param>Cache-Control</param>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.123.6</uri>
+                    </element>
+                    <element>
+                        <evidence>no-cache, no-store, max-age=0, must-revalidate</evidence>
+                        <method>GET</method>
+                        <param>Cache-Control</param>
+                        <uri>https://localhost.localdomain:443/management/application/manolis</uri>
+                    </element>
+                    <element>
+                        <evidence>no-cache, no-store, max-age=0, must-revalidate</evidence>
+                        <method>GET</method>
+                        <param>Cache-Control</param>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.1</uri>
+                    </element>
+                    <element>
+                        <evidence>no-cache, no-store, max-age=0, must-revalidate</evidence>
+                        <method>POST</method>
+                        <param>Cache-Control</param>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption</uri>
+                    </element>
+                </instances>
+                <name>Incomplete or No Cache-control and Pragma HTTP Header Set</name>
+                <pluginid>10015</pluginid>
+                <reference>&lt;p&gt;https://www.owasp.org/index.php/Session_Management_Cheat_Sheet#Web_Content_Caching&lt;/p&gt;</reference>
+                <riskcode>1</riskcode>
+                <riskdesc>Low (Medium)</riskdesc>
+                <solution>&lt;p&gt;Whenever possible ensure the cache-control HTTP header is set with no-cache, no-store, must-revalidate, private; and that the pragma HTTP header is set with no-cache.&lt;/p&gt;</solution>
+                <sourceid>3</sourceid>
+                <wascid>13</wascid>
+            </element>
+            <element>
+                <alert>Non-Storable Content</alert>
+                <confidence>2</confidence>
+                <count>7</count>
+                <cweid>524</cweid>
+                <desc>&lt;p&gt;The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.&lt;/p&gt;</desc>
+                <instances>
+                    <element>
+                        <evidence>no-store</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.1</uri>
+                    </element>
+                    <element>
+                        <evidence>no-store</evidence>
+                        <method>POST</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis</uri>
+                    </element>
+                    <element>
+                        <evidence>no-store</evidence>
+                        <method>POST</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption</uri>
+                    </element>
+                    <element>
+                        <evidence>no-store</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis</uri>
+                    </element>
+                    <element>
+                        <evidence>DELETE </evidence>
+                        <method>DELETE</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption/192.168.0.1</uri>
+                    </element>
+                    <element>
+                        <evidence>no-store</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.123.6</uri>
+                    </element>
+                    <element>
+                        <evidence>no-store</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption</uri>
+                    </element>
+                </instances>
+                <name>Non-Storable Content</name>
+                <pluginid>10049</pluginid>
+                <reference>&lt;p&gt;https://tools.ietf.org/html/rfc7234&lt;/p&gt;&lt;p&gt;https://tools.ietf.org/html/rfc7231&lt;/p&gt;&lt;p&gt;http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html (obsoleted by rfc7234)&lt;/p&gt;</reference>
+                <riskcode>0</riskcode>
+                <riskdesc>Informational (Medium)</riskdesc>
+                <solution>&lt;p&gt;The content may be marked as storable by ensuring that the following conditions are satisfied:&lt;/p&gt;&lt;p&gt;The request method must be understood by the cache and defined as being cacheable ("GET", "HEAD", and "POST" are currently defined as cacheable)&lt;/p&gt;&lt;p&gt;The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)&lt;/p&gt;&lt;p&gt;The "no-store" cache directive must not appear in the request or response header fields&lt;/p&gt;&lt;p&gt;For caching by "shared" caches such as "proxy" caches, the "private" response directive must not appear in the response&lt;/p&gt;&lt;p&gt;For caching by "shared" caches such as "proxy" caches, the "Authorization" header field must not appear in the request, unless the response explicitly allows it (using one of the "must-revalidate", "public", or "s-maxage" Cache-Control response directives)&lt;/p&gt;&lt;p&gt;In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:&lt;/p&gt;&lt;p&gt;It must contain an "Expires" header field&lt;/p&gt;&lt;p&gt;It must contain a "max-age" response directive&lt;/p&gt;&lt;p&gt;For "shared" caches such as "proxy" caches, it must contain a "s-maxage" response directive&lt;/p&gt;&lt;p&gt;It must contain a "Cache Control Extension" that allows it to be cached&lt;/p&gt;&lt;p&gt;It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).   &lt;/p&gt;</solution>
+                <sourceid>3</sourceid>
+                <wascid>13</wascid>
+            </element>
+            <element>
+                <alert>Backup File Disclosure</alert>
+                <confidence>2</confidence>
+                <count>6</count>
+                <cweid>425</cweid>
+                <desc>&lt;p&gt;A backup of the file was disclosed by the web server&lt;/p&gt;</desc>
+                <instances>
+                    <element>
+                        <attack>https://localhost.localdomain:443/application/192.168.0.123 - Copy (2).6</attack>
+                        <evidence>A backup of [https://localhost.localdomain:443/application/192.168.0.123.6] is available at [https://localhost.localdomain:443/application/192.168.0.123 - Copy (2).6]</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.123 - Copy (2).6</uri>
+                    </element>
+                    <element>
+                        <attack>https://localhost.localdomain:443/application/192.168.0.123 - Copy (3).6</attack>
+                        <evidence>A backup of [https://localhost.localdomain:443/application/192.168.0.123.6] is available at [https://localhost.localdomain:443/application/192.168.0.123 - Copy (3).6]</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.123 - Copy (3).6</uri>
+                    </element>
+                    <element>
+                        <attack>https://localhost.localdomain:443/application/109.224.194 - Copy.151</attack>
+                        <evidence>A backup of [https://localhost.localdomain:443/application/192.168.0.1] is available at [https://localhost.localdomain:443/application/109.224.194 - Copy.151]</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/109.224.194 - Copy.151</uri>
+                    </element>
+                    <element>
+                        <attack>https://localhost.localdomain:443/application/109.224.194 - Copy (2).151</attack>
+                        <evidence>A backup of [https://localhost.localdomain:443/application/192.168.0.1] is available at [https://localhost.localdomain:443/application/109.224.194 - Copy (2).151]</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/109.224.194 - Copy (2).151</uri>
+                    </element>
+                    <element>
+                        <attack>https://localhost.localdomain:443/application/109.224.194 - Copy (3).151</attack>
+                        <evidence>A backup of [https://localhost.localdomain:443/application/192.168.0.1] is available at [https://localhost.localdomain:443/application/109.224.194 - Copy (3).151]</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/109.224.194 - Copy (3).151</uri>
+                    </element>
+                    <element>
+                        <attack>https://localhost.localdomain:443/application/192.168.0.123 - Copy.6</attack>
+                        <evidence>A backup of [https://localhost.localdomain:443/application/192.168.0.123.6] is available at [https://localhost.localdomain:443/application/192.168.0.123 - Copy.6]</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.123 - Copy.6</uri>
+                    </element>
+                </instances>
+                <name>Backup File Disclosure</name>
+                <otherinfo>&lt;p&gt;https://localhost.localdomain:443/application/192.168.0.123.6&lt;/p&gt;</otherinfo>
+                <pluginid>10095</pluginid>
+                <reference>&lt;p&gt;http://projects.webappsec.org/Predictable-Resource-Location&lt;/p&gt;&lt;p&gt;http://cwe.mitre.org/data/definitions/425.html&lt;/p&gt;</reference>
+                <riskcode>2</riskcode>
+                <riskdesc>Medium (Medium)</riskdesc>
+                <solution>&lt;p&gt;Do not edit files in-situ on the web server, and ensure that un-necessary files (including hidden files) are removed from the web server.&lt;/p&gt;</solution>
+                <sourceid>1</sourceid>
+                <wascid>34</wascid>
+            </element>
+            <element>
+                <alert>Timestamp Disclosure - Unix</alert>
+                <confidence>1</confidence>
+                <count>7</count>
+                <cweid>200</cweid>
+                <desc>&lt;p&gt;A timestamp was disclosed by the application/web server - Unix&lt;/p&gt;</desc>
+                <instances>
+                    <element>
+                        <attack>31536000</attack>
+                        <evidence>31536000</evidence>
+                        <method>POST</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis</uri>
+                    </element>
+                    <element>
+                        <attack>31536000</attack>
+                        <evidence>31536000</evidence>
+                        <method>POST</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption</uri>
+                    </element>
+                    <element>
+                        <attack>31536000</attack>
+                        <evidence>31536000</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.1</uri>
+                    </element>
+                    <element>
+                        <attack>31536000</attack>
+                        <evidence>31536000</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption</uri>
+                    </element>
+                    <element>
+                        <attack>31536000</attack>
+                        <evidence>31536000</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis</uri>
+                    </element>
+                    <element>
+                        <attack>31536000</attack>
+                        <evidence>31536000</evidence>
+                        <method>GET</method>
+                        <uri>https://localhost.localdomain:443/application/192.168.0.123.6</uri>
+                    </element>
+                    <element>
+                        <attack>31536000</attack>
+                        <evidence>31536000</evidence>
+                        <method>DELETE</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption/192.168.0.1</uri>
+                    </element>
+                </instances>
+                <name>Timestamp Disclosure - Unix</name>
+                <otherinfo>&lt;p&gt;31536000, which evaluates to: 1971-01-01 01:00:00&lt;/p&gt;</otherinfo>
+                <pluginid>10096</pluginid>
+                <reference>&lt;p&gt;https://www.owasp.org/index.php/Top_10_2013-A6-Sensitive_Data_Exposure&lt;/p&gt;&lt;p&gt;http://projects.webappsec.org/w/page/13246936/Information%20Leakage&lt;/p&gt;</reference>
+                <riskcode>0</riskcode>
+                <riskdesc>Informational (Low)</riskdesc>
+                <solution>&lt;p&gt;Manually confirm that the timestamp data is not sensitive, and that the data cannot be aggregated to disclose exploitable patterns.&lt;/p&gt;</solution>
+                <sourceid>3</sourceid>
+                <wascid>13</wascid>
+            </element>
+            <element>
+                <alert>Example Passive Scanner: Denial of Service</alert>
+                <confidence>2</confidence>
+                <count>1</count>
+                <desc>&lt;p&gt;Denial of Service (DoS) is an attack technique with the intent of preventing a web site from serving normal user activity. DoS attacks, which are easily normally applied to the network layer, are also possible at the application layer. These malicious attacks can succeed by starving a system of critical resources, vulnerability exploit, or abuse of functionality.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Many times DoS attacks will attempt to consume all of a web site's available system resources such as: CPU, memory, disk space etc. When any one of these critical resources reach full utilization, the web site will normally be inaccessible.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;As today's web application environments include a web server, database server and an authentication server, DoS at the application layer may target each of these independent components. Unlike DoS at the network layer, where a large number of connection attempts are required, DoS at the application layer is a much simpler task to perform.&lt;/p&gt;</desc>
+                <instances>
+                    <element>
+                        <method>DELETE</method>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption/192.168.0.1</uri>
+                    </element>
+                </instances>
+                <name>Example Passive Scanner: Denial of Service</name>
+                <pluginid>60000</pluginid>
+                <reference>&lt;p&gt;http://projects.webappsec.org/Denial-of-Service&lt;/p&gt;&lt;p&gt;http://cwe.mitre.org/data/definitions/400.html&lt;/p&gt;</reference>
+                <riskcode>2</riskcode>
+                <riskdesc>Medium (Medium)</riskdesc>
+                <solution>&lt;p&gt;Phase: Architecture and Design&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Design throttling mechanisms into the system architecture. The best protection is to limit the amount of resources that an unauthorized user can cause to be expended. A strong authentication and access control model will help prevent such attacks from occurring in the first place. The login application should be protected against DoS attacks as much as possible. Limiting the database access, perhaps by caching result sets, can help minimize the resources expended. To further limit the potential for a DoS attack, consider tracking the rate of requests received from users and blocking requests that exceed a defined rate threshold.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Mitigation of resource exhaustion attacks requires that the target system either:&lt;/p&gt;&lt;p&gt;      recognizes the attack and denies that user further access for a given amount of time, or&lt;/p&gt;&lt;p&gt;      uniformly throttles all requests in order to make it more difficult to consume resources more quickly than they can again be freed. &lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;The first of these solutions is an issue in itself though, since it may allow attackers to prevent the use of the system by a particular valid user. If the attacker impersonates the valid user, he may be able to prevent the user from accessing the server in question.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;The second solution is simply difficult to effectively institute -- and even when properly done, it does not provide a full solution. It simply makes the attack require more resources on the part of the attacker.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Ensure that protocols have specific limits of scale placed on them.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Phase: Implementation&lt;/p&gt;&lt;p&gt;Ensure that all failures in resource alapplication place the system into a safe posture.&lt;/p&gt;</solution>
+                <sourceid>3</sourceid>
+            </element>
+            <element>
+                <alert>Integer Overflow Error</alert>
+                <confidence>2</confidence>
+                <count>1</count>
+                <cweid>190</cweid>
+                <desc>&lt;p&gt;An integer overflow condition exists when an integer, which has not been properly checked from the input stream is used within a compiled program. &lt;/p&gt;</desc>
+                <instances>
+                    <element>
+                        <attack>42336243669157824925072810095839911161911244</attack>
+                        <method>DELETE</method>
+                        <param>query</param>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption/192.168.0.1</uri>
+                    </element>
+                </instances>
+                <name>Integer Overflow Error</name>
+                <otherinfo>&lt;p&gt;Potential Integer Overflow.  Status code changed on the input of a long string of random integers.&lt;/p&gt;</otherinfo>
+                <pluginid>30003</pluginid>
+                <reference>&lt;p&gt;https://www.owasp.org/index.php/Integer_overflow and http://projects.webappsec.org/w/page/13246946/Integer%20Overflows.&lt;/p&gt;</reference>
+                <riskcode>2</riskcode>
+                <riskdesc>Medium (Medium)</riskdesc>
+                <solution>&lt;p&gt;Rewrite the background program using proper checking of the size of integer being input to prevent overflows and divide by 0 errors.  This will require a recompile of the background executable.&lt;/p&gt;</solution>
+                <sourceid>1</sourceid>
+                <wascid>3</wascid>
+            </element>
+            <element>
+                <alert>Format String Error</alert>
+                <confidence>2</confidence>
+                <count>1</count>
+                <cweid>134</cweid>
+                <desc>&lt;p&gt;A Format String error occurs when the submitted data of an input string is evaluated as a command by the application. &lt;/p&gt;</desc>
+                <instances>
+                    <element>
+                        <attack>ZAP%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s%n%s
+                        </attack>
+                        <method>DELETE</method>
+                        <param>query</param>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption/192.168.0.1?query=ZAP%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%25n%25s%0A</uri>
+                    </element>
+                </instances>
+                <name>Format String Error</name>
+                <otherinfo>&lt;p&gt;Potential Format String Error.  The script closed the connection on a /%s&lt;/p&gt;</otherinfo>
+                <pluginid>30002</pluginid>
+                <reference>&lt;p&gt;https://www.owasp.org/index.php/Format_string_attack&lt;/p&gt;</reference>
+                <riskcode>2</riskcode>
+                <riskdesc>Medium (Medium)</riskdesc>
+                <solution>&lt;p&gt;Rewrite the background program using proper deletion of bad character strings.  This will require a recompile of the background executable.&lt;/p&gt;</solution>
+                <sourceid>1</sourceid>
+                <wascid>6</wascid>
+            </element>
+            <element>
+                <alert>Buffer Overflow</alert>
+                <confidence>2</confidence>
+                <count>1</count>
+                <cweid>120</cweid>
+                <desc>&lt;p&gt;Buffer overflow errors are characterized by the overwriting of memory spaces of the background web process, which should have never been modified intentionally or unintentionally. Overwriting values of the IP (Instruction Pointer), BP (Base Pointer) and other registers causes exceptions, segmentation faults, and other process errors to occur. Usually these errors end execution of the application in an unexpected way. &lt;/p&gt;</desc>
+                <instances>
+                    <element>
+                        <attack>DELETE https://localhost.localdomain:443/management/application/manolis/exemption/192.168.0.1?query=xPYRlbROlHPHVVxRpJniwRAekDybfRPoOVXpEyUDtwQMIkRmvkvJJGtNbwbppcoReZgKNkWDPkiwcgvdceggKXAKHYIpjKptirOLynxUcfWesCmHyVhPHksRSflEIAaqAbuUlIZSJdYZFjEOMKEKEuFVSwTgiluTlLdCGxcfZVRnfHHDbQiYFCiJeqUCTfNQDoXTjVRwhOCSydRtNsfpFXgNFFUeyePqpRNMujFWsmUPUSEnPQnahfhKXYsvLcvRMNnhmMqHqwUfCrQRgscoOJkZruRqdFOGKnNDNQgAfJGwoeKcNnpWlmZgfUeSyNHDOhLNQIvxRyHdNMLVcwNSiOQmrRHOnMjGdtnYSIuAjRwoCjQHGxaFGdTtMpgxuwOJHePoEgJmOYkbCUnsPDiFvejuWmprhNsNUrRyvfSqwgkmshrFNUMMdCmuHwOqYGYowKMutXqjtAfXDpeTbCuACIOaEwjXJPDpgOTltTwjoLQVKZDWDBmKottatoRVSpoWqmUyDgXsmxdTJUoVDJTnHDrQGGsBETqtOHkcjxsxkMBnoxkLybfWdfpNqvVOcUmvGtbYSErypxWFlRuIcQhWOJSdysvWhysaoiRqIaHrHMYCstQBKRDqQtodcjpwujgRVZQiJXtplquSqxjkELtXMmvUmjHxZqQWLUVomODbCnKjuWXPjdHDfDZIHmYlsankLefDOkgUJdRydSOdnbtSdOAfqCCHhhYVxqCeZQfHDiLdAJTfTjgdlmBbLAHVLTwLcNuCTVICLVFuSvDRkIIgJbZdSxealKABXOwNgrZQFGnpfGxeZOhZwpfnQYGIStJCYudROjYXwaWVdnLMAjcCwfJBiwPChJgIMFRrLUCohjQkgBpRlpYiXKWXqtXHLUOQvpCccGSQPfIxyxHHewdWtFwYAGlHwnVAGktSPUYDmtVgRAjIGdjibjPdepCxItsNknOrUSCfkecysOvxmaqDjfFJBaUrCBgrSfTdKedmEbVGHvYeVYcPBIMRKfWCwRiHHLsCLtYISGBOGNiYgCticEpVbRSoVDdOYPJtOVlPVUaTHCeSvjhjahNAMgwWZWMtNeBjKwPmlMaXiGrWSYfOAesWVoHmvCrujeQljQLOWLmswUNTEKHBTCGcrfwYqFuRqpmYHJGHscmHZctgmrmujjFGcbGkBcnyNBqREpGlBpkYUySWJQUSDGvgCFeYEEkYSuOkxtGnJdBXJxPaNmDvCeHlMjMKLKcBbbVXjUTnfwshuosixcfGodHxpcLfKbULqoIWLOdswIymGfWDVxgSgnUYIwEKSxoyTUSHvmFaBGkiPxhvyOfTAAPjnNjMHxBDYghpeDGNPkvAJfuhnnETJBxdGiCYeHOdCnyyaDQRaocwuIUZxyitYoiEDqWMrPjSFVJdwBHKODUvrDZQBYSwFOOZslPIAAxnhDJPnVVWLnyZmnNpgnWUcFsBwLAvIsynQQeiVUVEnxykxcHZlAGRVMliHyEYYSUSxLibLLReWGGskagqgmMfNYFxRRfUupVAylGyefNheYYxSDpyiCJsbtGKcZccaPoynCmNDBIKEDORSRjYeyLHjiInFAcNjfmLQlUPlGxkufwTHrboUYGLdmkPyoqhqEQQWNeUyIYkVCbsChtcipwxiIRxgTVkkCqeQurSdUihfXIdKFMcMHlDastiMdulbVlmVTwRXApcGxuLvnIPnhyrcyjEYjoOVbgdqYYivPLwToQesTeEaVtgwNtYNscBCVSVnLUnLsUOFQUdcUAOapUuUjGJJYwkUSOjaauttSVkBGKnsELeulrmtgippNAKBGCnNnqFexvhmgnqcrgaTnjuYcBcWlnHKEktsuXRMFvqruFdyCQqhqbTdHUXvNQEPJsQYLNnrgTdckGpvkmbnGMoRgpTcWpgqgIKBvmAAXjBMtwiBkRaQwBjTeuLJbUnTZxUBkCaFbTkwiUKKNUhwfYIUTQDHSgsnVdBKgcjxpFoZMBLhsXwkIGcdjahJYnXwmnnTFEBDqaZGvxlVFewBqDtjYtAsnIetdHRJAmKoNQvtOLfrkVTFoJtLkxVvWhZJUfFuWeupUGXeQVTqHTbMuid HTTP/1.1
+                            Content-Type: application/json; charset=UTF-8
+                            Authorization: Basic enRkX3Rlc3RAM3NwLmNvLnVrOnBhc3N3b3JkMTIzPw==
+                            Accept: */*
+                            Content-Length: 0
+                            Connection: Keep-Alive
+                            User-Agent: Apache-HttpClient/4.5.6 (Java/10.0.2)
+                            Host: localhost.localdomain
+
+                        </attack>
+                        <method>DELETE</method>
+                        <param>query</param>
+                        <uri>https://localhost.localdomain:443/management/application/manolis/exemption/192.168.0.1</uri>
+                    </element>
+                </instances>
+                <name>Buffer Overflow</name>
+                <otherinfo>&lt;p&gt;Potential Buffer Overflow.  The script closed the connection and threw a 500 Internal Server Error&lt;/p&gt;</otherinfo>
+                <pluginid>30001</pluginid>
+                <reference>&lt;p&gt;https://www.owasp.org/index.php/Buffer_overflow_attack&lt;/p&gt;</reference>
+                <riskcode>2</riskcode>
+                <riskdesc>Medium (Medium)</riskdesc>
+                <solution>&lt;p&gt;Rewrite the background program using proper return length checking.  This will require a recompile of the background executable.&lt;/p&gt;</solution>
+                <sourceid>1</sourceid>
+                <wascid>7</wascid>
+            </element>
+        </alerts>
+    </site>
+</root>

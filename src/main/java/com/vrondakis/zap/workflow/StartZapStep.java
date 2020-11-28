@@ -17,13 +17,13 @@ public class StartZapStep extends Step {
     /**
      * Called with startZap() in jenkinsfile
      *
-     * @param host The host to run ZAP on - default localhost
-     * @param port The port to run ZAP on - default 9092
-     * @param timeout The amount of seconds to let the ZAP attack run for before it quits - default 1000
-     * @param zapHome Where the zap process is located - if not set this will not start ZAP (but still make calls if you're running
-     *        it locally)
+     * @param host         The host to run ZAP on - default localhost
+     * @param port         The port to run ZAP on - default 9092
+     * @param timeout      The amount of seconds to let the ZAP attack run for before it quits - default 1000
+     * @param zapHome      Where the zap process is located - if not set this will not start ZAP (but still make calls if you're running
+     *                     it locally)
      * @param allowedHosts The hosts to allow scans to begin on, if none are specified then it will run the attack locally only
-     * @param sessionPath Optional path to the session file
+     * @param sessionPath  Optional path to the session file
      */
     @DataBoundConstructor
     public StartZapStep(@CheckForNull String host, int port, int timeout, String zapHome, List<String> allowedHosts,

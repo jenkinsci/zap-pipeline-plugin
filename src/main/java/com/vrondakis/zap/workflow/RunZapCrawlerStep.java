@@ -16,10 +16,6 @@ public class RunZapCrawlerStep extends Step {
 
     @DataBoundConstructor
     public RunZapCrawlerStep(@CheckForNull String host) {
-        if (host == null) {
-            host = "localhost";
-        }
-
         this.runZapCrawlerParameters = new RunZapCrawlerParameters(host);
     }
 

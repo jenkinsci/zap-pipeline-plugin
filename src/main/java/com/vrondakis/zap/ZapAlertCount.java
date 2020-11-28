@@ -1,5 +1,7 @@
 package com.vrondakis.zap;
 
+import java.util.Objects;
+
 /**
  * Used for generating alert-count.json for the graph
  */
@@ -11,23 +13,31 @@ class ZapAlertCount {
     private int falsePositives;
     private String buildName;
 
-    boolean hasValues(){
+    public ZapAlertCount(int highAlerts, int mediumAlerts, int lowAlerts, int falsePositives, String buildName) {
+        this.highAlerts = highAlerts;
+        this.mediumAlerts = mediumAlerts;
+        this.lowAlerts = lowAlerts;
+        this.falsePositives = falsePositives;
+        this.buildName = buildName;
+    }
+
+    boolean hasValues() {
         return !(this.highAlerts <= 0 && this.mediumAlerts <= 0 && this.lowAlerts <= 0 && this.falsePositives <= 0);
     }
 
-    void incrementHigh(){
-        highAlerts++;
+    void incrementHigh(int amount) {
+        highAlerts += amount;
     }
 
-    void incrementMedium(){
-        mediumAlerts++;
+    void incrementMedium(int amount) {
+        mediumAlerts += amount;
     }
 
-    void incrementLow(){
-        lowAlerts++;
+    void incrementLow(int amount) {
+        lowAlerts += amount;
     }
 
-    void incrementFalsePositives(int count){
+    void incrementFalsePositives(int count) {
         falsePositives += count;
     }
 
@@ -64,11 +74,28 @@ class ZapAlertCount {
         this.highAlerts = highAlerts;
     }
 
-    public void setBuildName(String buildName){
+    public void setBuildName(String buildName) {
         this.buildName = buildName;
     }
 
-    public String getBuildName(){
+    public String getBuildName() {
         return buildName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ZapAlertCount that = (ZapAlertCount) o;
+        return highAlerts == that.highAlerts &&
+                mediumAlerts == that.mediumAlerts &&
+                lowAlerts == that.lowAlerts &&
+                falsePositives == that.falsePositives &&
+                Objects.equals(buildName, that.buildName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(highAlerts, mediumAlerts, lowAlerts, falsePositives, buildName);
     }
 }

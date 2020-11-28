@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <build>
         <plugins>
@@ -19,16 +18,16 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>3.19</version>
-        <relativePath/>
+        <relativePath />
     </parent>
     <groupId>com.vrondakis.zap</groupId>
     <artifactId>zap-pipeline</artifactId>
-    <version>1.4.1</version>
+    <version>1.10-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
-        <jenkins.version>2.7.3</jenkins.version>
+        <jenkins.version>2.121.1</jenkins.version>
         <java.level>8</java.level>
-        <workflow.version>2.16</workflow.version>
+        <workflow.version>2.2</workflow.version>
     </properties>
     <name>ZAP Pipeline Plugin</name>
     <description>Control OWASP ZAP through Pipeline &amp; more</description>
@@ -38,14 +37,14 @@
             <url>https://opensource.org/licenses/MIT</url>
         </license>
     </licenses>
-    <!-- Assuming you want to host on @jenkinsci:
-    <url>https://wiki.jenkins.io/display/JENKINS/TODO+Plugin</url>
+
+    <url>https://wiki.jenkins.io/display/JENKINS/Zap+Pipeline+Plugin</url>
     <scm>
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+        <tag>HEAD</tag>
     </scm>
-    -->
 
     <developers>
         <developer>
@@ -69,7 +68,6 @@
         </pluginRepository>
     </pluginRepositories>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -87,7 +85,6 @@
             <version>1.4.9</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -98,6 +95,13 @@
             <groupId>org.jenkins-ci.plugins.workflow</groupId>
             <artifactId>workflow-step-api</artifactId>
             <version>${workflow.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <version>${workflow.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -119,6 +123,20 @@
                     <artifactId>maven-aether-provider</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <version>${workflow.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.0.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
