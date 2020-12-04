@@ -42,7 +42,7 @@ public interface ZapDriver {
 
     void setZapPort(int zapPort);
 
-    void setZapDir(String dir);
+    void setZapDir(FilePath dir);
 
     void setFailBuild(int all, int hihg, int med, int low);
 
@@ -54,7 +54,7 @@ public interface ZapDriver {
 
     int getZapPort();
 
-    String getZapDir();
+    FilePath getZapDir();
 
     HashMap<Integer, Integer> getFailBuild();
 

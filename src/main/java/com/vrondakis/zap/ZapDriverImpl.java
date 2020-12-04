@@ -32,7 +32,7 @@ import net.sf.json.JSONObject;
 public class ZapDriverImpl implements ZapDriver {
     private String zapHost;
     private int zapPort;
-    private String zapDir;
+    private FilePath zapDir;
     private int zapTimeout;
     private HashMap<Integer, Integer> failBuild = new HashMap<>();
     private List<String> allowedHosts = new ArrayList<>();
@@ -355,7 +355,7 @@ public class ZapDriverImpl implements ZapDriver {
 
         if (zapDir != null) {
             cmd.add(ZapDriverController.CMD_DIR);
-            cmd.add(zapDir);
+            cmd.add(zapDir.getRemote());
         }
 
         cmd.add(ZapDriverController.CMD_CONFIG);
@@ -371,7 +371,7 @@ public class ZapDriverImpl implements ZapDriver {
         cmd.add(ZapDriverController.CMD_TIMEOUT);
 
         try {
-            launcher.launch().cmds(cmd).pwd(ws).start();
+            launcher.launch().stdout(launcher.getListener().getLogger()).stderr(launcher.getListener().getLogger()).cmds(cmd).pwd(ws).start();
             launcher.getListener().getLogger().println("zap: Started successfully");
             return true;
         } catch (Exception e) {
@@ -424,7 +424,7 @@ public class ZapDriverImpl implements ZapDriver {
     }
 
     @Override
-    public void setZapDir(String dir) {
+    public void setZapDir(FilePath dir) {
         zapDir = dir;
     }
 
@@ -452,7 +452,7 @@ public class ZapDriverImpl implements ZapDriver {
     }
 
     @Override
-    public String getZapDir() {
+    public FilePath getZapDir() {
         return zapDir;
     }
 

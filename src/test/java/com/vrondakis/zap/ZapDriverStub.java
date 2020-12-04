@@ -15,7 +15,7 @@ public class ZapDriverStub implements ZapDriver {
     private int port;
     private int timeout;
     private String host;
-    private String dir;
+    private FilePath dir;
     private String loadedSessionPath = "";
     private List<String> allowedHosts;
     private HashMap<Integer, Integer> failBuild = new HashMap<>();
@@ -96,7 +96,7 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public void setZapDir(String dir) {
+    public void setZapDir(FilePath dir) {
         this.dir = dir;
     }
 
@@ -129,7 +129,7 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public String getZapDir() {
+    public FilePath getZapDir() {
         return dir;
     }
 
