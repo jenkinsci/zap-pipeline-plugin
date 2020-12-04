@@ -32,6 +32,7 @@ import net.sf.json.JSONObject;
 public class ZapDriverImpl implements ZapDriver {
     private String zapHost;
     private int zapPort;
+    private String zapDir;
     private int zapTimeout;
     private HashMap<Integer, Integer> failBuild = new HashMap<>();
     private List<String> allowedHosts = new ArrayList<>();
@@ -352,6 +353,11 @@ public class ZapDriverImpl implements ZapDriver {
         cmd.add(ZapDriverController.CMD_PORT);
         cmd.add(Integer.toString(zapPort));
 
+        if (zapDir != null) {
+            cmd.add(ZapDriverController.CMD_DIR);
+            cmd.add(zapDir);
+        }
+
         cmd.add(ZapDriverController.CMD_CONFIG);
         cmd.add(ZapDriverController.CMD_DISABLEKEY);
 
@@ -417,6 +423,11 @@ public class ZapDriverImpl implements ZapDriver {
         this.zapPort = zapPort;
     }
 
+    @Override
+    public void setZapDir(String dir) {
+        zapDir = dir;
+    }
+
     public void setFailBuild(int all, int high, int med, int low) {
         failBuild.put(ZapArchive.ALL_ALERT, all);
         failBuild.put(ZapArchive.HIGH_ALERT, high);
@@ -438,6 +449,11 @@ public class ZapDriverImpl implements ZapDriver {
 
     public int getZapPort() {
         return zapPort;
+    }
+
+    @Override
+    public String getZapDir() {
+        return zapDir;
     }
 
     public HashMap<Integer, Integer> getFailBuild() {

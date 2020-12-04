@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.HashMap;
 
 
@@ -123,5 +124,31 @@ public class ArchiveZapStepTest extends ZapWorkflow {
         run = job.scheduleBuild2(0).get();
         r.assertBuildStatus(Result.FAILURE, run);
         Assert.assertNotNull(run.getAction(ZapFailBuildAction.class));
+    }
+
+
+    @Test
+    public void testTempFolderDeletedOnArchive() throws Exception {
+        // check temp directory has been deleted after archiving
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node('slave') {\n"
+                + "     startZap(zapHome: '/', port: 1234, host:'123.123.123.123')\n"
+                + "     archiveZap("
+                + "         failAllAlerts: 0,"
+                + "         failHighAlerts: 0,"
+                + "         failMediumAlerts: 0,"
+                + "         failLowAlerts: 0"
+                + "     )\n"
+                + "}"
+        ));
+
+        run = job.scheduleBuild2(0).get();
+
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        Assert.assertNotNull(zapDriver.getZapDir());
+        Assert.assertFalse(new File(zapDriver.getZapDir()).exists());
+
+        r.assertBuildStatus(Result.SUCCESS, run);
+        Assert.assertNull(run.getAction(ZapFailBuildAction.class));
     }
 }

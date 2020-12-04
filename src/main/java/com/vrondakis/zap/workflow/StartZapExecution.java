@@ -1,9 +1,11 @@
 package com.vrondakis.zap.workflow;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -67,9 +69,18 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
+        // create a temp folder where zap will write
+        File zapDir = null;
+        try {
+            zapDir = Files.createTempDirectory("zaptemp").toFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         ZapDriver zapDriver = ZapDriverController.newDriver(this.run);
         // Set ZAP properties
         zapDriver.setZapHost(zapStepParameters.getHost());
+        zapDriver.setZapDir(zapDir.getAbsolutePath());
         zapDriver.setZapPort(zapStepParameters.getPort());
         zapDriver.setZapTimeout(zapStepParameters.getTimeout());
         zapDriver.setAllowedHosts(zapStepParameters.getAllowedHosts());

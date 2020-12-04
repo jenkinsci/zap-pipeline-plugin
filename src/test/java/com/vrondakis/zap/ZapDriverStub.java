@@ -15,6 +15,7 @@ public class ZapDriverStub implements ZapDriver {
     private int port;
     private int timeout;
     private String host;
+    private String dir;
     private String loadedSessionPath = "";
     private List<String> allowedHosts;
     private HashMap<Integer, Integer> failBuild = new HashMap<>();
@@ -95,6 +96,11 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
+    public void setZapDir(String dir) {
+        this.dir = dir;
+    }
+
+    @Override
     public void setFailBuild(int all, int high, int med, int low) {
         failBuild.put(ZapArchive.ALL_ALERT, all);
         failBuild.put(ZapArchive.HIGH_ALERT, high);
@@ -120,6 +126,11 @@ public class ZapDriverStub implements ZapDriver {
     @Override
     public int getZapPort() {
         return port;
+    }
+
+    @Override
+    public String getZapDir() {
+        return dir;
     }
 
     @Override

@@ -42,6 +42,8 @@ public interface ZapDriver {
 
     void setZapPort(int zapPort);
 
+    void setZapDir(String dir);
+
     void setFailBuild(int all, int hihg, int med, int low);
 
     void setZapTimeout(int timeout);
@@ -51,6 +53,8 @@ public interface ZapDriver {
     int getZapTimeout();
 
     int getZapPort();
+
+    String getZapDir();
 
     HashMap<Integer, Integer> getFailBuild();
 
