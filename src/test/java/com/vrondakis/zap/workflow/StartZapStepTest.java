@@ -7,6 +7,7 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Collections;
 
 public class StartZapStepTest extends ZapWorkflow {
@@ -92,5 +93,40 @@ public class StartZapStepTest extends ZapWorkflow {
         Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());
 
         r.assertBuildStatus(Result.SUCCESS, run);
+    }
+
+
+    @Test
+    public void verifyParametersTestWithDir() throws Exception {
+        int timeout = 234;
+        String sessionPath = "session.session";
+
+
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node('slave') {\n"
+                + "     startZap(host: '" + host + "',"
+                + "     port:" + port + ","
+                + "     timeout:" + timeout + ","
+                + "     zapHome: '/opt/zap',"
+                + "     sessionPath:'" + sessionPath + "',"
+                + "     allowedHosts:['github.com'])\n"
+                + "}"
+        ));
+
+
+        run = job.scheduleBuild2(0).get();
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+
+        Assert.assertEquals(host, zapDriver.getZapHost());
+        Assert.assertEquals(port, zapDriver.getZapPort());
+        Assert.assertNotNull(zapDriver.getZapDir());
+        Assert.assertTrue(new File(zapDriver.getZapDir()).exists());
+        Assert.assertTrue(new File(zapDriver.getZapDir()).isDirectory());
+        Assert.assertEquals(timeout, zapDriver.getZapTimeout());
+        Assert.assertEquals(sessionPath, zapDriver.getLoadedSessionPath());
+        Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());
+
+        r.assertBuildStatus(Result.SUCCESS, run);
+
     }
 }

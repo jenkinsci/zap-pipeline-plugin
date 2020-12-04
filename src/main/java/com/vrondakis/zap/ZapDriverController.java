@@ -17,6 +17,7 @@ public class ZapDriverController {
     static final String CMD_DAEMON = "-daemon";
     static final String CMD_HOST = "-host";
     static final String CMD_PORT = "-port";
+    static final String CMD_DIR = "-dir";
     static final String CMD_CONFIG = "-config";
     static final String CMD_DISABLEKEY = "api.disablekey=true";
     static final String CMD_REGEX = "api.addrs.addr.regex=true";

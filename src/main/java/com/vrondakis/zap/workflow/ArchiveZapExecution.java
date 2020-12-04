@@ -1,6 +1,7 @@
 package com.vrondakis.zap.workflow;
 
 import com.vrondakis.zap.ZapFailBuildAction;
+import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import com.vrondakis.zap.ZapArchive;
@@ -9,6 +10,7 @@ import com.vrondakis.zap.ZapDriverController;
 
 import hudson.model.Result;
 
+import java.io.File;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -70,6 +72,12 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
         } finally {
             boolean success = ZapDriverController.shutdownZap(this.run);
+
+            String zapDir = ZapDriverController.getZapDriver(this.run).getZapDir();
+            if (zapDir != null) {
+                FileUtils.deleteQuietly(new File(zapDir));
+            }
+
             if (!success)
                 listener.getLogger().println("zap: Failed to shutdown ZAP (it's not running?)");
         }
