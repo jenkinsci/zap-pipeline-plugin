@@ -120,8 +120,8 @@ public class StartZapStepTest extends ZapWorkflow {
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
         Assert.assertNotNull(zapDriver.getZapDir());
-        Assert.assertTrue(new File(zapDriver.getZapDir()).exists());
-        Assert.assertTrue(new File(zapDriver.getZapDir()).isDirectory());
+        Assert.assertTrue(zapDriver.getZapDir().exists());
+        Assert.assertTrue(zapDriver.getZapDir().isDirectory());
         Assert.assertEquals(timeout, zapDriver.getZapTimeout());
         Assert.assertEquals(sessionPath, zapDriver.getLoadedSessionPath());
         Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());

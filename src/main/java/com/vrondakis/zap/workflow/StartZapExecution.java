@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
+import hudson.FilePath;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
@@ -70,17 +71,17 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         }
 
         // create a temp folder where zap will write
-        File zapDir = null;
+        FilePath zapDir = null;
         try {
-            zapDir = Files.createTempDirectory("zaptemp").toFile();
-        } catch (IOException e) {
+            zapDir = workspace.createTempDir( "zaptemp", "");
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
 
         ZapDriver zapDriver = ZapDriverController.newDriver(this.run);
         // Set ZAP properties
         zapDriver.setZapHost(zapStepParameters.getHost());
-        zapDriver.setZapDir(zapDir.getAbsolutePath());
+        zapDriver.setZapDir(zapDir);
         zapDriver.setZapPort(zapStepParameters.getPort());
         zapDriver.setZapTimeout(zapStepParameters.getTimeout());
         zapDriver.setAllowedHosts(zapStepParameters.getAllowedHosts());

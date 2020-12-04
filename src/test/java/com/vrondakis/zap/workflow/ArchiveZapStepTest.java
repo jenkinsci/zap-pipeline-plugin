@@ -146,7 +146,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
 
         ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
         Assert.assertNotNull(zapDriver.getZapDir());
-        Assert.assertFalse(new File(zapDriver.getZapDir()).exists());
+        Assert.assertFalse(zapDriver.getZapDir().exists());
 
         r.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));

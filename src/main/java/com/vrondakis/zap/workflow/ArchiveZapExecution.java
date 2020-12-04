@@ -1,6 +1,7 @@
 package com.vrondakis.zap.workflow;
 
 import com.vrondakis.zap.ZapFailBuildAction;
+import hudson.FilePath;
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
@@ -11,6 +12,7 @@ import com.vrondakis.zap.ZapDriverController;
 import hudson.model.Result;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -71,11 +73,20 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
             }
 
         } finally {
+
+            ZapDriver zap = ZapDriverController.getZapDriver(this.run);
+            FilePath zapDir = zap.getZapDir();
+
             boolean success = ZapDriverController.shutdownZap(this.run);
 
-            String zapDir = ZapDriverController.getZapDriver(this.run).getZapDir();
+
             if (zapDir != null) {
-                FileUtils.deleteQuietly(new File(zapDir));
+                try {
+                    listener.getLogger().println("deleting: " + zapDir.getRemote());
+                    zapDir.deleteRecursive();
+                } catch (IOException | InterruptedException e) {
+                    listener.getLogger().println("Cannot delete temp directory: " + e.getMessage());
+                }
             }
 
             if (!success)
