@@ -8,7 +8,6 @@ public class StartZapStepParameters {
     private static String DEFAULT_ZAP_HOME = System.getProperty("ZAP_HOME");
     private static List<String> DEFAULT_ALLOWED_HOSTS = new ArrayList<>();
     private String host;
-    private String zapDir;
     private int port;
     private int timeout;
     private String zapHome;
