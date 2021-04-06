@@ -35,7 +35,7 @@ public class ZapArchive extends Recorder {
     static final String RAW_REPORT_FILENAME = "zap-raw.json";
     static final String RAW_REPORT_FILENAME_XML = "zap-raw.xml";
     static final String RAW_OLD_REPORT_FILENAME = "zap-raw-old.json";
-    private static final String FALSE_POSITIVES_FILENAME = "zap-false-positives.json";
+    static final String FALSE_POSITIVES_FILENAME = "zap-false-positives.json";
     private static final String ALERT_COUNT_FILENAME = "alert-count.json";
     private static final String JSON_SITE_KEY = "site";
     private static final String JSON_ALERTS_KEY = "alerts";
@@ -61,17 +61,19 @@ public class ZapArchive extends Recorder {
     }
 
     /**
-     * Saves index.html to the current build archive
+     * Saves report files to the current build archive
      *
      * @return success
      */
     private boolean saveStaticFiles(File dir) {
         try {
-            String indexName = "index.html";
+            String[] staticFiles = {"index.html", "angular.min.js", "main.js", "normalize.css", "skeleton.css", "main.css", "back.png"};
             String pluginName = "zap-pipeline";
-            FilePath indexFile = new FilePath(new File(
-                    Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), indexName));
-            indexFile.copyTo(new FilePath(new File(dir, indexName)));
+            for (String staticFile: staticFiles) {
+                FilePath archiveFile = new FilePath(new File(
+                        Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), staticFile));
+                archiveFile.copyTo(new FilePath(new File(dir, staticFile)));
+            }
             return true;
         } catch (IOException | InterruptedException | NullPointerException e) {
             e.printStackTrace();
@@ -183,12 +185,13 @@ public class ZapArchive extends Recorder {
      * @param falsePositivesFilePath the relative path to the false positives file
      * @param workspace              the workspace for the running build
      * @param taskListener           task listener, passed by jenkins
+     * @param savePath               the output path to save the false positives file to
      */
-    private void saveFalsePositives(String falsePositivesFilePath, File workspace, @Nonnull TaskListener taskListener,
+    private void saveFalsePositives(String falsePositivesFilePath, FilePath workspace, @Nonnull TaskListener taskListener,
                                     File savePath) {
         try {
             if (workspace != null) {
-                FilePath[] falsePositivesFiles = new FilePath(workspace).list(falsePositivesFilePath);
+                FilePath[] falsePositivesFiles = workspace.list(falsePositivesFilePath);
                 if (falsePositivesFiles.length > 0) {
                     if (falsePositivesFiles.length > 1) {
                         taskListener.getLogger()
@@ -198,7 +201,6 @@ public class ZapArchive extends Recorder {
 
                     FilePath saveAsFile = new FilePath(new File(savePath.toString() + "/" + FALSE_POSITIVES_FILENAME));
                     falsePositivesFiles[0].copyTo(saveAsFile);
-
                 }
 
             } else {
@@ -307,7 +309,7 @@ public class ZapArchive extends Recorder {
      * @param taskListener Logging
      * @return Operation success
      */
-    public boolean archiveRawReport(Run<?, ?> dir, @Nonnull Job<?, ?> job, @Nonnull TaskListener taskListener,
+    public boolean archiveRawReport(Run<?, ?> dir, @Nonnull Job<?, ?> job, FilePath workspace, @Nonnull TaskListener taskListener,
                                     String falsePositivesFilePath) {
         File zapDir = new File(dir.getRootDir(), DIRECTORY_NAME);
         // Create the zap directory in the workspace if it doesn't already exist
@@ -324,7 +326,7 @@ public class ZapArchive extends Recorder {
         }
 
         // Fetches the false positives file (if it exists) and saves it
-        saveFalsePositives(falsePositivesFilePath, dir.getRootDir(), taskListener, zapDir);
+        saveFalsePositives(falsePositivesFilePath, workspace, taskListener, zapDir);
 
         // Fetches the JSON report from ZAP and saves it
         boolean success = saveZapReport(zapDir) && saveStaticFiles(zapDir) && saveAlertCount(zapDir);
