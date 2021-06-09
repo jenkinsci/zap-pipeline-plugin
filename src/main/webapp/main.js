@@ -69,10 +69,20 @@ var createFalsePositive = function(alert, instance) {
 }
 
 // A false positive matches an alert instance if all the values set in the false positive match
-// the values in the instance and alert
+// the values in the instance and alert. The uri value of a false positive will be a regex, so it's tested differently
 var falsePositiveMatch = function(falsePositive, alert, instance) {
 	return Object.keys(falsePositive).every(key => {
-		return !falsePositive.hasOwnProperty(key) || falsePositive[key] === alert[key] || falsePositive[key] === instance[key]
+	    if (!falsePositive.hasOwnProperty(key)) {
+	        return true;
+	    }
+	    if (key == "uri") {
+	        if (!instance.hasOwnProperty("uri")) {
+	            return false;
+	        }
+            var falsePattern = new RegExp(falsePositive["uri"]);
+            return falsePattern.test(instance["uri"]);
+	    }
+		return falsePositive[key] === alert[key] || falsePositive[key] === instance[key]
 	})
 }
 

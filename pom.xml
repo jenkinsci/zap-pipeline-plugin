@@ -38,7 +38,7 @@
         </license>
     </licenses>
 
-    <url>https://wiki.jenkins.io/display/JENKINS/Zap+Pipeline+Plugin</url>
+    <url>https://github.com/jenkinsci/zap-pipeline-plugin</url>
     <scm>
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.9.15</version>
+                <version>1.10.9</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

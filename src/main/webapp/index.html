@@ -2,19 +2,19 @@
 <html lang="en">
 <head>
 	<title>ZAP Scanning Report</title>
-	<link href="/plugin/zap-pipeline/normalize.css" rel="stylesheet">
-	<link href="/plugin/zap-pipeline/skeleton.css" rel="stylesheet">
-	<link href="/plugin/zap-pipeline/main.css" rel="stylesheet">
+	<link href="normalize.css" rel="stylesheet">
+	<link href="skeleton.css" rel="stylesheet">
+	<link href="main.css" rel="stylesheet">
 
-	<script src="/plugin/zap-pipeline/angular.min.js"></script>
-	<script src="/plugin/zap-pipeline/main.js"></script>
+	<script src="angular.min.js"></script>
+	<script src="main.js"></script>
 
 </head>
 <body data-ng-app="zap" data-ng-controller="mainController" data-ng-init="load()">
 
 <div class="navbar" ng-class="{'low' : counts.low > 0, 'medium' : counts.medium > 0, 'high': counts.high > 0}">
 	<div class="navbar-container">
-		<a data-ng-click="goBack()"><img alt="Back" src="/plugin/zap-pipeline/back.png"></a>
+		<a data-ng-click="goBack()"><img alt="Back" src="back.png"></a>
 	</div>
 </div>
 

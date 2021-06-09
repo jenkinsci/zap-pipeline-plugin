@@ -49,7 +49,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
         try {
             ZapArchive zapArchive = new ZapArchive(this.run);
-            boolean archiveResult = zapArchive.archiveRawReport(this.run, this.job, this.listener,
+            boolean archiveResult = zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener,
                 archiveZapStepParameters.getFalsePositivesFilePath());
             if (!archiveResult) {
                 listener.getLogger().println("zap: Failed to archive results");
