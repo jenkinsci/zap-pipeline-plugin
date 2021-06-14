@@ -20,15 +20,15 @@ public class StartZapStep extends Step {
      * @param host         The host to run ZAP on - default localhost
      * @param port         The port to run ZAP on - default 9092
      * @param timeout      The amount of seconds to let the ZAP attack run for before it quits - default 1000
-     * @param zapHome      Where the zap process is located - if not set this will not start ZAP (but still make calls if you're running
-     *                     it locally)
+     * @param zapHome      Where the zap process is located - this must be set if you are not using an external managed ZAP application.
      * @param allowedHosts The hosts to allow scans to begin on, if none are specified then it will run the attack locally only
      * @param sessionPath  Optional path to the session file
+     * @param externalZap  Set to true, ZAP application is externally managed.
      */
     @DataBoundConstructor
     public StartZapStep(@CheckForNull String host, int port, int timeout, String zapHome, List<String> allowedHosts,
-                        String sessionPath) {
-        zapStepParameters = new StartZapStepParameters(host, port, timeout, zapHome, allowedHosts, sessionPath);
+                        String sessionPath, boolean externalZap) {
+        zapStepParameters = new StartZapStepParameters(host, port, timeout, zapHome, allowedHosts, sessionPath, externalZap);
     }
 
     @Override

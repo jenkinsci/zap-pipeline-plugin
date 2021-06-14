@@ -18,9 +18,8 @@ import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Executor for archiveZap() function in Jenkinsfile
+ * Executor for archiveZap() function in Jenkins
  */
-
 public class ArchiveZapExecution extends DefaultStepExecutionImpl {
     private ArchiveZapStepParameters archiveZapStepParameters;
 
@@ -81,7 +80,9 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
             FilePath zapDir = zap.getZapDir();
 
             try {
-                ZapDriverController.shutdownZap(this.run);
+                if (archiveZapStepParameters.shouldShutdown()) {
+                    ZapDriverController.shutdownZap(this.run);
+                }
             } catch (Exception e) {
                 listener.getLogger().println("zap: Failed to shutdown ZAP. " + e.getMessage());
             }

@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 
 public class ArchiveZapStepTest extends ZapWorkflow {
@@ -127,6 +128,51 @@ public class ArchiveZapStepTest extends ZapWorkflow {
         Assert.assertNotNull(run.getAction(ZapFailBuildAction.class));
     }
 
+    @Test
+    public void zapIsShutdown() throws Exception {
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node('slave') {\n"
+                + "     startZap(zapHome: '/', port: 1234, host:'123.123.123.123')\n"
+                + "     archiveZap("
+                + "         failAllAlerts: 0,"
+                + "         failHighAlerts: 0,"
+                + "         failMediumAlerts: 0,"
+                + "         failLowAlerts: 0"
+                + "     )\n"
+                + "}"
+        ));
+
+        run = job.scheduleBuild2(0).get();
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+
+        r.assertBuildStatus(Result.SUCCESS, run);
+        Assert.assertNull(run.getAction(ZapFailBuildAction.class));
+        Assert.assertTrue(zapDriver.isZapShutdown());
+    }
+
+    @Test
+    public void zapIsNotShutdown() throws Exception {
+        // If all the failure parameters are 0, it should not break the build
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node('slave') {\n"
+                + "     startZap(zapHome: '/', port: 1234, host:'123.123.123.123')\n"
+                + "     archiveZap("
+                + "         failAllAlerts: 0,"
+                + "         failHighAlerts: 0,"
+                + "         failMediumAlerts: 0,"
+                + "         failLowAlerts: 0,"
+                + "         keepAlive: true"
+                + "     )\n"
+                + "}"
+        ));
+
+        run = job.scheduleBuild2(0).get();
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+
+        r.assertBuildStatus(Result.SUCCESS, run);
+        Assert.assertNull(run.getAction(ZapFailBuildAction.class));
+        Assert.assertFalse(zapDriver.isZapShutdown());
+    }
 
     @Test
     public void testTempFolderDeletedOnArchive() throws Exception {

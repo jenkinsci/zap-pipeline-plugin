@@ -13,15 +13,17 @@ public class StartZapStepParameters {
     private String zapHome;
     private List<String> allowedHosts;
     private String sessionPath;
+    private boolean externalZap;
 
     public StartZapStepParameters(String host, int port, int timeout, String zapHome, List<String> allowedHosts,
-                                  String sessionPath) {
+                                  String sessionPath, boolean externalZap) {
         this.host = host;
         this.port = port;
         this.timeout = timeout == 0 ? DEFAULT_TIMEOUT : timeout;
         this.zapHome = (zapHome == null || zapHome.isEmpty()) ? DEFAULT_ZAP_HOME : zapHome;
         this.allowedHosts = (allowedHosts == null || allowedHosts.isEmpty()) ? DEFAULT_ALLOWED_HOSTS : allowedHosts;
         this.sessionPath = sessionPath;
+        this.externalZap = externalZap;
     }
 
 
@@ -47,5 +49,13 @@ public class StartZapStepParameters {
 
     public String getSessionPath() {
         return sessionPath;
+    }
+
+    public boolean isExternalZap() {
+        return externalZap;
+    }
+
+    public void setExternalZap(boolean externalZap) {
+        this.externalZap = externalZap;
     }
 }

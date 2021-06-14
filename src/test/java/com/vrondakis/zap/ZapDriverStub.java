@@ -19,7 +19,7 @@ public class ZapDriverStub implements ZapDriver {
     private String loadedSessionPath = "";
     private List<String> allowedHosts;
     private HashMap<Integer, Integer> failBuild = new HashMap<>();
-
+    boolean zapWasShutdown = false;
 
     public ZapDriverStub() {
         super();
@@ -31,7 +31,11 @@ public class ZapDriverStub implements ZapDriver {
 
     @Override
     public void shutdownZap() {
-        // Do nothing
+        zapWasShutdown = true;
+    }
+
+    public boolean isZapShutdown() {
+        return zapWasShutdown;
     }
 
     @Override
