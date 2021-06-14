@@ -13,15 +13,17 @@ public class ArchiveZapStepParameters implements Serializable {
     private int failMediumAlerts;
     private int failLowAlerts;
     private String falsePositivesFilePath;
+    private boolean keepAlive;
 
     public ArchiveZapStepParameters(Integer failAllAlerts, Integer failHighAlerts, Integer failMediumAlerts,
-                                    Integer failLowAlerts, String falsePositivesFilePath) {
+                                    Integer failLowAlerts, String falsePositivesFilePath, boolean keepAlive) {
         this.failAllAlerts = failAllAlerts == null ? DEFAULT_FAIL_ALL : failAllAlerts;
         this.failHighAlerts = failHighAlerts == null ? DEFAULT_FAIL_HIGH : failHighAlerts;
         this.failMediumAlerts = failMediumAlerts == null ? DEFAULT_FAIL_MED : failMediumAlerts;
         this.failLowAlerts = failLowAlerts == null ? DEFAULT_FAIL_LOW : failLowAlerts;
         this.failLowAlerts = failLowAlerts == null ? DEFAULT_FAIL_LOW : failLowAlerts;
         this.falsePositivesFilePath = falsePositivesFilePath == null ? DEFAULT_FALSE_POSITIVES_FILE_PATH : falsePositivesFilePath;
+        this.keepAlive = keepAlive;
     }
 
     public int getFailAllAlerts() {
@@ -42,5 +44,9 @@ public class ArchiveZapStepParameters implements Serializable {
 
     public String getFalsePositivesFilePath() {
         return falsePositivesFilePath;
+    }
+
+    public boolean shouldShutdown() {
+        return !keepAlive;
     }
 }

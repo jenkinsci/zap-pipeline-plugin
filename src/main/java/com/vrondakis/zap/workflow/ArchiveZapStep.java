@@ -14,7 +14,7 @@ public class ArchiveZapStep extends Step implements Serializable {
     private final ArchiveZapStepParameters archiveZapStepParameters;
 
     /**
-     * Analyse the zap attack and generate the zap report
+     * Analyse the zap attack and generate the zap report, then stop the zap instance.
      *
      * @param failAllAlerts          Fail the run if there is x or more of any type of alert - default 0 (disabled)
      * @param failHighAlerts         Fail the run when there is x or more of HIGH risk alerts - default 1
@@ -22,12 +22,13 @@ public class ArchiveZapStep extends Step implements Serializable {
      * @param failLowAlerts          Fail the run when there is more x or more LOW risk alerts - default 0 (disabled)
      * @param falsePositivesFilePath File name and path (relative to workspace) to the falsePositives config file - default
      *                               "zapfalsePositives.json"
+     * @param keepAlive              If true, the zap application will not be sent the shutdown command.
      */
     @DataBoundConstructor
     public ArchiveZapStep(Integer failAllAlerts, Integer failHighAlerts, Integer failMediumAlerts, Integer failLowAlerts,
-                          String falsePositivesFilePath) {
+                          String falsePositivesFilePath, boolean keepAlive) {
         this.archiveZapStepParameters = new ArchiveZapStepParameters(failAllAlerts, failHighAlerts, failMediumAlerts,
-                failLowAlerts, falsePositivesFilePath);
+                failLowAlerts, falsePositivesFilePath, keepAlive);
     }
 
     @Override

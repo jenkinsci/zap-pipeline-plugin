@@ -78,9 +78,10 @@ public class ZapDriverImpl implements ZapDriver {
     }
 
     public void shutdownZap() throws ZapExecutionException {
-        if (0 == zapPort || null == zapHost) {
+        if (zapPort == 0 || zapHost == null) {
             throw new ZapExecutionException("Cannot shutdown Zap, missing Port and/or Host value.");
         }
+
         zapApi("core/action/shutdown");
     }
 
