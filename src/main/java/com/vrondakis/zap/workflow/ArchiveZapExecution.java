@@ -1,5 +1,6 @@
 package com.vrondakis.zap.workflow;
 
+import com.vrondakis.zap.ZapExecutionException;
 import com.vrondakis.zap.ZapFailBuildAction;
 import hudson.FilePath;
 import org.apache.commons.io.FileUtils;
@@ -15,8 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 
 /**
  * Executor for archiveZap() function in Jenkinsfile
@@ -36,12 +35,18 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
         System.out.println("zap: Archiving results...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
 
-        boolean pscanFinished = waitUntilPassiveScanHasFinished(zapDriver);
-        if (!pscanFinished) {
-            listener.getLogger().println("zap: Passive scan timed out before it could complete");
-            getContext().setResult(Result.UNSTABLE);
+        if (zapDriver.getZapHost() == null && zapDriver.getZapPort() == 0) {
+            listener.getLogger().println("zap: Zap does not appear to have been started. Nothing to archive.");
             getContext().onSuccess(true);
             return true;
+        }
+
+        try {
+            waitUntilPassiveScanHasFinished(zapDriver);
+        } catch (Exception e) {
+            getContext().onFailure(new ZapExecutionException("Error occurred checking that passive scan to finish.", e, listener.getLogger()));
+            getContext().onSuccess(true);
+            return false;
         }
 
         zapDriver.setFailBuild(archiveZapStepParameters.getFailAllAlerts(), archiveZapStepParameters.getFailHighAlerts(),
@@ -49,12 +54,11 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
         try {
             ZapArchive zapArchive = new ZapArchive(this.run);
-            boolean archiveResult = zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener,
-                archiveZapStepParameters.getFalsePositivesFilePath());
-            if (!archiveResult) {
-                listener.getLogger().println("zap: Failed to archive results");
-                getContext().onSuccess(true);
-                return true;
+            try {
+                zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener, archiveZapStepParameters.getFalsePositivesFilePath());
+            } catch (Exception e) {
+                getContext().onFailure(new ZapExecutionException("Failed to archive results.", e, listener.getLogger()));
+                return false;
             }
 
             // If any of the fail run parameters are set to a value more than 1
@@ -63,8 +67,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                     listener.getLogger().println(
                         "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report");
                     run.setResult(Result.FAILURE);
-                    getContext().onFailure(new Throwable(
-                                    "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report"));
+                    getContext().onFailure(new ZapExecutionException("Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report.", listener.getLogger()));
 
                     // Red text on build that shows the build has failed due to ZAP
                     this.run.addAction(new ZapFailBuildAction());
@@ -77,20 +80,20 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
             ZapDriver zap = ZapDriverController.getZapDriver(this.run);
             FilePath zapDir = zap.getZapDir();
 
-            boolean success = ZapDriverController.shutdownZap(this.run);
-
+            try {
+                ZapDriverController.shutdownZap(this.run);
+            } catch (Exception e) {
+                listener.getLogger().println("zap: Failed to shutdown ZAP. " + e.getMessage());
+            }
 
             if (zapDir != null) {
                 try {
-                    listener.getLogger().println("deleting: " + zapDir.getRemote());
+                    listener.getLogger().println("zap: Deleting temp directory: " + zapDir.getRemote());
                     zapDir.deleteRecursive();
                 } catch (IOException | InterruptedException e) {
-                    listener.getLogger().println("Cannot delete temp directory: " + e.getMessage());
+                    listener.getLogger().println("zap: Failed to delete temp directory. " + e.getMessage());
                 }
             }
-
-            if (!success)
-                listener.getLogger().println("zap: Failed to shutdown ZAP (it's not running?)");
         }
 
         getContext().onSuccess(true);
@@ -101,25 +104,16 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
      * Waits until there are no more records to scan for the passive scanner
      * 
      * @param zapDriver the zap driver
-     * @return true if there are no records left so scan, false if the passive scanner timed out
      */
-    private boolean waitUntilPassiveScanHasFinished(ZapDriver zapDriver) {
+    private void waitUntilPassiveScanHasFinished(ZapDriver zapDriver) throws ZapExecutionException, InterruptedException {
         OffsetDateTime startedTime = OffsetDateTime.now();
         int timeoutSeconds = zapDriver.getZapTimeout();
 
         while (zapDriver.zapRecordsToScan() > 0) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
-                return false;
+                throw new ZapExecutionException("ZAP Scanner failed to complete within the set timeout of " + timeoutSeconds + " seconds.");
             }
-
-            try {
-                TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
-            } catch (InterruptedException e) {
-                // Usually if the Jenkins run is stopped
-            }
+            TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
         }
-
-        return true;
     }
-
 }

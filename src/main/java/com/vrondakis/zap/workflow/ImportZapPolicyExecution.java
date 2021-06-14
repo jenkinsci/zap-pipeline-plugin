@@ -3,6 +3,7 @@ package com.vrondakis.zap.workflow;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import com.vrondakis.zap.ZapExecutionException;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import com.vrondakis.zap.ZapDriver;
@@ -20,16 +21,15 @@ public class ImportZapPolicyExecution extends DefaultStepExecutionImpl {
     public boolean start() {
         listener.getLogger().println("zap: Loading attack policy...");
         if (importZapPolicyStepParameters == null || importZapPolicyStepParameters.getPolicyPath().isEmpty()) {
-            getContext().onFailure(new Throwable("zap: Policy path not provided!"));
+            getContext().onFailure(new ZapExecutionException("Policy path not provided.", listener.getLogger()));
             return false;
         }
 
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
-        boolean success = zapDriver.loadPolicy(importZapPolicyStepParameters.getPolicyPath());
-        if (!success) {
-            listener.getLogger().println("zap: Failed to load attack policy at " + importZapPolicyStepParameters.getPolicyPath());
-            getContext().onFailure(
-                    new Throwable("zap: Failed to load attack policy at " + importZapPolicyStepParameters.getPolicyPath()));
+        try {
+            zapDriver.loadPolicy(importZapPolicyStepParameters.getPolicyPath());
+        } catch (Exception e) {
+            getContext().onFailure(new ZapExecutionException("Failed to load attack policy at " + importZapPolicyStepParameters.getPolicyPath(), e, listener.getLogger()));
             return false;
         }
 

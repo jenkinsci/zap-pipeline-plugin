@@ -65,7 +65,7 @@ public class ZapArchive extends Recorder {
      *
      * @return success
      */
-    private boolean saveStaticFiles(File dir) {
+    private void saveStaticFiles(File dir) throws ZapExecutionException {
         try {
             String[] staticFiles = {"index.html", "angular.min.js", "main.js", "normalize.css", "skeleton.css", "main.css", "back.png"};
             String pluginName = "zap-pipeline";
@@ -74,10 +74,8 @@ public class ZapArchive extends Recorder {
                         Jenkins.getInstance().getPlugin(pluginName).getWrapper().baseResourceURL.getFile(), staticFile));
                 archiveFile.copyTo(new FilePath(new File(dir, staticFile)));
             }
-            return true;
-        } catch (IOException | InterruptedException | NullPointerException e) {
-            e.printStackTrace();
-            return false;
+        } catch (NullPointerException | IOException | InterruptedException e) {
+            throw new ZapExecutionException("Failed to copy static report files to build archive.", e);
         }
     }
 
@@ -112,7 +110,7 @@ public class ZapArchive extends Recorder {
      * @param zapDir The ZAP directory you wish to save to
      * @return success
      */
-    private boolean saveAlertCount(File zapDir) {
+    private void saveAlertCount(File zapDir) throws ZapExecutionException {
         try {
 
             List<ZapAlert> alerts = getAlertsFromZap();
@@ -126,11 +124,8 @@ public class ZapArchive extends Recorder {
 
             FilePath fp = new FilePath(new File(zapDir + "/" + ALERT_COUNT_FILENAME));
             fp.write(json, "UTF-8");
-
-            return true;
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            throw new ZapExecutionException("Failed to save alert counts to build archive.", e);
         }
     }
 
@@ -140,23 +135,18 @@ public class ZapArchive extends Recorder {
      * @param path - Where to save the file
      * @return If it saved successfully or not
      */
-    private boolean saveZapReport(File path) {
-        try {
-            FilePath fp = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME));
-            if (zapDriver.getZapHost() == null || zapDriver.getZapPort() == 0)
-                return false;
+    private void saveZapReport(File path) throws ZapExecutionException {
+        FilePath fp = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME));
 
+        try {
             String report = zapDriver.getZapReport();
             fp.write(report, "UTF-8");
 
             String xmlReport = zapDriver.getZapReportXML();
             FilePath fpXml = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME_XML));
             fpXml.write(xmlReport, "UTF-8");
-
-            return true;
-        } catch (URISyntaxException | IOException | UnirestException | InterruptedException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception e) {
+            throw new ZapExecutionException("Failed to copy raw zap report to build archive.", e);
         }
     }
 
@@ -309,8 +299,8 @@ public class ZapArchive extends Recorder {
      * @param taskListener Logging
      * @return Operation success
      */
-    public boolean archiveRawReport(Run<?, ?> dir, @Nonnull Job<?, ?> job, FilePath workspace, @Nonnull TaskListener taskListener,
-                                    String falsePositivesFilePath) {
+    public void archiveRawReport(Run<?, ?> dir, @Nonnull Job<?, ?> job, FilePath workspace, @Nonnull TaskListener taskListener,
+                                    String falsePositivesFilePath) throws ZapExecutionException {
         File zapDir = new File(dir.getRootDir(), DIRECTORY_NAME);
         // Create the zap directory in the workspace if it doesn't already exist
 
@@ -318,10 +308,7 @@ public class ZapArchive extends Recorder {
             boolean mResult = zapDir.mkdir();
 
             if (!mResult) {
-
-                taskListener.getLogger()
-                        .println("zap: Could not create directory at " + zapDir.toURI().toString() + " (archiveRawReport)");
-                return false;
+                throw new ZapExecutionException("Could not create build archive directory at " + zapDir.toURI().toString() + ".");
             }
         }
 
@@ -329,7 +316,9 @@ public class ZapArchive extends Recorder {
         saveFalsePositives(falsePositivesFilePath, workspace, taskListener, zapDir);
 
         // Fetches the JSON report from ZAP and saves it
-        boolean success = saveZapReport(zapDir) && saveStaticFiles(zapDir) && saveAlertCount(zapDir);
+        saveZapReport(zapDir);
+        saveStaticFiles(zapDir);
+        saveAlertCount(zapDir);
 
         // Only show the graph if ZAP has been ran more than twice in the current builds
         AtomicInteger count = new AtomicInteger(0);
@@ -348,20 +337,15 @@ public class ZapArchive extends Recorder {
 
         // If the report was retrieved and saved add the "ZAP scanning report" to the build
         // If it was not saved just add the graph (by hiding the button)
-        ZapAction action = new ZapAction(run, success);
+        ZapAction action = new ZapAction(run);
 
         if(run.getAction(ZapAction.class) == null) {
             if (count.get() > 0) run.addAction(action);
         }
 
-        if (!success)
-            return false;
-
         // Saves the report of the previous build in the current builds workspace (to compare new/old reports)
         Optional<File> oldBuildZapDir = getPreviousReportDir(job);
         oldBuildZapDir.ifPresent(file -> savePreviousZapReport(zapDir, file));
-
-        return true;
     }
 
     /**

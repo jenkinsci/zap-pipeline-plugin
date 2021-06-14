@@ -2,6 +2,7 @@ package com.vrondakis.zap.workflow;
 
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
+import com.vrondakis.zap.ZapExecutionException;
 import hudson.model.Result;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
@@ -27,19 +28,19 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
 
         // Change to attack mode in ZAP
-        boolean changeModeSuccess = zapDriver.setZapMode("attack");
-        if (!changeModeSuccess) {
-            listener.getLogger().println("zap: Failed to switch to attack mode");
-            getContext().onSuccess(false);
+        try {
+            zapDriver.setZapMode("attack");
+            listener.getLogger().println("zap: Set mode to attack mode");
+        } catch (Exception e) {
+            getContext().onSuccess(new ZapExecutionException("Failed to switch ZAP to attack mode.", e, listener.getLogger()));
             return false;
         }
-        listener.getLogger().println("zap: Set mode to attack mode");
 
         // Start the attack on the collected urls
-        boolean startAttackSuccess = zapDriver.zapAttack(runZapAttackStepParameters);
-        if (!startAttackSuccess) {
-            listener.getLogger().println("zap: Failed to start attack");
-            getContext().onSuccess(false);
+        try {
+            zapDriver.zapAttack(runZapAttackStepParameters);
+        } catch (Exception e) {
+            getContext().onSuccess(new ZapExecutionException("Failed to start attack.", e, listener.getLogger()));
             return false;
         }
 
@@ -58,21 +59,23 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
             }
 
             status = zapDriver.zapAttackStatus();
-            if(oldStatus!=status) {
+            if (oldStatus!=status) {
                 listener.getLogger().print("\nzap: Scan progress is: " + status + "%");
                 oldStatus = status;
             }
-            else
+            else {
                 listener.getLogger().print(".");
-
+            }
 
             try {
                 // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
                 // when the scan is complete
-                if (status != ZapDriver.COMPLETED_PERCENTAGE)
+                if (status != ZapDriver.COMPLETED_PERCENTAGE) {
                     TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
+                }
             } catch (InterruptedException e) {
-                // Usually if the Jenkins run is stopped
+                getContext().onSuccess(new ZapExecutionException("\nFailed to complete attack.", e, listener.getLogger()));
+                return false;
             }
         }
 

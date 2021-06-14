@@ -16,27 +16,27 @@ public interface ZapDriver {
     int ZAP_INITIALIZE_TIMEOUT = 100;
     int ZAP_INITIALIZE_WAIT = 20;
 
-    boolean shutdownZap();
+    void shutdownZap() throws ZapExecutionException;
 
-    boolean setZapMode(String zapMode);
+    void setZapMode(String zapMode) throws ZapExecutionException;
 
-    boolean startZapCrawler(String host);
+    void startZapCrawler(String host) throws ZapExecutionException, ZapExecutionException;
 
     int zapCrawlerStatus();
 
-    boolean importUrls(String path);
+    void importUrls(String path) throws ZapExecutionException;
 
-    boolean loadSession(String sessionPath);
+    void loadSession(String sessionPath) throws ZapExecutionException;
 
-    boolean loadPolicy(String policy);
+    void loadPolicy(String policy) throws ZapExecutionException;
 
-    boolean zapAttack(RunZapAttackStepParameters zsp);
+    boolean zapAttack(RunZapAttackStepParameters zsp) throws ZapExecutionException, UnirestException, IOException, URISyntaxException;
 
-    boolean zapCrawlerSuccess();
+    void zapCrawlerSuccess() throws InterruptedException, ZapExecutionException;
 
     int zapAttackStatus();
 
-    boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher);
+    void startZapProcess(String zapHome, FilePath ws, Launcher launcher) throws IOException;
 
     void setZapHost(String zapHost);
 
@@ -65,7 +65,7 @@ public interface ZapDriver {
     String getZapReport() throws IOException, UnirestException, URISyntaxException;
     String getZapReportXML() throws IOException, UnirestException, URISyntaxException;
 
-    boolean zapAliveCheck();
+    void zapAliveCheck() throws ZapExecutionException;
     
-    int zapRecordsToScan();
+    int zapRecordsToScan() throws ZapExecutionException;
 }

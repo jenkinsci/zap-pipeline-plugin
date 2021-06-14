@@ -42,11 +42,9 @@ import jenkins.tasks.SimpleBuildStep;
 public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildAction {
     private final Run<?, ?> run;
     private transient ZapTrendChart zapTrendChart;
-    private boolean showButton;
 
-    public ZapAction(Run<?, ?> run, boolean showButton) {
+    public ZapAction(Run<?, ?> run) {
         this.run = run;
-        this.showButton = showButton;
     }
 
     public Run<?, ?> getRun() {
@@ -175,12 +173,12 @@ public class ZapAction implements Action, RunAction2, SimpleBuildStep.LastBuildA
 
     @Override
     public String getDisplayName() {
-        return showButton ? "ZAP Scanning Report" : null;
+        return "ZAP Scanning Report";
     }
 
     @Override
     public String getIconFileName() {
-        return showButton ? "/plugin/zap-pipeline/logo.png" : null;
+        return "/plugin/zap-pipeline/logo.png";
     }
 
     protected String getTitle() {
