@@ -18,6 +18,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
     public void testFailureParametersSet() throws Exception {
         job.setDefinition(new CpsFlowDefinition(""
                 + "node('slave') {\n"
+                + "     startZap(zapHome: '/', port: 1234, host:'123.123.123.123')\n"
                 + "     archiveZap("
                 + "         failAllAlerts: 313,"
                 + "         failHighAlerts: 314,"

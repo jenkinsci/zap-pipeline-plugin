@@ -3,6 +3,7 @@ package com.vrondakis.zap.workflow;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import com.vrondakis.zap.ZapExecutionException;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import com.vrondakis.zap.ZapDriver;
@@ -21,16 +22,16 @@ public class ImportZapUrlsExecution extends DefaultStepExecutionImpl {
         listener.getLogger().println("zap: Importing list of URLs...");
 
         if (importZapUrlsStepParameters == null || importZapUrlsStepParameters.getPath().isEmpty()) {
-            getContext().onFailure(new Throwable("zap: Could not load URLs file"));
+            getContext().onFailure(new ZapExecutionException("Could not load URLs file.", listener.getLogger()));
             return false;
         }
 
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
 
-        boolean success = zapDriver.importUrls(importZapUrlsStepParameters.getPath());
-        if (!success) {
-            listener.getLogger().println("zap: Failed to load list of URLs at " + importZapUrlsStepParameters.getPath());
-            getContext().onFailure(new Throwable("zap: Failed to load list of URLs at " + importZapUrlsStepParameters.getPath()));
+        try {
+            zapDriver.importUrls(importZapUrlsStepParameters.getPath());
+        } catch (Exception e) {
+            getContext().onSuccess(new ZapExecutionException("Failed to load list of URLs at " + importZapUrlsStepParameters.getPath(), e, listener.getLogger()));
             return false;
         }
 

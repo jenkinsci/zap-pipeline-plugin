@@ -26,7 +26,6 @@ import com.vrondakis.zap.workflow.RunZapAttackStepParameters;
 import hudson.FilePath;
 import hudson.Launcher;
 import net.sf.json.JSONArray;
-import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 
 public class ZapDriverImpl implements ZapDriver {
@@ -46,7 +45,7 @@ public class ZapDriverImpl implements ZapDriver {
      * @param params Map with GET Parameters for the call
      * @return JSONObject or null
      */
-    private JSONObject zapApi(String apiUrl, Map<String, String> params) {
+    private JSONObject zapApi(String apiUrl, Map<String, String> params) throws ZapExecutionException {
         try {
             String query = ZapDriverController.formatParams(params);
 
@@ -56,56 +55,55 @@ public class ZapDriverImpl implements ZapDriver {
             InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
 
             String res = IOUtils.toString(response, StandardCharsets.UTF_8);
-            return JSONObject.fromObject(res);
-
-        } catch (URISyntaxException | IOException | UnirestException e) {
-            // Should be handled in calling function
-            e.printStackTrace();
-            return null;
+            JSONObject value = JSONObject.fromObject(res);
+            if (value == null) {
+                throw new ZapExecutionException("ZAP API returned an empty response.");
+            }
+            return value;
+        } catch (ZapExecutionException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ZapExecutionException("Failed call ZAP API.", e);
         }
     }
 
-    private JSONObject zapApi(String apiUrl) {
+    private void verifyApiResultIsOk(JSONObject result, String errorMessage) throws ZapExecutionException {
+        if (!result.has("Result") || !result.getString("Result").equals("OK")) {
+            throw new ZapExecutionException(errorMessage);
+        }
+    }
+
+    private JSONObject zapApi(String apiUrl) throws ZapExecutionException {
         return zapApi(apiUrl, Collections.emptyMap());
     }
 
-    public boolean shutdownZap() {
-        if (0 == zapPort || null == zapHost)
-            return false;
-
-        return zapApi("core/action/shutdown") != null;
+    public void shutdownZap() throws ZapExecutionException {
+        if (0 == zapPort || null == zapHost) {
+            throw new ZapExecutionException("Cannot shutdown Zap, missing Port and/or Host value.");
+        }
+        zapApi("core/action/shutdown");
     }
 
-    public boolean setZapMode(String mode) {
+    public void setZapMode(String mode) throws ZapExecutionException {
         Map<String, String> arguments = Collections.singletonMap("mode", mode);
-        return zapApi("core/action/setMode", arguments) != null;
+        zapApi("core/action/setMode", arguments);
     }
 
     /**
      * Starts the ZAP crawler on a specified URL
      *
      * @param host The host to attack
-     * @return Success
      */
-    public boolean startZapCrawler(String host) {
+    public void startZapCrawler(String host) throws ZapExecutionException {
         if (crawlId != 0) {
-            return false;
+            throw new ZapExecutionException("ZAP Crawler already running");
         }
 
-        try {
-            // Start the scan on a particular site
-            Map<String, String> arguments = Collections.singletonMap("url", host);
-            JSONObject result = zapApi("spider/action/scan", arguments);
+        // Start the scan on a particular site
+        Map<String, String> arguments = Collections.singletonMap("url", host);
+        JSONObject result = zapApi("spider/action/scan", arguments);
 
-            if (result != null) {
-                crawlId = result.getInt("scan");
-                return true;
-            }
-        } catch (JSONException e) {
-            // Return below
-        }
-
-        return false;
+        crawlId = result.getInt("scan");
     }
 
     /**
@@ -117,87 +115,81 @@ public class ZapDriverImpl implements ZapDriver {
         Map<String, String> arguments = Collections.singletonMap("scanId", Integer.toString(crawlId));
         try {
             JSONObject json = zapApi("spider/view/status", arguments);
-            if (json != null) {
-                return json.getInt("status");
-            } else {
-                return COMPLETED_PERCENTAGE; // Failed to retrieve status so skip it
-            }
+            return json.getInt("status");
 
-        } catch (JSONException e) {
+        } catch (ZapExecutionException e) {
             return COMPLETED_PERCENTAGE;
         }
     }
 
-    public boolean zapCrawlerSuccess() {
+    public void zapCrawlerSuccess() throws InterruptedException, ZapExecutionException {
         OffsetDateTime startedTime = OffsetDateTime.now();
         int timeoutSeconds = this.getZapTimeout();
 
-        int status = this.zapCrawlerStatus();
+        int status = zapCrawlerStatus();
         while (status < ZapDriver.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
-                return false;
+                throw new ZapExecutionException("ZAP Crawler failed to complete within the set timeout of " + timeoutSeconds + " seconds.");
             }
 
-            status = this.zapCrawlerStatus();
+            status = zapCrawlerStatus();
             System.out.println("zap: Crawler progress is: " + status + "%");
 
-            try {
-                // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
-                // when the scan is complete.
-                if (status != ZapDriver.COMPLETED_PERCENTAGE)
-                    TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
-            } catch (InterruptedException e) {
-                // Usually if Jenkins run is stopped
-                System.out.println("zap: Failed to get status of crawler");
+            // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
+            // when the scan is complete.
+            if (status != ZapDriver.COMPLETED_PERCENTAGE) {
+                TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
             }
         }
-
-        return true;
     }
 
     /**
      * Imports URLs from a text file
      *
      * @param path - The path to load from
-     * @return Success
      */
-    public boolean importUrls(String path) {
+    public void importUrls(String path) throws ZapExecutionException {
         System.out.println("zap: Importing URLs from " + path);
         Map<String, String> arguments = Collections.singletonMap("filePath", path);
 
         JSONObject result = zapApi("importurls/action/importurls", arguments);
-        return result != null && result.has("Result") && result.getString("Result").equals("OK");
+
+        verifyApiResultIsOk(result, "Request to import URLs returned a non-'OK' result.");
     }
 
     /**
-     * Loads a ZAP session
+     * Verifies ZAP session
      *
      * @param sessionPath - The path of the .session file
-     * @return Success
      */
-    public boolean loadSession(String sessionPath) {
+    public void loadSession(String sessionPath) throws ZapExecutionException {
         System.out.println("zap: Loading session from " + sessionPath);
         Map<String, String> arguments = Collections.singletonMap("name", sessionPath);
-        JSONObject result = zapApi("core/action/loadSession", arguments);
 
-        return result != null && result.has("Result") && result.getString("Result").equals("OK");
+        try {
+            JSONObject result = zapApi("core/action/loadSession", arguments);
+
+
+            verifyApiResultIsOk(result, "ZAP Session was empty, corrupt or non-existent.");
+        } catch (Exception e) {
+            throw new ZapExecutionException("Could not load session file.", e);
+        }
     }
 
     /**
      * Loads a ZAP policy from a file path
      *
      * @param policy - The path to load from
-     * @return Success
      */
-    public boolean loadPolicy(String policy) {
+    public void loadPolicy(String policy) throws ZapExecutionException {
         Map<String, String> arguments = Collections.singletonMap("path", policy);
         JSONObject result = zapApi("ascan/action/importScanPolicy", arguments);
 
-        if (result == null)
-            return false;
-
-        return (result.has("Result") && result.getString("Result").equals("OK"))
-                        || (result.has("code") && result.getString("code").equals("already_exists"));
+        boolean isOk = result.has("Result") && result.getString("Result").equals("OK");
+        boolean alreadyExists = result.has("code") && result.getString("code").equals("already_exists");
+        if (isOk || alreadyExists) {
+            throw new ZapExecutionException("Request to import scan policy returned a non-'OK' result.");
+        }
     }
 
     /**
@@ -206,13 +198,11 @@ public class ZapDriverImpl implements ZapDriver {
      * @param zsp The parameters from the groovy step
      * @return Success
      */
-    public boolean zapAttack(RunZapAttackStepParameters zsp) {
+    public boolean zapAttack(RunZapAttackStepParameters zsp) throws ZapExecutionException, URISyntaxException {
         // Reset scans
         startedScans.clear();
 
         JSONObject sitesObj = zapApi("core/view/sites");
-        if (sitesObj == null)
-            return false;
 
         List<String> scanUrls = new ArrayList<>();
         JSONArray sites = sitesObj.getJSONArray("sites");
@@ -222,10 +212,10 @@ public class ZapDriverImpl implements ZapDriver {
             // Only starts the scan if a scan on the site isn't currently running
             boolean found = scanUrls.stream().anyMatch(scan -> scan.equals(site.toString()));
             if (!found) {
-                if (beginScan(url, zsp))
+                if (beginScan(url, zsp)) {
                     scanUrls.add(url);
+                }
             }
-
         }
 
         return true;
@@ -238,60 +228,52 @@ public class ZapDriverImpl implements ZapDriver {
      * @param url The URL to scan. Does not include ZAP host prefix
      * @return Success
      */
-    private boolean beginScan(String url, RunZapAttackStepParameters zsp) {
-        try {
-            List<String> allowedHosts = this.allowedHosts;
-            String host = new URI(url).getHost();
-            // If it is in the allowed hosts parameter - or if the url is unset if it is local
-            // localhost.localdomain does not resolve properly with INetAddress.getByName, which is why there is an additional check
-            if (!host.equals("localhost.localdomain")) {
-                if (this.allowedHosts.isEmpty()) {
-                    InetAddress addr = null;
-                    try {
-                        addr = InetAddress.getByName(host);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    if (addr == null)
-                        return false;
-
-                    if (!addr.isAnyLocalAddress() && !addr.isLoopbackAddress())
-                        return false;
-                } else if (!allowedHosts.contains(host)) {
-                    System.out.println(
-                        "zap: Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
-                    return false;
+    private boolean beginScan(String url, RunZapAttackStepParameters zsp) throws URISyntaxException, ZapExecutionException {
+        List<String> allowedHosts = this.allowedHosts;
+        String host = new URI(url).getHost();
+        // If it is in the allowed hosts parameter - or if the url is unset if it is local
+        // localhost.localdomain does not resolve properly with INetAddress.getByName, which is why there is an additional check
+        if (!host.equals("localhost.localdomain")) {
+            if (this.allowedHosts.isEmpty()) {
+                InetAddress addr = null;
+                try {
+                    addr = InetAddress.getByName(host);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+                if (addr == null)
+                    return false;
+
+                if (!addr.isAnyLocalAddress() && !addr.isLoopbackAddress())
+                    return false;
+            } else if (!allowedHosts.contains(host)) {
+                System.out.println(
+                    "zap: Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
+                return false;
             }
-
-            // Start the scan on a particular site with a particular user
-            String attackUrl = "ascan/action/scan";
-            Map<String, String> arguments = new HashMap<>();
-            arguments.put("url", url);
-
-            if (zsp.getUser() != 0) {
-                System.out.println("zap: Loading user ID: " + zsp.getUser());
-                attackUrl += "AsUser";
-                arguments.put("userId", Integer.toString(zsp.getUser()));
-            }
-
-            if (zsp.getScanPolicyName() != null && !zsp.getScanPolicyName().isEmpty()) {
-                arguments.put("scanPolicyName", zsp.getScanPolicyName());
-            }
-
-            JSONObject result = zapApi(attackUrl, arguments);
-            if (result != null) {
-                int zapScanId = result.getInt("scan");
-                startedScans.add(zapScanId);
-                return true;
-            }
-
-        } catch (JSONException | URISyntaxException e) {
-            return false;
         }
 
-        return false;
+        // Start the scan on a particular site with a particular user
+        String attackUrl = "ascan/action/scan";
+        Map<String, String> arguments = new HashMap<>();
+        arguments.put("url", url);
+
+        if (zsp.getUser() != 0) {
+            System.out.println("zap: Loading user ID: " + zsp.getUser());
+            attackUrl += "AsUser";
+            arguments.put("userId", Integer.toString(zsp.getUser()));
+        }
+
+        if (zsp.getScanPolicyName() != null && !zsp.getScanPolicyName().isEmpty()) {
+            arguments.put("scanPolicyName", zsp.getScanPolicyName());
+        }
+
+        JSONObject result = zapApi(attackUrl, arguments);
+        int zapScanId = result.getInt("scan");
+        startedScans.add(zapScanId);
+
+        return true;
     }
 
     /**
@@ -314,13 +296,9 @@ public class ZapDriverImpl implements ZapDriver {
             Map<String, String> arguments = Collections.singletonMap("scanId", Integer.toString(startedScan));
             try {
                 JSONObject json = zapApi("ascan/view/status", arguments);
-                if (json != null) {
-                    int status = json.getInt("status");
-                    totalScanProgress += status;
-                } else {
-                    totalScanProgress = COMPLETED_PERCENTAGE; // Failed to retrieve status so skip it
-                }
-            } catch (JSONException e) {
+                int status = json.getInt("status");
+                totalScanProgress += status;
+            } catch (ZapExecutionException e) {
                 totalScanProgress = COMPLETED_PERCENTAGE;
             }
 
@@ -338,7 +316,7 @@ public class ZapDriverImpl implements ZapDriver {
      * @param launcher - Passed by step
      * @return Success
      */
-    public boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher) {
+    public void startZapProcess(String zapHome, FilePath ws, Launcher launcher) throws IOException {
         List<String> cmd = new ArrayList<>();
 
         Path zapPath = Paths.get(zapHome,
@@ -370,19 +348,12 @@ public class ZapDriverImpl implements ZapDriver {
         cmd.add(ZapDriverController.CMD_CONFIG);
         cmd.add(ZapDriverController.CMD_TIMEOUT);
 
-        try {
-            launcher.launch().stdout(launcher.getListener().getLogger()).stderr(launcher.getListener().getLogger()).cmds(cmd).pwd(ws).start();
-            launcher.getListener().getLogger().println("zap: Started successfully");
-            return true;
-        } catch (Exception e) {
-            launcher.getListener().getLogger().println("zap: An error occurred while staring ZAP" + e.toString());
-            e.printStackTrace();
-            return false;
-        }
+        launcher.launch().stdout(launcher.getListener().getLogger()).stderr(launcher.getListener().getLogger()).cmds(cmd).pwd(ws).start();
+        launcher.getListener().getLogger().println("zap: Started successfully");
     }
 
     @Override
-    public boolean zapAliveCheck() {
+    public void zapAliveCheck() throws ZapExecutionException {
         OffsetDateTime startedTime = OffsetDateTime.now();
         while (!OffsetDateTime.now().isAfter(startedTime.plusSeconds(ZapDriver.ZAP_INITIALIZE_TIMEOUT))) {
             try {
@@ -390,7 +361,7 @@ public class ZapDriverImpl implements ZapDriver {
                 System.out.println("zap: Attempting to connect to ZAP at " + this.getZapHost() + ":" + this.getZapPort());
 
                 new Socket(this.getZapHost(), this.getZapPort());
-                return true;
+                return;
             } catch (IOException e) {
                 // Do nothing, just means ZAP hasn't started yet - we want to wait for the timeout
             } catch (InterruptedException e) {
@@ -398,7 +369,7 @@ public class ZapDriverImpl implements ZapDriver {
             }
         }
 
-        return false;
+        throw new ZapExecutionException("Timed out waiting for ZAP application to become active for new connections.");
     }
 
     public String getZapReport() throws IOException, UnirestException, URISyntaxException {
@@ -474,7 +445,7 @@ public class ZapDriverImpl implements ZapDriver {
      * @return The number of records the passive scanner still has so scan
      */
     @Override
-    public int zapRecordsToScan() {
+    public int zapRecordsToScan() throws ZapExecutionException {
         Map<String, String> arguments = Collections.emptyMap();
         JSONObject recordsToScan = zapApi("pscan/view/recordsToScan", arguments);
         return recordsToScan.getInt("recordsToScan");

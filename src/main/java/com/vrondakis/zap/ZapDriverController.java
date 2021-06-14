@@ -32,8 +32,9 @@ public class ZapDriverController {
 
     public static ZapDriver getZapDriver(Run run) {
         ZapDriver driver = zapDrivers.get(run.getUrl());
-        if (driver != null)
+        if (driver != null) {
             return driver;
+        }
 
         System.out.println("zap: Creating new ZAP driver for build URL: " + run.getUrl());
         return newDriver(run);
@@ -59,13 +60,12 @@ public class ZapDriverController {
         return zapDrivers.containsKey(run.getUrl());
     }
 
-    public static boolean shutdownZap(Run run) {
-        boolean success = getZapDriver(run).shutdownZap();
+    public static void shutdownZap(Run run) throws ZapExecutionException {
+        getZapDriver(run).shutdownZap();
 
-        if (zapDrivers.get(run.getUrl()) instanceof ZapDriverImpl)
+        if (zapDrivers.get(run.getUrl()) instanceof ZapDriverImpl) {
             zapDrivers.remove(run.getUrl());
-
-        return success;
+        }
     }
 
     // Converts map of parameters to URL parameters

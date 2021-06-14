@@ -57,14 +57,14 @@ public class ZapArchiveTest extends ZapTests {
     }
 
     @Test
-    public void testDirectoryCreation() throws IOException, InterruptedException {
+    public void testDirectoryCreation() throws IOException, InterruptedException, ZapExecutionException {
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
 
         Assert.assertTrue(zapDirectoryA.isDirectory());
     }
 
     @Test
-    public void testStaticFileSaving() throws IOException, InterruptedException {
+    public void testStaticFileSaving() throws ZapExecutionException, IOException, InterruptedException {
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
 
         String[] staticFiles = {"index.html", "angular.min.js", "main.js", "normalize.css", "skeleton.css", "main.css", "back.png"};
@@ -76,7 +76,7 @@ public class ZapArchiveTest extends ZapTests {
     }
 
     @Test
-    public void testFalsePositiveFileSaving() throws IOException, InterruptedException {
+    public void testFalsePositiveFileSaving() throws IOException, InterruptedException, ZapExecutionException {
         saveFalsePositives(zapRunA);
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
 
@@ -86,7 +86,7 @@ public class ZapArchiveTest extends ZapTests {
     }
 
     @Test
-    public void testAlertCounts() throws IOException, InterruptedException {
+    public void testAlertCounts() throws IOException, InterruptedException, ZapExecutionException {
         // Archive both of the reports
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
 
@@ -100,7 +100,7 @@ public class ZapArchiveTest extends ZapTests {
     }
 
     @Test
-    public void testAlertCountsFalsePositive() throws IOException, InterruptedException {
+    public void testAlertCountsFalsePositive() throws IOException, InterruptedException, ZapExecutionException {
         // Save the false positives file for zapRunA, so the alert counts will be different
         saveFalsePositives(zapRunA);
 
@@ -117,7 +117,7 @@ public class ZapArchiveTest extends ZapTests {
     }
 
     @Test
-    public void checkPreviousReport() throws IOException, InterruptedException {
+    public void checkPreviousReport() throws IOException, InterruptedException, ZapExecutionException {
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
         zapArchiveB.archiveRawReport(zapRunB, job, zapWorkspaceB, taskListener, "false-positives.json");
 
@@ -129,7 +129,7 @@ public class ZapArchiveTest extends ZapTests {
     }
 
     @Test
-    public void testActionCreated() {
+    public void testActionCreated() throws ZapExecutionException {
         // Archive both builds
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
 
@@ -139,14 +139,14 @@ public class ZapArchiveTest extends ZapTests {
     }
 
     @Test
-    public void testActionNotCreated() {
+    public void testActionNotCreated() throws ZapExecutionException {
         // Archive both builds
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
         Assert.assertNull(zapRunA.getParent().getAction(ZapAction.class));
     }
 
     @Test
-    public void testFailBuildFalse() throws IOException, InterruptedException {
+    public void testFailBuildFalse() throws IOException, InterruptedException, ZapExecutionException {
         saveFalsePositives(zapRunA);
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
 
@@ -154,7 +154,7 @@ public class ZapArchiveTest extends ZapTests {
     }
 
     @Test
-    public void testFailBuild() throws IOException, InterruptedException {
+    public void testFailBuild() throws IOException, InterruptedException, ZapExecutionException {
         saveFalsePositives(zapRunA);
         zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
 
