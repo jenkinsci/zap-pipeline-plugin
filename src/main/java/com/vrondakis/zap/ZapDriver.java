@@ -68,4 +68,12 @@ public interface ZapDriver {
     boolean zapAliveCheck();
     
     int zapRecordsToScan();
+
+    void setZapRootCaFile(String rootCaFile);
+
+    String getZapRootCaFile();
+
+    void setAdditionalConfigurations(List<String> additionalConfigurations);
+
+    List<String> getAdditionalConfigurations();
 }

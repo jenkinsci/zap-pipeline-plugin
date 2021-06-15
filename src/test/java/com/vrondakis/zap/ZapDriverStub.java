@@ -19,7 +19,8 @@ public class ZapDriverStub implements ZapDriver {
     private String loadedSessionPath = "";
     private List<String> allowedHosts;
     private HashMap<Integer, Integer> failBuild = new HashMap<>();
-
+    private String rootCaFile;
+    private List<String> additionalConfigurations;
 
     public ZapDriverStub() {
         super();
@@ -165,8 +166,28 @@ public class ZapDriverStub implements ZapDriver {
         return true;
     }
 
-	@Override
-	public int zapRecordsToScan() {
-		return 0;
-	}
+    @Override
+    public int zapRecordsToScan() {
+        return 0;
+    }
+
+    @Override
+    public void setZapRootCaFile(String rootCaFile) {
+        this.rootCaFile = rootCaFile;
+    }
+
+    @Override
+    public String getZapRootCaFile() {
+        return rootCaFile;
+    }
+
+    @Override
+    public void setAdditionalConfigurations(List<String> additionalConfigurations) {
+        this.additionalConfigurations = additionalConfigurations;
+    }
+
+    @Override
+    public List<String> getAdditionalConfigurations() {
+        return additionalConfigurations;
+    }
 }

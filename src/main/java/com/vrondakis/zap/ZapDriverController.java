@@ -23,6 +23,7 @@ public class ZapDriverController {
     static final String CMD_REGEX = "api.addrs.addr.regex=true";
     static final String CMD_NAME = "api.addrs.addr.name=.*";
     static final String CMD_TIMEOUT = "connection.timeoutInSecs=600";
+    static final String CMD_CERTLOAD = "-certload";
 
     static final String ZAP_UNIX_PROGRAM = "zap.sh";
     static final String ZAP_WIN_PROGRAM = "zap.bat";

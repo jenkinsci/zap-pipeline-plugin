@@ -24,11 +24,13 @@ public class StartZapStep extends Step {
      *                     it locally)
      * @param allowedHosts The hosts to allow scans to begin on, if none are specified then it will run the attack locally only
      * @param sessionPath  Optional path to the session file
+     * @param rootCaFile   the root CA file that can be exported using 'zap.sh -daemon -certfulldump cert.pem
+     * @param additionalConfigurations  configurations to add to ZAP startup, in the form of key=value pairs. If empty, only default configurations are added
      */
     @DataBoundConstructor
     public StartZapStep(@CheckForNull String host, int port, int timeout, String zapHome, List<String> allowedHosts,
-                        String sessionPath) {
-        zapStepParameters = new StartZapStepParameters(host, port, timeout, zapHome, allowedHosts, sessionPath);
+                        String sessionPath, String rootCaFile, List<String> additionalConfigurations) {
+        zapStepParameters = new StartZapStepParameters(host, port, timeout, zapHome, allowedHosts, sessionPath, rootCaFile, additionalConfigurations);
     }
 
     @Override

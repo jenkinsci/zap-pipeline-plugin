@@ -38,6 +38,8 @@ public class ZapDriverImpl implements ZapDriver {
     private List<String> allowedHosts = new ArrayList<>();
     private final List<Integer> startedScans = new ArrayList<>();
     private int crawlId;
+    private String rootCaFile;
+    private List<String> additionalConfigurations = new ArrayList<>();
 
     /**
      * Calls the ZAP api
@@ -370,6 +372,16 @@ public class ZapDriverImpl implements ZapDriver {
         cmd.add(ZapDriverController.CMD_CONFIG);
         cmd.add(ZapDriverController.CMD_TIMEOUT);
 
+        for (String additionalConfiguration: additionalConfigurations) {
+            cmd.add(ZapDriverController.CMD_CONFIG);
+            cmd.add(additionalConfiguration);
+        }
+
+        if (rootCaFile != null) {
+            cmd.add(ZapDriverController.CMD_CERTLOAD);
+            cmd.add(rootCaFile);
+        }
+
         try {
             launcher.launch().stdout(launcher.getListener().getLogger()).stderr(launcher.getListener().getLogger()).cmds(cmd).pwd(ws).start();
             launcher.getListener().getLogger().println("zap: Started successfully");
@@ -478,6 +490,26 @@ public class ZapDriverImpl implements ZapDriver {
         Map<String, String> arguments = Collections.emptyMap();
         JSONObject recordsToScan = zapApi("pscan/view/recordsToScan", arguments);
         return recordsToScan.getInt("recordsToScan");
+    }
+
+    @Override
+    public void setZapRootCaFile(String rootCaFile) {
+        this.rootCaFile = rootCaFile;
+    }
+
+    @Override
+    public String getZapRootCaFile() {
+        return rootCaFile;
+    }
+
+    @Override
+    public void setAdditionalConfigurations(List<String> additionalConfigurations) {
+        this.additionalConfigurations = additionalConfigurations;
+    }
+
+    @Override
+    public List<String> getAdditionalConfigurations() {
+        return additionalConfigurations;
     }
 
 }
