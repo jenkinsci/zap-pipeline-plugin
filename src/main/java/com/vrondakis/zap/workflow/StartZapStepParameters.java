@@ -16,9 +16,11 @@ public class StartZapStepParameters {
     private List<String> additionalConfigurations;
     private String sessionPath;
     private String rootCaFile;
+    private boolean externalZap;
 
     public StartZapStepParameters(String host, int port, int timeout, String zapHome, List<String> allowedHosts,
-                                  String sessionPath, String rootCaFile, List<String> additionalConfigurations) {
+                                  String sessionPath, boolean externalZap, String rootCaFile, List<String> additionalConfigurations) {
+
         this.host = host;
         this.port = port;
         this.timeout = timeout == 0 ? DEFAULT_TIMEOUT : timeout;
@@ -27,6 +29,8 @@ public class StartZapStepParameters {
         this.sessionPath = sessionPath;
         this.rootCaFile = rootCaFile;
         this.additionalConfigurations = (additionalConfigurations == null || additionalConfigurations.isEmpty()) ? DEFAULT_ADDITIONAL_CONFIGURATIONS: additionalConfigurations;
+        this.externalZap = externalZap;
+
     }
 
 
@@ -60,5 +64,13 @@ public class StartZapStepParameters {
 
     public List<String> getAdditionalConfigurations() {
         return additionalConfigurations;
+    }
+
+    public boolean isExternalZap() {
+        return externalZap;
+    }
+
+    public void setExternalZap(boolean externalZap) {
+        this.externalZap = externalZap;
     }
 }

@@ -2,6 +2,7 @@ package com.vrondakis.zap.workflow;
 
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
+import com.vrondakis.zap.ZapExecutionException;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import java.io.ObjectInputStream;
@@ -23,24 +24,26 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
     @Override
     public boolean start() {
         if (runZapCrawlerParameters == null || runZapCrawlerParameters.getHost().equals("")) {
-            this.listener.getLogger().println("zap: Could not run ZAP crawler, no host has been provided");
-            getContext().onSuccess(false);
+            getContext().onFailure(new ZapExecutionException("Could not run ZAP crawler, no host has been provided",  listener.getLogger()));
             return false;
         }
 
-        this.listener.getLogger().println("zap: Starting crawler on host " + runZapCrawlerParameters.getHost() + "...");
+        listener.getLogger().println("zap: Starting crawler on host " + runZapCrawlerParameters.getHost() + "...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
 
-        boolean success = zapDriver.startZapCrawler(runZapCrawlerParameters.getHost());
-        if (!success) {
-            System.out.println("zap: Failed to start ZAP crawler on host " + runZapCrawlerParameters.getHost());
-            getContext().onFailure(new Throwable("zap: Failed to start ZAP crawler on host " + runZapCrawlerParameters.getHost()));
+        try {
+            zapDriver.startZapCrawler(runZapCrawlerParameters.getHost());
+        } catch (Exception e) {
+            getContext().onFailure(new ZapExecutionException("Failed to start ZAP crawler on host: " + runZapCrawlerParameters.getHost(), e, listener.getLogger()));
             return false;
         }
 
-        boolean completed = zapDriver.zapCrawlerSuccess();
-        if (!completed)
-            listener.getLogger().println("zap: Could not complete ZAP crawl due to the timeout");
+        try {
+            zapDriver.zapCrawlerSuccess();
+        }  catch (Exception e) {
+            getContext().onFailure(new ZapExecutionException("ZAP crawler did not complete successfully.", e, listener.getLogger()));
+            return false;
+        }
 
 
         getContext().onSuccess(true);

@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
+import com.vrondakis.zap.ZapExecutionException;
+import org.apache.commons.lang.ObjectUtils;
 import hudson.FilePath;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import com.vrondakis.zap.ZapDriver;
@@ -36,24 +38,21 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             try {
                 launcher = new Launcher.RemoteLauncher(listener, workspace.getChannel(), node.toComputer().isUnix());
             } catch (NullPointerException e) {
-                this.listener.getLogger().println("zap: Could not start ZAP. Failed to retrieve OS information");
-                getContext().onSuccess(false);
+                getContext().onFailure(new ZapExecutionException("Could not start ZAP. Failed to retrieve OS information", e, listener.getLogger()));
                 return false;
             }
         }
 
         // No parameters
         if (zapStepParameters == null) {
-            this.listener.getLogger().println("zap: Could not start ZAP. No parameters are provided - startZap");
-            getContext().onFailure(new Throwable("zap: Could not start ZAP. No parameters are provided - startZap"));
+            getContext().onFailure(new ZapExecutionException("Could not start ZAP. No parameters are provided.", listener.getLogger()));
             return false;
         }
 
         // Zap home not set / invalid
         this.listener.getLogger().println("zap: Starting ZAP on port " + zapStepParameters.getPort() + "...");
         if (zapStepParameters.getZapHome() == null || zapStepParameters.getZapHome().isEmpty()) {
-            this.listener.getLogger().println("zap: Did not start ZAP process because zapHome is not set");
-            getContext().onFailure(new Throwable("zap: Did not start ZAP process because zapHome is not set"));
+            getContext().onFailure(new ZapExecutionException("Did not start ZAP process because zapHome is not set.", listener.getLogger()));
             return false;
         }
 
@@ -61,12 +60,11 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         // See https://github.com/jenkinsci/zap-pipeline-plugin/issues/8
         try {
             if (!workspace.exists()) {
-                launcher.getListener().getLogger().println("Creating workspace directory...");
+                listener.getLogger().println("Creating workspace directory...");
                 workspace.mkdirs();
             }
         } catch (Exception e) {
-            launcher.getListener().getLogger().println("Unable to create workspace dir: " + e.toString());
-            e.printStackTrace();
+            getContext().onFailure(new ZapExecutionException("Unable to create workspace dir.", e, listener.getLogger()));
             return false;
         }
 
@@ -75,7 +73,8 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         try {
             zapDir = workspace.createTempDir( "zaptemp", "");
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            getContext().onFailure(new ZapExecutionException("Unable to create temporary zap folder.", e, listener.getLogger()));
+            return false;
         }
 
         ZapDriver zapDriver = ZapDriverController.newDriver(this.run);
@@ -88,11 +87,10 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         zapDriver.setZapRootCaFile(zapStepParameters.getRootCaFile());
         zapDriver.setAdditionalConfigurations(zapStepParameters.getAdditionalConfigurations());
 
-
-        boolean success = zapDriver.startZapProcess(zapStepParameters.getZapHome(), workspace, launcher);
-        if (!success) {
-            this.listener.getLogger().println("zap: Failed to start ZAP process");
-            getContext().onFailure(new Throwable("zap: Failed to start ZAP process"));
+        try {
+            zapDriver.startZapProcess(zapStepParameters.getZapHome(), workspace, launcher);
+        } catch (Exception e) {
+            getContext().onFailure(new ZapExecutionException("Failed to start ZAP process.", e, listener.getLogger()));
             return false;
         }
 
@@ -100,22 +98,24 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
         // Wait for ZAP to start before continuing...
         listener.getLogger().println("zap: Waiting for ZAP to initialize...");
-        boolean zapHasStarted = zapDriver.zapAliveCheck();
 
-        if (!zapHasStarted) {
-            this.listener.getLogger().println("zap: Failed to start ZAP on port " + zapDriver.getZapPort());
-            getContext().onFailure(
-                    new Throwable("zap: Failed to start ZAP on " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort() + ". Socket timed out"));
-
+        try {
+            zapDriver.zapAliveCheck();
+        } catch (Exception e) {
+            getContext().onFailure(new ZapExecutionException("Failed to start ZAP on " + zapDriver.getZapHost() + ":" + zapDriver.getZapPort(), e, listener.getLogger()));
             return false;
         }
 
         // Load session
         if (zapStepParameters.getSessionPath() != null && !zapStepParameters.getSessionPath().isEmpty()) {
             this.listener.getLogger().println("zap: Loading session " + zapStepParameters.getSessionPath());
-            boolean loadedSession = zapDriver.loadSession(zapStepParameters.getSessionPath());
-            if (!loadedSession)
-                getContext().onFailure(new Throwable("zap: Could not load session file"));
+
+            try {
+                zapDriver.loadSession(zapStepParameters.getSessionPath());
+            } catch (Exception e) {
+                getContext().onFailure(new ZapExecutionException("Could not load session file.", e, listener.getLogger()));
+                return false;
+            }
         }
 
         getContext().onSuccess(true);

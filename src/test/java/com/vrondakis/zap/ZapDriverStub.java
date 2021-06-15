@@ -19,8 +19,12 @@ public class ZapDriverStub implements ZapDriver {
     private String loadedSessionPath = "";
     private List<String> allowedHosts;
     private HashMap<Integer, Integer> failBuild = new HashMap<>();
+
     private String rootCaFile;
     private List<String> additionalConfigurations;
+
+    boolean zapWasShutdown = false;
+
 
     public ZapDriverStub() {
         super();
@@ -31,18 +35,22 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public boolean shutdownZap() {
-        return false;
+    public void shutdownZap() {
+        zapWasShutdown = true;
+    }
+
+    public boolean isZapShutdown() {
+        return zapWasShutdown;
     }
 
     @Override
-    public boolean setZapMode(String zapMode) {
-        return false;
+    public void setZapMode(String zapMode) {
+        // Do nothing
     }
 
     @Override
-    public boolean startZapCrawler(String host) {
-        return true;
+    public void startZapCrawler(String host) {
+        // Do nothing
     }
 
     @Override
@@ -51,19 +59,18 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public boolean importUrls(String path) {
-        return true;
+    public void importUrls(String path) {
+        // Do nothing
     }
 
     @Override
-    public boolean loadSession(String sessionPath) {
+    public void loadSession(String sessionPath) {
         loadedSessionPath = sessionPath;
-        return true;
     }
 
     @Override
-    public boolean loadPolicy(String policy) {
-        return true;
+    public void loadPolicy(String policy) {
+        // Do nothing
     }
 
     @Override
@@ -72,8 +79,8 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public boolean zapCrawlerSuccess() {
-        return true;
+    public void zapCrawlerSuccess() {
+        // Do nothing
     }
 
     @Override
@@ -82,8 +89,8 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public boolean startZapProcess(String zapHome, FilePath ws, Launcher launcher) {
-        return true;
+    public void startZapProcess(String zapHome, FilePath ws, Launcher launcher) {
+        // do nothing
     }
 
     @Override
@@ -162,8 +169,8 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public boolean zapAliveCheck() {
-        return true;
+    public void zapAliveCheck() {
+        // Do nothing
     }
 
     @Override
