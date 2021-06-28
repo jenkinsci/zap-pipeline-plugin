@@ -317,7 +317,6 @@ public class ZapDriverImpl implements ZapDriver {
      * @param zapHome - The location of the zap.sh file
      * @param ws - Passed by step
      * @param launcher - Passed by step
-     * @return Success
      */
     public void startZapProcess(String zapHome, FilePath ws, Launcher launcher) throws IOException {
         List<String> cmd = new ArrayList<>();

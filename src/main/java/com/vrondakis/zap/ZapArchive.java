@@ -63,7 +63,7 @@ public class ZapArchive extends Recorder {
     /**
      * Saves report files to the current build archive
      *
-     * @return success
+     * @param dir the directory to copy the files to
      */
     private void saveStaticFiles(File dir) throws ZapExecutionException {
         try {
@@ -108,7 +108,6 @@ public class ZapArchive extends Recorder {
      * Saves alert-count.json to the zapDir directory (build/x/zap).
      *
      * @param zapDir The ZAP directory you wish to save to
-     * @return success
      */
     private void saveAlertCount(File zapDir) throws ZapExecutionException {
         try {
@@ -133,7 +132,6 @@ public class ZapArchive extends Recorder {
      * Retrieves the ZAP report from ZAP and saves it in path
      *
      * @param path - Where to save the file
-     * @return If it saved successfully or not
      */
     private void saveZapReport(File path) throws ZapExecutionException {
         FilePath fp = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME));
@@ -241,6 +239,7 @@ public class ZapArchive extends Recorder {
     /**
      * Gets the directory of the last build that ran ZAP
      *
+     * @param job the current jenkins job
      * @return The file path of the last available report, null if none are found
      */
     private Optional<File> getPreviousReportDir(Job<?, ?> job) {
@@ -296,8 +295,11 @@ public class ZapArchive extends Recorder {
     /**
      * Archives the current raw ZAP JSON report &amp; saves static files
      *
+     * @param dir the current run directory
+     * @param job the current jenkins job
+     * @param workspace filepath to the current workspace
      * @param taskListener Logging
-     * @return Operation success
+     * @param falsePositivesFilePath path to the false positives file
      */
     public void archiveRawReport(Run<?, ?> dir, @Nonnull Job<?, ?> job, FilePath workspace, @Nonnull TaskListener taskListener,
                                     String falsePositivesFilePath) throws ZapExecutionException {
