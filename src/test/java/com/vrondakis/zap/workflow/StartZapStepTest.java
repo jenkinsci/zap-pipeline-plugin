@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class StartZapStepTest extends ZapWorkflow {
@@ -91,10 +92,75 @@ public class StartZapStepTest extends ZapWorkflow {
         Assert.assertEquals(timeout, zapDriver.getZapTimeout());
         Assert.assertEquals(sessionPath, zapDriver.getLoadedSessionPath());
         Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());
+        Assert.assertEquals(new ArrayList<>(), zapDriver.getAdditionalConfigurations());
+        r.assertBuildStatus(Result.SUCCESS, run);
+    }
+
+    @Test
+    public void verifyParametersTestWithCerts() throws Exception {
+        int timeout = 234;
+        String sessionPath = "session.session";
+
+
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node('slave') {\n"
+                + "     startZap(host: '" + host + "',"
+                + "     port:" + port + ","
+                + "     timeout:" + timeout + ","
+                + "     zapHome: '/opt/zap',"
+                + "     rootCaFile: '/opt/certs.pem',"
+                + "     sessionPath:'" + sessionPath + "',"
+                + "     allowedHosts:['github.com'])\n"
+                + "}"
+        ));
+
+
+        run = job.scheduleBuild2(0).get();
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+
+        Assert.assertEquals(host, zapDriver.getZapHost());
+        Assert.assertEquals(port, zapDriver.getZapPort());
+        Assert.assertEquals(timeout, zapDriver.getZapTimeout());
+        Assert.assertEquals(sessionPath, zapDriver.getLoadedSessionPath());
+        Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());
+        Assert.assertEquals("/opt/certs.pem", zapDriver.getZapRootCaFile());
 
         r.assertBuildStatus(Result.SUCCESS, run);
     }
 
+
+    @Test
+    public void verifyParametersTestWithExtraConfiguration() throws Exception {
+        int timeout = 234;
+        String sessionPath = "session.session";
+
+
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node('slave') {\n"
+                + "     startZap(host: '" + host + "',"
+                + "     port:" + port + ","
+                + "     timeout:" + timeout + ","
+                + "     zapHome: '/opt/zap',"
+                + "     additionalConfigurations: ['connection.proxyChain.enabled=true', 'connection.proxyChain.authEnabled=true'],"
+                + "     sessionPath:'" + sessionPath + "',"
+                + "     allowedHosts:['github.com'])\n"
+                + "}"
+        ));
+
+
+        run = job.scheduleBuild2(0).get();
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+
+        Assert.assertEquals(host, zapDriver.getZapHost());
+        Assert.assertEquals(port, zapDriver.getZapPort());
+        Assert.assertEquals(timeout, zapDriver.getZapTimeout());
+        Assert.assertEquals(sessionPath, zapDriver.getLoadedSessionPath());
+        Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());
+        Assert.assertEquals(2, zapDriver.getAdditionalConfigurations().size());
+        Assert.assertEquals("connection.proxyChain.enabled=true", zapDriver.getAdditionalConfigurations().get(0));
+
+        r.assertBuildStatus(Result.SUCCESS, run);
+    }
 
     @Test
     public void verifyParametersTestWithDir() throws Exception {

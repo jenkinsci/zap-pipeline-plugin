@@ -66,6 +66,15 @@ public interface ZapDriver {
     String getZapReportXML() throws IOException, UnirestException, URISyntaxException;
 
     void zapAliveCheck() throws ZapExecutionException;
-    
+
+    void setZapRootCaFile(String rootCaFile);
+
+    String getZapRootCaFile();
+
+    void setAdditionalConfigurations(List<String> additionalConfigurations);
+
+    List<String> getAdditionalConfigurations();
+
     int zapRecordsToScan() throws ZapExecutionException;
+
 }
