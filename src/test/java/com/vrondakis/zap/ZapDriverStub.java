@@ -8,6 +8,7 @@ import hudson.Launcher;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class ZapDriverStub implements ZapDriver {
     private List<String> additionalConfigurations;
 
     boolean zapWasShutdown = false;
+    private List<Integer> passiveRulesIds = new ArrayList<>();
+    private String passiveRulesAction;
 
 
     public ZapDriverStub() {
@@ -91,6 +94,26 @@ public class ZapDriverStub implements ZapDriver {
     @Override
     public void startZapProcess(String zapHome, FilePath ws, Launcher launcher) {
         // do nothing
+    }
+
+    @Override
+    public void enablePassiveScanners(List<Integer> ids) throws ZapExecutionException {
+        passiveRulesIds = ids;
+        passiveRulesAction = "enable";
+    }
+
+    @Override
+    public void disablePassiveScanners(List<Integer> ids) throws ZapExecutionException {
+        passiveRulesIds = ids;
+        passiveRulesAction = "disable";
+    }
+
+    public List<Integer> getPassiveRulesIds() {
+        return passiveRulesIds;
+    }
+
+    public String getPassiveRulesAction() {
+        return passiveRulesAction;
     }
 
     @Override

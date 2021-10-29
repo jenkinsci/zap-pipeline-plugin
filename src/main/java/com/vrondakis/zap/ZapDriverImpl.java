@@ -10,12 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 
@@ -362,6 +359,32 @@ public class ZapDriverImpl implements ZapDriver {
 
         launcher.launch().stdout(launcher.getListener().getLogger()).stderr(launcher.getListener().getLogger()).cmds(cmd).pwd(ws).start();
         launcher.getListener().getLogger().println("zap: Started successfully");
+    }
+
+    @Override
+    public void enablePassiveScanners(List<Integer> ids) throws ZapExecutionException {
+        zapApi("pscan/action/disableAllScanners/");
+
+        String commaIds = String.join(",", ids
+                .stream()
+                .map(id -> id.toString())
+                .collect(Collectors.toList()));
+        Map<String, String> arguments = new HashMap<>();
+        arguments.put("ids", commaIds);
+        zapApi("pscan/action/enableScanners/", arguments);
+    }
+
+    @Override
+    public void disablePassiveScanners(List<Integer> ids) throws ZapExecutionException {
+        zapApi("pscan/action/enableAllScanners/");
+
+        String commaIds = String.join(",", ids
+                .stream()
+                .map(id -> id.toString())
+                .collect(Collectors.toList()));
+        Map<String, String> arguments = new HashMap<>();
+        arguments.put("ids", commaIds);
+        zapApi("pscan/action/disableScanners/", arguments);
     }
 
     @Override

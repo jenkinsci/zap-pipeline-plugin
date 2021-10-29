@@ -38,6 +38,10 @@ public interface ZapDriver {
 
     void startZapProcess(String zapHome, FilePath ws, Launcher launcher) throws IOException;
 
+    void enablePassiveScanners(List<Integer> ids) throws ZapExecutionException;
+
+    void disablePassiveScanners(List<Integer> ids) throws ZapExecutionException;
+
     void setZapHost(String zapHost);
 
     void setZapPort(int zapPort);
