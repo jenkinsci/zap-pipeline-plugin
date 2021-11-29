@@ -53,6 +53,7 @@ public class ZapDriverImpl implements ZapDriver {
 
             apiUrl = "/JSON/" + apiUrl;
             URI uri = new URI("http", null, getZapHost(), getZapPort(), apiUrl, query, null);
+            System.out.println("zap: Calling " + uri.toString());
 
             InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
 
@@ -258,13 +259,13 @@ public class ZapDriverImpl implements ZapDriver {
         }
 
         // Start the scan on a particular site with a particular user
-        String attackUrl = "ascan/action/scan";
+        String endpoint = "scan";
         Map<String, String> arguments = new HashMap<>();
         arguments.put("url", url);
 
         if (zsp.getUser() != 0) {
             System.out.println("zap: Loading user ID: " + zsp.getUser());
-            attackUrl += "AsUser";
+            endpoint = "scanAsUser";
             arguments.put("userId", Integer.toString(zsp.getUser()));
         }
 
@@ -272,8 +273,9 @@ public class ZapDriverImpl implements ZapDriver {
             arguments.put("scanPolicyName", zsp.getScanPolicyName());
         }
 
-        JSONObject result = zapApi(attackUrl, arguments);
-        int zapScanId = result.getInt("scan");
+        JSONObject result = zapApi("ascan/action/"+endpoint, arguments);
+        System.out.println("zap: Scan ID: " + result.getString(endpoint));
+        int zapScanId = result.getInt(endpoint);
         startedScans.add(zapScanId);
 
         return true;
