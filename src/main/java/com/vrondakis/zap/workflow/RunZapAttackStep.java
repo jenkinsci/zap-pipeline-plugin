@@ -18,10 +18,11 @@ public class RunZapAttackStep extends Step {
      * @param scanPolicyName The scan policy name to use when attacking (optional). Make sure to load the policy from a file first
      *                       using loadScanPolicy()
      * @param userId         The ZAP user ID to run the attack with, loaded from the context (optional)
+     * @param contextId      The ZAP context ID to run the attack with (optional)
      */
     @DataBoundConstructor
-    public RunZapAttackStep(String scanPolicyName, int userId) {
-        this.runZapAttackStepParameters = new RunZapAttackStepParameters(scanPolicyName, userId);
+    public RunZapAttackStep(String scanPolicyName, int userId, int contextId) {
+        this.runZapAttackStepParameters = new RunZapAttackStepParameters(scanPolicyName, userId, contextId);
     }
 
     @Override

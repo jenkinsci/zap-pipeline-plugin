@@ -268,6 +268,11 @@ public class ZapDriverImpl implements ZapDriver {
             arguments.put("userId", Integer.toString(zsp.getUser()));
         }
 
+        if(zsp.getContextId() != 0){
+            System.out.println("zap: Using context ID: " + zsp.getContextId());
+            arguments.put("contextId", Integer.toString(zsp.getContextId()));
+        }
+
         if (zsp.getScanPolicyName() != null && !zsp.getScanPolicyName().isEmpty()) {
             arguments.put("scanPolicyName", zsp.getScanPolicyName());
         }
