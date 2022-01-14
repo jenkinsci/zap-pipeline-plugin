@@ -23,33 +23,24 @@ import hudson.model.TaskListener;
  * Executor for archiveZap() function in Jenkins
  */
 public class ArchiveZapExecution extends SynchronousNonBlockingStepExecution<Void> {
-    
-    private Run<?, ?> run;
-    private FilePath workspace;
-    private TaskListener listener;
-    private Job<?, ?> job;
 	
 	private ArchiveZapStepParameters archiveZapStepParameters;
 
     public ArchiveZapExecution(StepContext context, ArchiveZapStepParameters parameters) {
         super(context);
         this.archiveZapStepParameters = parameters;
-        try {
-            this.run = context.get(Run.class);
-            this.workspace = context.get(FilePath.class);
-            this.listener = context.get(TaskListener.class);
-            this.job = context.get(Job.class);
-        } catch (IOException | InterruptedException e) {
-            this.listener.getLogger().println("zap: Failed to run: " + e.getClass());
-            getContext().onFailure(e);
-        }
     }
  
     @Override
 	protected Void run() throws Exception {
+    	TaskListener listener = getContext().get(TaskListener.class);;
+    	Run<?, ?> run = getContext().get(Run.class);
+        FilePath workspace = getContext().get(FilePath.class);
+        Job<?, ?> job = getContext().get(Job.class);
+    	
         listener.getLogger().println("zap: Archiving results...");
         System.out.println("zap: Archiving results...");
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(run);
 
         if (zapDriver.getZapHost() == null && zapDriver.getZapPort() == 0) {
             listener.getLogger().println("zap: Zap does not appear to have been started. Nothing to archive.");
@@ -68,9 +59,9 @@ public class ArchiveZapExecution extends SynchronousNonBlockingStepExecution<Voi
             archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
 
         try {
-            ZapArchive zapArchive = new ZapArchive(this.run);
+            ZapArchive zapArchive = new ZapArchive(run);
             try {
-                zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener, archiveZapStepParameters.getFalsePositivesFilePath());
+                zapArchive.archiveRawReport(run, job, workspace, listener, archiveZapStepParameters.getFalsePositivesFilePath());
             } catch (Exception e) {
                 getContext().onFailure(new ZapExecutionException("Failed to archive results.", e, listener.getLogger()));
                 return null;
@@ -78,26 +69,26 @@ public class ArchiveZapExecution extends SynchronousNonBlockingStepExecution<Voi
 
             // If any of the fail run parameters are set to a value more than 1
             if (zapDriver.getFailBuild().values().stream().anyMatch(count -> count > 0)) {
-                if (zapArchive.shouldFailBuild(this.listener)) {
+                if (zapArchive.shouldFailBuild(listener)) {
                     listener.getLogger().println(
                         "zap: Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report");
                     run.setResult(Result.FAILURE);
                     getContext().onFailure(new ZapExecutionException("Number of detected ZAP alerts is too high, failing run. Check the ZAP scanning report.", listener.getLogger()));
 
                     // Red text on build that shows the build has failed due to ZAP
-                    this.run.addAction(new ZapFailBuildAction());
+                    run.addAction(new ZapFailBuildAction());
                     return null;
                 }
             }
 
         } finally {
 
-            ZapDriver zap = ZapDriverController.getZapDriver(this.run);
+            ZapDriver zap = ZapDriverController.getZapDriver(run);
             FilePath zapDir = zap.getZapDir();
 
             try {
                 if (archiveZapStepParameters.shouldShutdown()) {
-                    ZapDriverController.shutdownZap(this.run);
+                    ZapDriverController.shutdownZap(run);
                 }
             } catch (Exception e) {
                 listener.getLogger().println("zap: Failed to shutdown ZAP. " + e.getMessage());
