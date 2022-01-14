@@ -1,35 +1,49 @@
 package com.vrondakis.zap.workflow;
 
-import com.vrondakis.zap.ZapExecutionException;
-import com.vrondakis.zap.ZapFailBuildAction;
-import hudson.FilePath;
-import org.apache.commons.io.FileUtils;
+import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
+
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import com.vrondakis.zap.ZapArchive;
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
+import com.vrondakis.zap.ZapExecutionException;
+import com.vrondakis.zap.ZapFailBuildAction;
 
+import hudson.FilePath;
 import hudson.model.Result;
-
-import java.io.File;
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Executor for archiveZap() function in Jenkins
  */
 public class ArchiveZapExecution extends DefaultStepExecutionImpl {
-    private ArchiveZapStepParameters archiveZapStepParameters;
+    
+	private ArchiveZapStepParameters archiveZapStepParameters;
 
     public ArchiveZapExecution(StepContext context, ArchiveZapStepParameters parameters) {
         super(context);
         this.archiveZapStepParameters = parameters;
     }
+   
+	@Override
+	public boolean start() throws Exception {
+		new Thread("saltAPI") {
+			@Override
+			public void run() {
+				try {
+					archiveResults();
+				} catch (Exception e) {
+					getContext().onFailure(e);
+				}
+			}
+		}.start();
 
-    @Override
-    public boolean start() {
+		return false;
+	}
+ 
+    private void archiveResults() {
         listener.getLogger().println("zap: Archiving results...");
         System.out.println("zap: Archiving results...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
@@ -37,15 +51,14 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
         if (zapDriver.getZapHost() == null && zapDriver.getZapPort() == 0) {
             listener.getLogger().println("zap: Zap does not appear to have been started. Nothing to archive.");
             getContext().onSuccess(true);
-            return true;
+            return;
         }
 
         try {
             waitUntilPassiveScanHasFinished(zapDriver);
         } catch (Exception e) {
             getContext().onFailure(new ZapExecutionException("Error occurred checking that passive scan to finish.", e, listener.getLogger()));
-            getContext().onSuccess(true);
-            return false;
+            return;
         }
 
         zapDriver.setFailBuild(archiveZapStepParameters.getFailAllAlerts(), archiveZapStepParameters.getFailHighAlerts(),
@@ -57,7 +70,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
                 zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener, archiveZapStepParameters.getFalsePositivesFilePath());
             } catch (Exception e) {
                 getContext().onFailure(new ZapExecutionException("Failed to archive results.", e, listener.getLogger()));
-                return false;
+                return;
             }
 
             // If any of the fail run parameters are set to a value more than 1
@@ -70,7 +83,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
 
                     // Red text on build that shows the build has failed due to ZAP
                     this.run.addAction(new ZapFailBuildAction());
-                    return false;
+                    return;
                 }
             }
 
@@ -98,7 +111,6 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
         }
 
         getContext().onSuccess(true);
-        return true;
     }
 
     /**
@@ -117,4 +129,5 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
             TimeUnit.SECONDS.sleep(ZapDriver.ZAP_SCAN_SLEEP);
         }
     }
+
 }
