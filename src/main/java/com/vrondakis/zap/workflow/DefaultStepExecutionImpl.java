@@ -15,12 +15,11 @@ import hudson.model.TaskListener;
 import javax.annotation.Nonnull;
 
 public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl {
-    Run run;
+    Run<?, ?> run;
     Node node;
     FilePath workspace;
     Launcher launcher;
     TaskListener listener;
-    Job<?, ?> job;
 
     DefaultStepExecutionImpl(StepContext context) {
         super(context);
@@ -30,7 +29,6 @@ public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl
             this.launcher = context.get(Launcher.class);
             this.workspace = context.get(FilePath.class);
             this.listener = context.get(TaskListener.class);
-            this.job = context.get(Job.class);
         } catch (IOException | InterruptedException e) {
             this.listener.getLogger().println("zap: Failed to run: " + e.getClass());
             getContext().onFailure(e);
