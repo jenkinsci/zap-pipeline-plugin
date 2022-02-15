@@ -19,10 +19,10 @@ public class ConfigurePassiveRulesStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     configurePassiveRules(action: 'enablePassiveScanners', ids: [1,2])\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run)).getPassiveRulesIds(), Arrays.asList(1, 2));
         Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run)).getPassiveRulesAction(), "enable");
     }
@@ -35,10 +35,10 @@ public class ConfigurePassiveRulesStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     configurePassiveRules(action: 'disablePassiveScanners', ids: [1,2,3])\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run)).getPassiveRulesIds(), Arrays.asList(1, 2, 3));
         Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run)).getPassiveRulesAction(), "disable");
     }
@@ -51,10 +51,10 @@ public class ConfigurePassiveRulesStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     configurePassiveRules(action: 'wrongName', ids: [1,2])\n"
                 + "}"
-        ));
+            , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
 
     }
 
@@ -66,9 +66,9 @@ public class ConfigurePassiveRulesStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     importZapUrls()"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
     }
 }

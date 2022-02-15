@@ -18,7 +18,6 @@ public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl
     Run<?, ?> run;
     Node node;
     FilePath workspace;
-    Launcher launcher;
     TaskListener listener;
 
     DefaultStepExecutionImpl(StepContext context) {
@@ -26,7 +25,6 @@ public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl
         try {
             this.run = context.get(Run.class);
             this.node = context.get(Node.class);
-            this.launcher = context.get(Launcher.class);
             this.workspace = context.get(FilePath.class);
             this.listener = context.get(TaskListener.class);
         } catch (IOException | InterruptedException e) {
