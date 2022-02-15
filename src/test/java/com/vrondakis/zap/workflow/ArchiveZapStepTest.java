@@ -17,8 +17,8 @@ import java.util.concurrent.ExecutionException;
 public class ArchiveZapStepTest extends ZapWorkflow {
     @Test
     public void testFailureParametersSet() throws Exception {
-        job.setDefinition(new CpsFlowDefinition(""
-                + "node('slave') {\n"
+        job.setDefinition((new CpsFlowDefinition(
+                "node('slave') {\n"
                 + "     startZap(zapHome: '/', port: 1234, host:'123.123.123.123')\n"
                 + "     archiveZap("
                 + "         failAllAlerts: 313,"
@@ -27,7 +27,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 + "         failLowAlerts: 316"
                 + "     )\n"
                 + "}"
-        ));
+                , true)));
 
         run = job.scheduleBuild2(0).get();
 
@@ -38,20 +38,20 @@ public class ArchiveZapStepTest extends ZapWorkflow {
         Assert.assertEquals(315, (int) failConditions.get(ZapArchive.MEDIUM_ALERT));
         Assert.assertEquals(316, (int) failConditions.get(ZapArchive.LOW_ALERT));
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 
     @Test
     public void zapArchiveNoZap() throws Exception {
         // If archiveZap() is ran without call starting startZap first, it should not break the build.
-        job.setDefinition(new CpsFlowDefinition(""
-                + "node('slave') {\n"
+        job.setDefinition(new CpsFlowDefinition(
+                "node('slave') {\n"
                 + "     archiveZap()\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 
     @Test
@@ -67,10 +67,10 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 + "         failLowAlerts: 2"
                 + "     )\n`"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
     }
 
     @Test
@@ -86,10 +86,10 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 + "         failLowAlerts: 0"
                 + "     )\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
     }
 
     @Test
@@ -105,10 +105,10 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 + "         failLowAlerts: 0"
                 + "     )\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
     }
 
@@ -121,10 +121,10 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 + "         failAllAlerts: 1"
                 + "     )\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
         Assert.assertNotNull(run.getAction(ZapFailBuildAction.class));
     }
 
@@ -140,12 +140,12 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 + "         failLowAlerts: 0"
                 + "     )\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
         ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
         Assert.assertTrue(zapDriver.isZapShutdown());
     }
@@ -164,12 +164,12 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 + "         keepAlive: true"
                 + "     )\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
         ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
         Assert.assertFalse(zapDriver.isZapShutdown());
     }
@@ -187,7 +187,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 + "         failLowAlerts: 0"
                 + "     )\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
 
@@ -195,7 +195,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
         Assert.assertNotNull(zapDriver.getZapDir());
         Assert.assertFalse(zapDriver.getZapDir().exists());
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
     }
 }

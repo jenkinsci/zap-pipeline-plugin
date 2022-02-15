@@ -16,10 +16,10 @@ public class ImportZapUrlsStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     importZapUrls(path: " + "'a-file.txt'" + ")\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 
     @Test
@@ -30,9 +30,9 @@ public class ImportZapUrlsStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     importZapUrls()"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
     }
 }
