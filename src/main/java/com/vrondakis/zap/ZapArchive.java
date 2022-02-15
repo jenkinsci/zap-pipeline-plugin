@@ -88,16 +88,12 @@ public class ZapArchive extends Recorder {
             amountOfInstances -= falsePositives;
             zapAlertCount.incrementFalsePositives(falsePositives);
 
-            switch (alert.getRiskcode()) {
-                case "1":
-                    zapAlertCount.incrementLow(amountOfInstances);
-                    break;
-                case "2":
-                    zapAlertCount.incrementMedium(amountOfInstances);
-                    break;
-                case "3":
-                    zapAlertCount.incrementHigh(amountOfInstances);
-                    break;
+            if ("1".equals(alert.getRiskcode())) {
+                zapAlertCount.incrementLow(amountOfInstances);
+            } else if ("2".equals(alert.getRiskcode())) {
+                zapAlertCount.incrementMedium(amountOfInstances);
+            } else if ("3".equals(alert.getRiskcode())) {
+                zapAlertCount.incrementHigh(amountOfInstances);
             }
         });
 
