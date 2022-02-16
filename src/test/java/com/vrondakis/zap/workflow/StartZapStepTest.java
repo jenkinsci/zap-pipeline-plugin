@@ -50,6 +50,23 @@ public class StartZapStepTest extends ZapWorkflow {
     }
 
     @Test
+    public void testExternalZap() throws Exception {
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node('slave') {\n"
+                + "     startZap(host: '" + host + "', port:" + port + ", externalZap: true)\n"
+                + "}"
+                , true));
+
+        run = job.scheduleBuild2(0).get();
+
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
+        Assert.assertEquals(host, zapDriver.getZapHost());
+        Assert.assertEquals(port, zapDriver.getZapPort());
+
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
+    }
+
+    @Test
     public void verifyMinimumParameterTest() throws Exception {
         job.setDefinition(new CpsFlowDefinition(""
                 + "node('slave') {\n"
