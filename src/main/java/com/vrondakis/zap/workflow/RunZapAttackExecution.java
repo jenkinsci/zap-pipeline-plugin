@@ -25,7 +25,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
     @Override
     public boolean start() {
         listener.getLogger().println("zap: Starting attack...");
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run, listener.getLogger());
 
         // Change to attack mode in ZAP
         try {

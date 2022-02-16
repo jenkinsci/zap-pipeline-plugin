@@ -132,20 +132,6 @@
             <artifactId>dashboard-view</artifactId>
             <version>2.18</version>
             <optional>true</optional>
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.maven</groupId>-->
-<!--                    <artifactId>maven-embedder</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.maven</groupId>-->
-<!--                    <artifactId>maven-core</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.apache.maven</groupId>-->
-<!--                    <artifactId>maven-aether-provider</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
         </dependency>
 
         <dependency>
@@ -186,28 +172,24 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
             <version>4.5.13</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore-nio</artifactId>
             <version>4.4.14</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpasyncclient</artifactId>
             <version>4.1.4</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.13</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

@@ -29,7 +29,7 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
         }
 
         listener.getLogger().println("zap: Starting crawler on host " + runZapCrawlerParameters.getHost() + "...");
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run, listener.getLogger());
 
         try {
             zapDriver.startZapCrawler(runZapCrawlerParameters.getHost());

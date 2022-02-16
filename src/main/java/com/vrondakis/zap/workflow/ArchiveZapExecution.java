@@ -40,7 +40,7 @@ public class ArchiveZapExecution extends SynchronousNonBlockingStepExecution<Voi
     	
         listener.getLogger().println("zap: Archiving results...");
         System.out.println("zap: Archiving results...");
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(run);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(run, listener.getLogger());
 
         if (zapDriver.getZapHost() == null && zapDriver.getZapPort() == 0) {
             listener.getLogger().println("zap: Zap does not appear to have been started. Nothing to archive.");
@@ -59,7 +59,7 @@ public class ArchiveZapExecution extends SynchronousNonBlockingStepExecution<Voi
             archiveZapStepParameters.getFailMediumAlerts(), archiveZapStepParameters.getFailLowAlerts());
 
         try {
-            ZapArchive zapArchive = new ZapArchive(run);
+            ZapArchive zapArchive = new ZapArchive(run, listener.getLogger());
             try {
                 zapArchive.archiveRawReport(run, job, workspace, listener, archiveZapStepParameters.getFalsePositivesFilePath());
             } catch (Exception e) {
@@ -83,12 +83,12 @@ public class ArchiveZapExecution extends SynchronousNonBlockingStepExecution<Voi
 
         } finally {
 
-            ZapDriver zap = ZapDriverController.getZapDriver(run);
+            ZapDriver zap = ZapDriverController.getZapDriver(run, listener.getLogger());
             FilePath zapDir = zap.getZapDir();
 
             try {
                 if (archiveZapStepParameters.shouldShutdown()) {
-                    ZapDriverController.shutdownZap(run);
+                    ZapDriverController.shutdownZap(run, listener.getLogger());
                 }
             } catch (Exception e) {
                 listener.getLogger().println("zap: Failed to shutdown ZAP. " + e.getMessage());

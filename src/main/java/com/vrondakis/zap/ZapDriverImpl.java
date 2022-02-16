@@ -2,6 +2,7 @@ package com.vrondakis.zap;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
@@ -36,6 +37,25 @@ public class ZapDriverImpl implements ZapDriver {
     private int crawlId;
     private String rootCaFile;
     private List<String> additionalConfigurations = new ArrayList<>();
+    private PrintStream logger = System.out;
+
+    /**
+     * Sets the current logger.
+     * @param logger
+     */
+    public void setLogger(PrintStream logger) {
+        this.logger = logger;
+    }
+
+    /**
+     * Logs message using the currently set logger.
+     * @param message the message to log
+     */
+    private void log(String message) {
+        if (logger != null) {
+            logger.println(message);
+        }
+    }
 
     /**
      * Calls the ZAP api
@@ -133,7 +153,7 @@ public class ZapDriverImpl implements ZapDriver {
             }
 
             status = zapCrawlerStatus();
-            System.out.println("zap: Crawler progress is: " + status + "%");
+            log("zap: Crawler progress is: " + status + "%");
 
             // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause
             // when the scan is complete.
@@ -149,7 +169,7 @@ public class ZapDriverImpl implements ZapDriver {
      * @param path - The path to load from
      */
     public void importUrls(String path) throws ZapExecutionException {
-        System.out.println("zap: Importing URLs from " + path);
+        log("zap: Importing URLs from " + path);
         Map<String, String> arguments = Collections.singletonMap("filePath", path);
 
         JSONObject result = zapApi("importurls/action/importurls", arguments);
@@ -163,7 +183,7 @@ public class ZapDriverImpl implements ZapDriver {
      * @param sessionPath - The path of the .session file
      */
     public void loadSession(String sessionPath) throws ZapExecutionException {
-        System.out.println("zap: Loading session from " + sessionPath);
+        log("zap: Loading session from " + sessionPath);
         Map<String, String> arguments = Collections.singletonMap("name", sessionPath);
 
         try {
@@ -248,7 +268,7 @@ public class ZapDriverImpl implements ZapDriver {
                 if (!addr.isAnyLocalAddress() && !addr.isLoopbackAddress())
                     return false;
             } else if (!allowedHosts.contains(host)) {
-                System.out.println(
+                log(
                     "zap: Host " + host + " is not in the allowedHosts parameter and is not a local host. Not scanning.");
                 return false;
             }
@@ -260,7 +280,7 @@ public class ZapDriverImpl implements ZapDriver {
         arguments.put("url", url);
 
         if (zsp.getUser() != 0) {
-            System.out.println("zap: Loading user ID: " + zsp.getUser());
+            log("zap: Loading user ID: " + zsp.getUser());
             attackUrl += "AsUser";
             arguments.put("userId", Integer.toString(zsp.getUser()));
         }
@@ -393,13 +413,15 @@ public class ZapDriverImpl implements ZapDriver {
         while (!OffsetDateTime.now().isAfter(startedTime.plusSeconds(ZapDriver.ZAP_INITIALIZE_TIMEOUT))) {
             try {
                 TimeUnit.SECONDS.sleep(ZapDriver.ZAP_INITIALIZE_WAIT);
-                System.out.println("zap: Attempting to connect to ZAP at " + this.getZapHost() + ":" + this.getZapPort());
+                log("zap: Attempting to connect to ZAP at " + this.getZapHost() + ":" + this.getZapPort());
 
                 new Socket(this.getZapHost(), this.getZapPort());
                 return;
             } catch (IOException e) {
+                log("zap: Zap connect attempt failed: " + e.getMessage());
                 // Do nothing, just means ZAP hasn't started yet - we want to wait for the timeout
             } catch (InterruptedException e) {
+                log("zap: Zap connect attempt failed: " + e.getMessage());
                 break;
             }
         }

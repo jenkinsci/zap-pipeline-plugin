@@ -23,8 +23,8 @@ public class ConfigurePassiveRulesStepTest extends ZapWorkflow {
 
         run = job.scheduleBuild2(0).get();
         jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
-        Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run)).getPassiveRulesIds(), Arrays.asList(1, 2));
-        Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run)).getPassiveRulesAction(), "enable");
+        Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run, System.out)).getPassiveRulesIds(), Arrays.asList(1, 2));
+        Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run, System.out)).getPassiveRulesAction(), "enable");
     }
 
     @Test
@@ -39,8 +39,8 @@ public class ConfigurePassiveRulesStepTest extends ZapWorkflow {
 
         run = job.scheduleBuild2(0).get();
         jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
-        Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run)).getPassiveRulesIds(), Arrays.asList(1, 2, 3));
-        Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run)).getPassiveRulesAction(), "disable");
+        Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run, System.out)).getPassiveRulesIds(), Arrays.asList(1, 2, 3));
+        Assert.assertEquals(((ZapDriverStub)ZapDriverController.getZapDriver(run, System.out)).getPassiveRulesAction(), "disable");
     }
 
     @Test

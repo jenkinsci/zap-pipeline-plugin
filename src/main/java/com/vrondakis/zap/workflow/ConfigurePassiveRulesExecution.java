@@ -29,7 +29,7 @@ public class ConfigurePassiveRulesExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run, listener.getLogger());
 
         try {
             if ("enablePassiveScanners".equalsIgnoreCase(configurePassiveRulesStepParameters.getAction())) {

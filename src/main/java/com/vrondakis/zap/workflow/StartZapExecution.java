@@ -78,7 +78,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-        ZapDriver zapDriver = ZapDriverController.newDriver(this.run);
+        ZapDriver zapDriver = ZapDriverController.newDriver(this.run, listener.getLogger());
         // Set ZAP properties
         zapDriver.setZapHost(zapStepParameters.getHost());
         zapDriver.setZapDir(zapDir);

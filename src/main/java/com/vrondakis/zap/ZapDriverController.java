@@ -1,5 +1,6 @@
 package com.vrondakis.zap;
 
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,20 +32,21 @@ public class ZapDriverController {
     static Class<? extends ZapDriver> zapDriverClass = ZapDriverImpl.class;
     private static HashMap<String, ZapDriver> zapDrivers = new HashMap<>();
 
-    public static ZapDriver getZapDriver(Run run) {
+    public static ZapDriver getZapDriver(Run run, PrintStream logger) {
         ZapDriver driver = zapDrivers.get(run.getUrl());
         if (driver != null) {
             return driver;
         }
 
         System.out.println("zap: Creating new ZAP driver for build URL: " + run.getUrl());
-        return newDriver(run);
+        return newDriver(run, logger);
     }
 
-    public static <T extends ZapDriver> ZapDriver newDriver(Run run, Class<T> zapDriver) {
+    public static <T extends ZapDriver> ZapDriver newDriver(Run run, PrintStream logger, Class<T> zapDriver) {
         ZapDriver zDriver;
         try {
             zDriver = zapDriver.getDeclaredConstructor().newInstance();
+            zDriver.setLogger(logger);
             zapDrivers.put(run.getUrl(), zDriver);
             return zDriver;
         } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
@@ -53,16 +55,16 @@ public class ZapDriverController {
         }
     }
 
-    public static ZapDriver newDriver(Run run) {
-        return ZapDriverController.newDriver(run, zapDriverClass);
+    public static ZapDriver newDriver(Run run, PrintStream logger) {
+        return ZapDriverController.newDriver(run, logger, zapDriverClass);
     }
 
     public static boolean zapDriverExists(Run run) {
         return zapDrivers.containsKey(run.getUrl());
     }
 
-    public static void shutdownZap(Run run) throws ZapExecutionException {
-        getZapDriver(run).shutdownZap();
+    public static void shutdownZap(Run run, PrintStream logger) throws ZapExecutionException {
+        getZapDriver(run, logger).shutdownZap();
 
         if (zapDrivers.get(run.getUrl()) instanceof ZapDriverImpl) {
             zapDrivers.remove(run.getUrl());

@@ -25,7 +25,7 @@ public class StartZapStepTest extends ZapWorkflow {
 
         run = job.scheduleBuild2(0).get();
 
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
         Assert.assertNull(zapDriver.getZapHost());
         Assert.assertNull(zapDriver.getAllowedHosts());
         Assert.assertEquals(Collections.emptyMap(), zapDriver.getFailBuild());
@@ -44,7 +44,7 @@ public class StartZapStepTest extends ZapWorkflow {
                 , true));
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         jenkinsRule.assertBuildStatus(Result.FAILURE, run);
     }
@@ -59,7 +59,7 @@ public class StartZapStepTest extends ZapWorkflow {
 
         run = job.scheduleBuild2(0).get();
 
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
 
@@ -85,7 +85,7 @@ public class StartZapStepTest extends ZapWorkflow {
 
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
@@ -116,7 +116,7 @@ public class StartZapStepTest extends ZapWorkflow {
 
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
@@ -148,7 +148,7 @@ public class StartZapStepTest extends ZapWorkflow {
 
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
@@ -180,7 +180,7 @@ public class StartZapStepTest extends ZapWorkflow {
 
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());

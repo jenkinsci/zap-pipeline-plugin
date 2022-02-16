@@ -7,6 +7,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +28,15 @@ public class ZapDriverStub implements ZapDriver {
     boolean zapWasShutdown = false;
     private List<Integer> passiveRulesIds = new ArrayList<>();
     private String passiveRulesAction;
+    private PrintStream logger = System.out;
 
+    /**
+     * Sets the current logger.
+     * @param logger
+     */
+    public void setLogger(PrintStream logger) {
+        this.logger = logger;
+    }
 
     public ZapDriverStub() {
         super();
