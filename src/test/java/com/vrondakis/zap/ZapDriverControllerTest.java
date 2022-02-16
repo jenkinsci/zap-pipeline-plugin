@@ -20,8 +20,8 @@ public class ZapDriverControllerTest extends ZapTests {
 
     @Test
     public void testNewZapDriver() {
-        ZapDriver firstDriver = ZapDriverController.newDriver(run, ZapDriverStub.class);
-        ZapDriver secondDriver = ZapDriverController.getZapDriver(run);
+        ZapDriver firstDriver = ZapDriverController.newDriver(run, System.out, ZapDriverStub.class);
+        ZapDriver secondDriver = ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertSame(firstDriver, secondDriver);
     }
@@ -30,18 +30,18 @@ public class ZapDriverControllerTest extends ZapTests {
     public void testDifferentZapDriver() throws ExecutionException, InterruptedException {
         WorkflowRun secondRun = job.scheduleBuild2(0).get();
 
-        ZapDriver firstDriver = ZapDriverController.newDriver(run, ZapDriverStub.class);
-        ZapDriver secondDriver = ZapDriverController.newDriver(secondRun, ZapDriverStub.class);
+        ZapDriver firstDriver = ZapDriverController.newDriver(run, System.out, ZapDriverStub.class);
+        ZapDriver secondDriver = ZapDriverController.newDriver(secondRun, System.out, ZapDriverStub.class);
 
         Assert.assertNotSame(firstDriver, secondDriver);
     }
 
     @Test
     public void testGetNewZapDriver() throws ExecutionException, InterruptedException {
-        ZapDriver firstDriver = ZapDriverController.getZapDriver(run);
+        ZapDriver firstDriver = ZapDriverController.getZapDriver(run, System.out);
 
         WorkflowRun secondRun = job.scheduleBuild2(0).get();
-        ZapDriver secondDriver = ZapDriverController.getZapDriver(secondRun);
+        ZapDriver secondDriver = ZapDriverController.getZapDriver(secondRun, System.out);
 
         Assert.assertNotNull(firstDriver);
         Assert.assertNotNull(secondDriver);

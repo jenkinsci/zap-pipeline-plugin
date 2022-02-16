@@ -17,6 +17,7 @@ import net.sf.json.JSONObject;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,12 +51,12 @@ public class ZapArchive extends Recorder {
     private ZapDriver zapDriver;
     private Run<?, ?> run;
 
-    public ZapArchive(Run<?, ?> run) {
+    public ZapArchive(Run<?, ?> run, PrintStream logger) {
         this.run = run;
-        this.zapDriver = ZapDriverController.getZapDriver(run);
+        this.zapDriver = ZapDriverController.getZapDriver(run, logger);
     }
 
-    public ZapArchive(Run<?, ?> run, ZapDriver zapDriver) {
+    public ZapArchive(Run<?, ?> run, PrintStream logger, ZapDriver zapDriver) {
         this.zapDriver = zapDriver;
         this.run = run;
     }

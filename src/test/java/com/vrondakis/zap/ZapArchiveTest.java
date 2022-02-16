@@ -38,8 +38,8 @@ public class ZapArchiveTest extends ZapTests {
         zapRunA = job.scheduleBuild2(0).get();
         zapRunB = job.scheduleBuild2(0).get();
 
-        zapArchiveA = new ZapArchive(zapRunA, zapDriver);
-        zapArchiveB = new ZapArchive(zapRunB, zapDriver);
+        zapArchiveA = new ZapArchive(zapRunA, System.out, zapDriver);
+        zapArchiveB = new ZapArchive(zapRunB, System.out, zapDriver);
 
         zapWorkspaceA = new FilePath(zapRunA.getRootDir());
         zapWorkspaceB = new FilePath(zapRunB.getRootDir());

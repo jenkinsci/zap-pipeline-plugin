@@ -31,7 +31,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
 
         run = job.scheduleBuild2(0).get();
 
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
         HashMap<Integer, Integer> failConditions = zapDriver.getFailBuild();
         Assert.assertEquals(313, (int) failConditions.get(ZapArchive.ALL_ALERT));
         Assert.assertEquals(314, (int) failConditions.get(ZapArchive.HIGH_ALERT));
@@ -143,7 +143,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 , true));
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
@@ -167,7 +167,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
                 , true));
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
@@ -191,7 +191,7 @@ public class ArchiveZapStepTest extends ZapWorkflow {
 
         run = job.scheduleBuild2(0).get();
 
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
         Assert.assertNotNull(zapDriver.getZapDir());
         Assert.assertFalse(zapDriver.getZapDir().exists());
 

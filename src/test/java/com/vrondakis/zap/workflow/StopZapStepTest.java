@@ -19,7 +19,7 @@ public class StopZapStepTest extends ZapWorkflow {
                 , true));
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
@@ -38,7 +38,7 @@ public class StopZapStepTest extends ZapWorkflow {
 
         run = job.scheduleBuild2(0).get();
 
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
         Assert.assertNotNull(zapDriver.getZapDir());
         Assert.assertFalse(zapDriver.getZapDir().exists());
 
