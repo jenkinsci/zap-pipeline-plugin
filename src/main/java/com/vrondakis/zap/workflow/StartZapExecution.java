@@ -52,8 +52,8 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
 
         // Zap home not set / invalid
         this.listener.getLogger().println("zap: Starting ZAP on port " + zapStepParameters.getPort() + "...");
-        if (zapStepParameters.getZapHome() == null || zapStepParameters.getZapHome().isEmpty()) {
-            getContext().onFailure(new ZapExecutionException("Did not start ZAP process because zapHome is not set.", listener.getLogger()));
+        if ((zapStepParameters.getZapHome() == null || zapStepParameters.getZapHome().isEmpty()) && !zapStepParameters.isExternalZap()) {
+            getContext().onFailure(new ZapExecutionException("Did not start ZAP process because zapHome is not set, and external ZAP is not true.", listener.getLogger()));
             return false;
         }
 
@@ -88,11 +88,15 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
         zapDriver.setZapRootCaFile(zapStepParameters.getRootCaFile());
         zapDriver.setAdditionalConfigurations(zapStepParameters.getAdditionalConfigurations());
 
-        try {
-            zapDriver.startZapProcess(zapStepParameters.getZapHome(), workspace, launcher);
-        } catch (Exception e) {
-            getContext().onFailure(new ZapExecutionException("Failed to start ZAP process.", e, listener.getLogger()));
-            return false;
+        if (zapStepParameters.isExternalZap()) {
+            listener.getLogger().println("zap: Run marked as external zap, skipping startup of the zap instance.");
+        } else {
+            try {
+                zapDriver.startZapProcess(zapStepParameters.getZapHome(), workspace, launcher);
+            } catch (Exception e) {
+                getContext().onFailure(new ZapExecutionException("Failed to start ZAP process.", e, listener.getLogger()));
+                return false;
+            }
         }
 
         this.listener.getLogger().println("zap: Checking ZAP is alive at " + zapStepParameters.getHost() + ":" + zapStepParameters.getPort());
