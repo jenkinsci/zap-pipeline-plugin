@@ -4,7 +4,10 @@ import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
 import com.vrondakis.zap.ZapExecutionException;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Executor for zapAttack() function in jenkinsfile
  */
-public class RunZapAttackExecution extends DefaultStepExecutionImpl {
+public class RunZapAttackExecution extends SynchronousNonBlockingStepExecution<Void> {
     private RunZapAttackStepParameters runZapAttackStepParameters;
 
     public RunZapAttackExecution(StepContext context, RunZapAttackStepParameters runZapAttackStepParameters) {
@@ -23,9 +26,11 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public Boolean run() {
+    protected Void run() throws Exception {
+        TaskListener listener = getContext().get(TaskListener.class);;
+        Run<?, ?> run = getContext().get(Run.class);
         listener.getLogger().println("zap: Starting attack...");
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run, listener.getLogger());
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(run, listener.getLogger());
 
         // Change to attack mode in ZAP
         try {
@@ -33,7 +38,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
             listener.getLogger().println("zap: Set mode to attack mode");
         } catch (Exception e) {
             getContext().onSuccess(new ZapExecutionException("Failed to switch ZAP to attack mode.", e, listener.getLogger()));
-            return false;
+            return null;
         }
 
         // Start the attack on the collected urls
@@ -41,7 +46,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
             zapDriver.zapAttack(runZapAttackStepParameters);
         } catch (Exception e) {
             getContext().onSuccess(new ZapExecutionException("Failed to start attack.", e, listener.getLogger()));
-            return false;
+            return null;
         }
 
         OffsetDateTime startedTime = OffsetDateTime.now();
@@ -55,7 +60,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
                 listener.getLogger().println("zap: Scan timed out before it could complete");
                 getContext().setResult(Result.UNSTABLE);
                 getContext().onSuccess(true);
-                return true;
+                return null;
             }
 
             status = zapDriver.zapAttackStatus();
@@ -75,13 +80,13 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
                 }
             } catch (InterruptedException e) {
                 getContext().onSuccess(new ZapExecutionException("\nFailed to complete attack.", e, listener.getLogger()));
-                return false;
+                return null;
             }
         }
 
         listener.getLogger().print("\n");
         getContext().onSuccess(true);
-        return true;
+        return null;
     }
 
     // findbugs fails without this because "non-transient non-serializable instance field in serializable class"

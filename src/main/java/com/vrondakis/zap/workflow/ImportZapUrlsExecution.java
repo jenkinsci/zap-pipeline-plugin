@@ -18,7 +18,7 @@ public class ImportZapUrlsExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public Boolean run() {
+    public boolean start() {
         listener.getLogger().println("zap: Importing list of URLs...");
 
         if (importZapUrlsStepParameters == null || importZapUrlsStepParameters.getPath().isEmpty()) {

@@ -11,12 +11,10 @@ import hudson.Launcher;
 import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
-import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 
 import javax.annotation.Nonnull;
 
-public abstract class DefaultStepExecutionImpl extends SynchronousNonBlockingStepExecution {
+public abstract class DefaultStepExecutionImpl extends AbstractStepExecutionImpl  {
     Run<?, ?> run;
     Node node;
     FilePath workspace;

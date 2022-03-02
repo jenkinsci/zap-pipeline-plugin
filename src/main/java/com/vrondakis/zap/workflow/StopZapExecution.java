@@ -22,7 +22,7 @@ public class StopZapExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public Boolean run() {
+    public boolean start() {
         listener.getLogger().println("zap: Stopping Zap...");
         System.out.println("zap: Stopping Zap...");
 

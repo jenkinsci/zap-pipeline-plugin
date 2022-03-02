@@ -18,7 +18,7 @@ public class ImportZapPolicyExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public Boolean run() {
+    public boolean start() {
         listener.getLogger().println("zap: Loading attack policy...");
         if (importZapPolicyStepParameters == null || importZapPolicyStepParameters.getPolicyPath().isEmpty()) {
             getContext().onFailure(new ZapExecutionException("Policy path not provided.", listener.getLogger()));
