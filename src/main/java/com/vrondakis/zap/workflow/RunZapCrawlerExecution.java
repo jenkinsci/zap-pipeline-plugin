@@ -22,7 +22,7 @@ public class RunZapCrawlerExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start() {
+    public Boolean run() {
         if (runZapCrawlerParameters == null || runZapCrawlerParameters.getHost().equals("")) {
             getContext().onFailure(new ZapExecutionException("Could not run ZAP crawler, no host has been provided",  listener.getLogger()));
             return false;

@@ -23,7 +23,7 @@ public class RunZapAttackExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start() {
+    public Boolean run() {
         listener.getLogger().println("zap: Starting attack...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
 

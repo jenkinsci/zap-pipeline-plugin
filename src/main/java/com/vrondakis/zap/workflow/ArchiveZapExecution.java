@@ -29,7 +29,7 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start() {
+    public Boolean run() {
         listener.getLogger().println("zap: Archiving results...");
         System.out.println("zap: Archiving results...");
         ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
@@ -56,6 +56,11 @@ public class ArchiveZapExecution extends DefaultStepExecutionImpl {
             try {
                 zapArchive.archiveRawReport(this.run, this.job, this.workspace, this.listener, archiveZapStepParameters.getFalsePositivesFilePath());
             } catch (Exception e) {
+                listener.getLogger().println(e.getMessage());
+                for (StackTraceElement el: e.getStackTrace()) {
+                    listener.getLogger().println(el.toString());
+                }
+                listener.getLogger().println(e.getCause());
                 getContext().onFailure(new ZapExecutionException("Failed to archive results.", e, listener.getLogger()));
                 return false;
             }

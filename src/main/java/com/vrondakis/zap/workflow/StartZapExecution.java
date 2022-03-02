@@ -30,7 +30,7 @@ public class StartZapExecution extends DefaultStepExecutionImpl {
     }
 
     @Override
-    public boolean start() {
+    public Boolean run() {
         // Linux vs Windows & master vs slave
         if (node.getNodeName().isEmpty()) {
             launcher = new Launcher.LocalLauncher(listener, workspace.getChannel());
