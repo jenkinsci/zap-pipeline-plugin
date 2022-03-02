@@ -26,11 +26,11 @@ public class StopZapExecution extends DefaultStepExecutionImpl {
         listener.getLogger().println("zap: Stopping Zap...");
         System.out.println("zap: Stopping Zap...");
 
-        ZapDriver zap = ZapDriverController.getZapDriver(this.run);
+        ZapDriver zap = ZapDriverController.getZapDriver(this.run, listener.getLogger());
         FilePath zapDir = zap.getZapDir();
 
         try {
-            ZapDriverController.shutdownZap(this.run);
+            ZapDriverController.shutdownZap(this.run, listener.getLogger());
         } catch (Exception e) {
             listener.getLogger().println("zap: Failed to shutdown ZAP.");
         }

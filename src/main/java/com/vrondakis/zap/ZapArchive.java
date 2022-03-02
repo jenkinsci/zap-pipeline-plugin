@@ -17,6 +17,7 @@ import net.sf.json.JSONObject;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,12 +51,12 @@ public class ZapArchive extends Recorder {
     private ZapDriver zapDriver;
     private Run<?, ?> run;
 
-    public ZapArchive(Run<?, ?> run) {
+    public ZapArchive(Run<?, ?> run, PrintStream logger) {
         this.run = run;
-        this.zapDriver = ZapDriverController.getZapDriver(run);
+        this.zapDriver = ZapDriverController.getZapDriver(run, logger);
     }
 
-    public ZapArchive(Run<?, ?> run, ZapDriver zapDriver) {
+    public ZapArchive(Run<?, ?> run, PrintStream logger, ZapDriver zapDriver) {
         this.zapDriver = zapDriver;
         this.run = run;
     }
@@ -88,16 +89,12 @@ public class ZapArchive extends Recorder {
             amountOfInstances -= falsePositives;
             zapAlertCount.incrementFalsePositives(falsePositives);
 
-            switch (alert.getRiskcode()) {
-                case "1":
-                    zapAlertCount.incrementLow(amountOfInstances);
-                    break;
-                case "2":
-                    zapAlertCount.incrementMedium(amountOfInstances);
-                    break;
-                case "3":
-                    zapAlertCount.incrementHigh(amountOfInstances);
-                    break;
+            if ("1".equals(alert.getRiskcode())) {
+                zapAlertCount.incrementLow(amountOfInstances);
+            } else if ("2".equals(alert.getRiskcode())) {
+                zapAlertCount.incrementMedium(amountOfInstances);
+            } else if ("3".equals(alert.getRiskcode())) {
+                zapAlertCount.incrementHigh(amountOfInstances);
             }
         });
 

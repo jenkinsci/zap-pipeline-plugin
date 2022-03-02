@@ -11,10 +11,10 @@ public class ImportZapPolicyStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     importZapScanPolicy()\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
     }
 
     @Test
@@ -23,9 +23,9 @@ public class ImportZapPolicyStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     importZapScanPolicy(policyPath: '/var/policy.policy')\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 }

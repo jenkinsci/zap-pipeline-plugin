@@ -4,7 +4,6 @@ package com.vrondakis.zap;
 import java.io.PrintStream;
 
 public class ZapExecutionException extends Exception {
-    private boolean listener;
 
     public ZapExecutionException(String message) {
         super(message);

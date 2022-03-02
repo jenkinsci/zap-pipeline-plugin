@@ -1,6 +1,5 @@
 package com.vrondakis.zap.workflow;
 
-import com.vrondakis.zap.ZapArchive;
 import com.vrondakis.zap.ZapDriverController;
 import com.vrondakis.zap.ZapDriverStub;
 import com.vrondakis.zap.ZapFailBuildAction;
@@ -8,9 +7,6 @@ import hudson.model.Result;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.HashMap;
-
 
 public class StopZapStepTest extends ZapWorkflow {
     @Test
@@ -20,12 +16,12 @@ public class StopZapStepTest extends ZapWorkflow {
                 + "     startZap(zapHome: '/', port: 1234, host:'123.123.123.123')\n"
                 + "     stopZap()\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
         Assert.assertTrue(zapDriver.isZapShutdown());
     }
@@ -38,15 +34,15 @@ public class StopZapStepTest extends ZapWorkflow {
                 + "     startZap(zapHome: '/', port: 1234, host:'123.123.123.123')\n"
                 + "     stopZap()\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
 
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
         Assert.assertNotNull(zapDriver.getZapDir());
         Assert.assertFalse(zapDriver.getZapDir().exists());
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
         Assert.assertNull(run.getAction(ZapFailBuildAction.class));
     }
 }

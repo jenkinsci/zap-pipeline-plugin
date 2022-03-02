@@ -11,10 +11,10 @@ public class RunZapCrawlerStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     runZapCrawler()\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
     }
 
     @Test
@@ -23,9 +23,9 @@ public class RunZapCrawlerStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     runZapCrawler(host: 'http://google.com')\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 }

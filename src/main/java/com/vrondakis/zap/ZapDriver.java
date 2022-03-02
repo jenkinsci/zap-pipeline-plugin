@@ -6,6 +6,7 @@ import hudson.FilePath;
 import hudson.Launcher;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,8 @@ public interface ZapDriver {
     long ZAP_SCAN_SLEEP = 10;
     int ZAP_INITIALIZE_TIMEOUT = 100;
     int ZAP_INITIALIZE_WAIT = 20;
+
+    void setLogger(PrintStream logger);
 
     void shutdownZap() throws ZapExecutionException;
 
@@ -37,6 +40,10 @@ public interface ZapDriver {
     int zapAttackStatus();
 
     void startZapProcess(String zapHome, FilePath ws, Launcher launcher) throws IOException;
+
+    void enablePassiveScanners(List<Integer> ids) throws ZapExecutionException;
+
+    void disablePassiveScanners(List<Integer> ids) throws ZapExecutionException;
 
     void setZapHost(String zapHost);
 

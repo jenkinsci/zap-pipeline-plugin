@@ -17,22 +17,18 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousStepExecution;
 import javax.annotation.Nonnull;
 
 public abstract class DefaultStepExecutionImpl extends SynchronousNonBlockingStepExecution {
-    Run run;
+    Run<?, ?> run;
     Node node;
     FilePath workspace;
-    Launcher launcher;
     TaskListener listener;
-    Job<?, ?> job;
 
     DefaultStepExecutionImpl(StepContext context) {
         super(context);
         try {
             this.run = context.get(Run.class);
             this.node = context.get(Node.class);
-            this.launcher = context.get(Launcher.class);
             this.workspace = context.get(FilePath.class);
             this.listener = context.get(TaskListener.class);
-            this.job = context.get(Job.class);
         } catch (IOException | InterruptedException e) {
             this.listener.getLogger().println("zap: Failed to run: " + e.getClass());
             getContext().onFailure(e);
@@ -53,5 +49,4 @@ public abstract class DefaultStepExecutionImpl extends SynchronousNonBlockingSte
     public void stop(@Nonnull Throwable throwable) throws Exception {
         // findbugs
     }
-
 }

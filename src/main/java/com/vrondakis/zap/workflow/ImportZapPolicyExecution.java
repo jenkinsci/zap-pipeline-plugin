@@ -25,7 +25,7 @@ public class ImportZapPolicyExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run, listener.getLogger());
         try {
             zapDriver.loadPolicy(importZapPolicyStepParameters.getPolicyPath());
         } catch (Exception e) {

@@ -26,7 +26,7 @@ public class ImportZapUrlsExecution extends DefaultStepExecutionImpl {
             return false;
         }
 
-        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run);
+        ZapDriver zapDriver = ZapDriverController.getZapDriver(this.run, listener.getLogger());
 
         try {
             zapDriver.importUrls(importZapUrlsStepParameters.getPath());

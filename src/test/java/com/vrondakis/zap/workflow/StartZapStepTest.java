@@ -21,18 +21,18 @@ public class StartZapStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     startZap()\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
 
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
         Assert.assertNull(zapDriver.getZapHost());
         Assert.assertNull(zapDriver.getAllowedHosts());
         Assert.assertEquals(Collections.emptyMap(), zapDriver.getFailBuild());
         Assert.assertEquals(0, zapDriver.getZapPort());
         Assert.assertEquals(0, zapDriver.getZapTimeout());
 
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
     }
 
     @Test
@@ -41,12 +41,29 @@ public class StartZapStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     startZap(host: '" + host + "', port:" + port + ")\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
-        r.assertBuildStatus(Result.FAILURE, run);
+        jenkinsRule.assertBuildStatus(Result.FAILURE, run);
+    }
+
+    @Test
+    public void testExternalZap() throws Exception {
+        job.setDefinition(new CpsFlowDefinition(""
+                + "node('slave') {\n"
+                + "     startZap(host: '" + host + "', port:" + port + ", externalZap: true)\n"
+                + "}"
+                , true));
+
+        run = job.scheduleBuild2(0).get();
+
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
+        Assert.assertEquals(host, zapDriver.getZapHost());
+        Assert.assertEquals(port, zapDriver.getZapPort());
+
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 
     @Test
@@ -55,15 +72,15 @@ public class StartZapStepTest extends ZapWorkflow {
                 + "node('slave') {\n"
                 + "     startZap(host: '" + host + "', port:" + port + ", zapHome:'/opt/zap')\n"
                 + "}"
-        ));
+                , true));
 
         run = job.scheduleBuild2(0).get();
 
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 
     @Test
@@ -81,11 +98,11 @@ public class StartZapStepTest extends ZapWorkflow {
                 + "     sessionPath:'" + sessionPath + "',"
                 + "     allowedHosts:['github.com'])\n"
                 + "}"
-        ));
+                , true));
 
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
@@ -93,7 +110,7 @@ public class StartZapStepTest extends ZapWorkflow {
         Assert.assertEquals(sessionPath, zapDriver.getLoadedSessionPath());
         Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());
         Assert.assertEquals(new ArrayList<>(), zapDriver.getAdditionalConfigurations());
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 
     @Test
@@ -112,11 +129,11 @@ public class StartZapStepTest extends ZapWorkflow {
                 + "     sessionPath:'" + sessionPath + "',"
                 + "     allowedHosts:['github.com'])\n"
                 + "}"
-        ));
+                , true));
 
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
@@ -125,9 +142,8 @@ public class StartZapStepTest extends ZapWorkflow {
         Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());
         Assert.assertEquals("/opt/certs.pem", zapDriver.getZapRootCaFile());
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
-
 
     @Test
     public void verifyParametersTestWithExtraConfiguration() throws Exception {
@@ -145,11 +161,11 @@ public class StartZapStepTest extends ZapWorkflow {
                 + "     sessionPath:'" + sessionPath + "',"
                 + "     allowedHosts:['github.com'])\n"
                 + "}"
-        ));
+                , true));
 
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
@@ -159,7 +175,7 @@ public class StartZapStepTest extends ZapWorkflow {
         Assert.assertEquals(2, zapDriver.getAdditionalConfigurations().size());
         Assert.assertEquals("connection.proxyChain.enabled=true", zapDriver.getAdditionalConfigurations().get(0));
 
-        r.assertBuildStatus(Result.SUCCESS, run);
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 
     @Test
@@ -177,11 +193,11 @@ public class StartZapStepTest extends ZapWorkflow {
                 + "     sessionPath:'" + sessionPath + "',"
                 + "     allowedHosts:['github.com'])\n"
                 + "}"
-        ));
+                , true));
 
 
         run = job.scheduleBuild2(0).get();
-        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run);
+        ZapDriverStub zapDriver = (ZapDriverStub) ZapDriverController.getZapDriver(run, System.out);
 
         Assert.assertEquals(host, zapDriver.getZapHost());
         Assert.assertEquals(port, zapDriver.getZapPort());
@@ -192,7 +208,6 @@ public class StartZapStepTest extends ZapWorkflow {
         Assert.assertEquals(sessionPath, zapDriver.getLoadedSessionPath());
         Assert.assertEquals(Collections.singletonList("github.com"), zapDriver.getAllowedHosts());
 
-        r.assertBuildStatus(Result.SUCCESS, run);
-
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, run);
     }
 }
