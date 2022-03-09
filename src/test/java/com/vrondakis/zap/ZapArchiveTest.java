@@ -58,19 +58,19 @@ public class ZapArchiveTest extends ZapTests {
 
     @Test
     public void testDirectoryCreation() throws IOException, InterruptedException, ZapExecutionException {
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
 
         Assert.assertTrue(zapDirectoryA.isDirectory());
     }
 
     @Test
     public void testStaticFileSaving() throws ZapExecutionException, IOException, InterruptedException {
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
 
         String[] staticFiles = {"index.html", "angular.min.js", "main.js", "normalize.css", "skeleton.css", "main.css", "back.png"};
         for (String staticFile: staticFiles) {
             String archiveFile = new FilePath(zapDirectoryA, staticFile).readToString();
-            FilePath resourceFile = new FilePath(new File(Jenkins.getInstance().getPlugin("zap-pipeline").getWrapper().baseResourceURL.getFile(), staticFile));
+            FilePath resourceFile = new FilePath(new File(Jenkins.get().getPlugin("zap-pipeline").getWrapper().baseResourceURL.getFile(), staticFile));
             Assert.assertEquals(resourceFile.readToString(), archiveFile);
         }
     }
@@ -78,7 +78,7 @@ public class ZapArchiveTest extends ZapTests {
     @Test
     public void testFalsePositiveFileSaving() throws IOException, InterruptedException, ZapExecutionException {
         saveFalsePositives(zapRunA);
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
 
         FilePath falsePositives = new FilePath(zapWorkspaceA, "false-positives.json");
         FilePath savedFile = new FilePath(zapDirectoryA, ZapArchive.FALSE_POSITIVES_FILENAME);
@@ -88,7 +88,7 @@ public class ZapArchiveTest extends ZapTests {
     @Test
     public void testAlertCounts() throws IOException, InterruptedException, ZapExecutionException {
         // Archive both of the reports
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
 
         // Read alert-count files
         String zapAlertCountRawA = new FilePath(zapDirectoryA, "alert-count.json").readToString();
@@ -105,7 +105,7 @@ public class ZapArchiveTest extends ZapTests {
         saveFalsePositives(zapRunA);
 
         // Archive the reports
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
 
         // Read alert-count files
         String zapAlertCountRawA = new FilePath(zapDirectoryA, "alert-count.json").readToString();
@@ -118,8 +118,8 @@ public class ZapArchiveTest extends ZapTests {
 
     @Test
     public void checkPreviousReport() throws IOException, InterruptedException, ZapExecutionException {
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
-        zapArchiveB.archiveRawReport(zapRunB, job, zapWorkspaceB, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
+        zapArchiveB.archiveRawReport(zapRunB, job, zapWorkspaceB, taskListener, "false-positives.json", false);
 
         String zapReportA = new FilePath(zapDirectoryA, ZapArchive.RAW_REPORT_FILENAME).readToString();
         String zapReportB = new FilePath(zapDirectoryB, ZapArchive.RAW_OLD_REPORT_FILENAME).readToString();
@@ -131,24 +131,24 @@ public class ZapArchiveTest extends ZapTests {
     @Test
     public void testActionCreated() throws ZapExecutionException {
         // Archive both builds
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
 
         // The action should be added on the second build, as it is only added if there is more than one build.
-        zapArchiveB.archiveRawReport(zapRunB, job, zapWorkspaceB, taskListener, "false-positives.json");
+        zapArchiveB.archiveRawReport(zapRunB, job, zapWorkspaceB, taskListener, "false-positives.json", false);
         Assert.assertNotNull(zapRunB.getAction(ZapAction.class));
     }
 
     @Test
     public void testActionNotCreated() throws ZapExecutionException {
         // Archive both builds
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
         Assert.assertNull(zapRunA.getParent().getAction(ZapAction.class));
     }
 
     @Test
     public void testFailBuildFalse() throws IOException, InterruptedException, ZapExecutionException {
         saveFalsePositives(zapRunA);
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
 
         Assert.assertFalse(zapArchiveA.shouldFailBuild(taskListener));
     }
@@ -156,7 +156,7 @@ public class ZapArchiveTest extends ZapTests {
     @Test
     public void testFailBuild() throws IOException, InterruptedException, ZapExecutionException {
         saveFalsePositives(zapRunA);
-        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json");
+        zapArchiveA.archiveRawReport(zapRunA, job, zapWorkspaceA, taskListener, "false-positives.json", false);
 
         Assert.assertFalse(zapArchiveA.shouldFailBuild(taskListener));
     }

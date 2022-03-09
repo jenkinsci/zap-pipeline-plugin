@@ -69,7 +69,7 @@ public interface ZapDriver {
 
     List<String> getAllowedHosts();
 
-    String getZapReport() throws IOException, UnirestException, URISyntaxException;
+    String getZapReport(boolean detailed) throws IOException, UnirestException, URISyntaxException;
     String getZapReportXML() throws IOException, UnirestException, URISyntaxException;
 
     void zapAliveCheck() throws ZapExecutionException;

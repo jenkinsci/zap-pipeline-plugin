@@ -130,11 +130,11 @@ public class ZapArchive extends Recorder {
      *
      * @param path - Where to save the file
      */
-    private void saveZapReport(File path) throws ZapExecutionException {
+    private void saveZapReport(File path, boolean detailedReport) throws ZapExecutionException {
         FilePath fp = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME));
 
         try {
-            String report = zapDriver.getZapReport();
+            String report = zapDriver.getZapReport(detailedReport);
             fp.write(report, "UTF-8");
 
             String xmlReport = zapDriver.getZapReportXML();
@@ -206,7 +206,7 @@ public class ZapArchive extends Recorder {
      */
     private List<ZapAlert> getAlertsFromZap() {
         try {
-            JSONObject report = JSONObject.fromObject(zapDriver.getZapReport());
+            JSONObject report = JSONObject.fromObject(zapDriver.getZapReport(false));
             // Zap returns either an array of sites, or a single site as an object. Attempt to load as an array, then
             // fall back to object on fail
             JSONArray sites;
@@ -299,7 +299,7 @@ public class ZapArchive extends Recorder {
      * @param falsePositivesFilePath path to the false positives file
      */
     public void archiveRawReport(Run<?, ?> dir, @Nonnull Job<?, ?> job, FilePath workspace, @Nonnull TaskListener taskListener,
-                                    String falsePositivesFilePath) throws ZapExecutionException {
+                                    String falsePositivesFilePath, boolean detailedReport) throws ZapExecutionException {
         File zapDir = new File(dir.getRootDir(), DIRECTORY_NAME);
         // Create the zap directory in the workspace if it doesn't already exist
 
@@ -315,7 +315,7 @@ public class ZapArchive extends Recorder {
         saveFalsePositives(falsePositivesFilePath, workspace, taskListener, zapDir);
 
         // Fetches the JSON report from ZAP and saves it
-        saveZapReport(zapDir);
+        saveZapReport(zapDir, detailedReport);
         saveStaticFiles(zapDir);
         saveAlertCount(zapDir);
 

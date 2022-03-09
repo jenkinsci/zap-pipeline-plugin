@@ -33,12 +33,17 @@ var parseRawBuild = function(build) {
 				}
 
 				alert.instances.forEach(instance => {
+					console.log("coucou" + instance['request-header'])
 					alertReformatted.instances.push({
 						uri: instance.uri,
 						method: instance.method,
 						param: instance.param,
 						attack: instance.attack,
 						evidence: instance.evidence,
+						requestHeader: instance['request-header'],
+						requestBody: instance['request-body'],
+						responseHeader: instance['response-header'],
+						responseBody: instance['response-body'],
 					})
 				})
 
@@ -184,6 +189,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window, $q
                     prevAlert.instances.splice(prevInstanceIndex, 1)
                 }
                 instance.showMore = false
+				instance.showDetails = false
                 instance.newAlert = prevInstanceIndex === -1
 
                 // Increment risk-based counters

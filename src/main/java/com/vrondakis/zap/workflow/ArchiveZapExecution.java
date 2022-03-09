@@ -61,7 +61,7 @@ public class ArchiveZapExecution extends SynchronousNonBlockingStepExecution<Voi
         try {
             ZapArchive zapArchive = new ZapArchive(run, listener.getLogger());
             try {
-                zapArchive.archiveRawReport(run, job, workspace, listener, archiveZapStepParameters.getFalsePositivesFilePath());
+                zapArchive.archiveRawReport(run, job, workspace, listener, archiveZapStepParameters.getFalsePositivesFilePath(), archiveZapStepParameters.isDetailedReport());
             } catch (Exception e) {
                 getContext().onFailure(new ZapExecutionException("Failed to archive results.", e, listener.getLogger()));
                 return null;

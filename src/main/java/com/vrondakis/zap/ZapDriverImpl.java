@@ -429,8 +429,10 @@ public class ZapDriverImpl implements ZapDriver {
         throw new ZapExecutionException("Timed out waiting for ZAP application to become active for new connections.");
     }
 
-    public String getZapReport() throws IOException, UnirestException, URISyntaxException {
-        URI uri = new URI("http", null, zapHost, zapPort, "/OTHER/core/other/jsonreport", "formMethod=GET", null);
+    public String getZapReport(boolean detailedReport) throws IOException, UnirestException, URISyntaxException {
+
+        String reportName = detailedReport ? "traditional-json-plus": "traditional-json";
+        URI uri = new URI("http", null, zapHost, zapPort, "/JSON/reports/action/generate/", String.format("title=test&template=%s&theme=&description=&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=&reportFileNamePattern=&reportDir=&display=", reportName), null);
 
         InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
         return IOUtils.toString(response, StandardCharsets.UTF_8);

@@ -82,7 +82,9 @@
 
 			<div data-ng-show="alert.showInstances" data-ng-repeat="instance in alert.instances track by $index">
 					<pre>
-<code class="instance-code" data-ng-class="{'suppressed':instance.suppressed, 'low':alert.riskCode==1, 'medium' : alert.riskCode==2, 'high': alert.riskCode==3}" data-ng-show="instance.showMore"><b>URI:</b> {{instance.uri}}
+<code class="instance-code"
+	  data-ng-class="{'suppressed':instance.suppressed, 'low':alert.riskCode==1, 'medium' : alert.riskCode==2, 'high': alert.riskCode==3}"
+	  data-ng-show="instance.showMore"><b>URI:</b> {{instance.uri}}
 <b>Method:</b> {{instance.method}}
 <b>Param:</b> {{instance.param}}
 <b>Evidence:</b> {{instance.evidence}}
@@ -92,6 +94,8 @@
 	  data-ng-show="!instance.showMore"><b>URI:</b> {{instance.uri}}
 <b>Method:</b> {{instance.method}}
 <b>Param:</b> {{instance.param}}</code>
+
+
 					</pre>
 				<div class="instance-actions">
 					<a data-ng-click="instance.showMore=!instance.showMore">
@@ -105,6 +109,21 @@
 								Copy to Clipboard
 							</span>
 					</a>
+					<a data-ng-click="instance.showDetails=!instance.showDetails" data-ng-if="instance.requestHeader">
+							<span class="button button-instance-action"
+								  data-ng-class="{'button-primary':instance.showDetails}">
+								{{instance.showDetails ? 'Hide details' : 'Show details'}}
+							</span>
+					</a>
+					<pre>
+<code class="instance-code"
+	  data-ng-class="{'suppressed':instance.suppressed, 'low':alert.riskCode==1, 'medium' : alert.riskCode==2, 'high': alert.riskCode==3}"
+	  data-ng-show="instance.showDetails">
+<b>Request Headers</b><br/>{{instance.requestHeader}}
+<b>Request Body: </b><br/>{{instance.requestBody}}
+<b>Response Headers</b><br/>{{instance.responseHeader}}
+<b>Response Body: </b><br/>{{instance.responseBody}}</code>
+					</pre>
 				</div>
 			</div>
 
