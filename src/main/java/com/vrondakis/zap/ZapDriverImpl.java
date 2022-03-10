@@ -1,12 +1,10 @@
 package com.vrondakis.zap;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,6 +13,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import net.sf.json.JSONException;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import com.mashape.unirest.http.Unirest;
@@ -429,13 +429,26 @@ public class ZapDriverImpl implements ZapDriver {
         throw new ZapExecutionException("Timed out waiting for ZAP application to become active for new connections.");
     }
 
-    public String getZapReport(boolean detailedReport) throws IOException, UnirestException, URISyntaxException {
+    public String getZapReport(boolean detailedReport) throws IOException, UnirestException, URISyntaxException, InterruptedException {
+
+        FilePath reportPath = zapDir.createTempFile("result", ".json");
 
         String reportName = detailedReport ? "traditional-json-plus": "traditional-json";
-        URI uri = new URI("http", null, zapHost, zapPort, "/JSON/reports/action/generate/", String.format("title=test&template=%s&theme=&description=&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=&reportFileNamePattern=&reportDir=&display=", reportName), null);
+        URI uri = new URI("http", null, zapHost, zapPort, "/JSON/reports/action/generate", String.format("title=test&template=%s&theme=&description=&contexts=&sites=&sections=&includedConfidences=&includedRisks=&reportFileName=%s&reportFileNamePattern=&reportDir=%s&display=", reportName, reportPath.getName(), zapDir.getRemote()), null);
 
         InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
-        return IOUtils.toString(response, StandardCharsets.UTF_8);
+        String replyStr = IOUtils.toString(response, StandardCharsets.UTF_8);
+
+        JSONObject reply = JSONObject.fromObject(replyStr);
+        try {
+            String filePath = reply.getString("generate");
+            return reportPath.readToString();
+        } catch (NullPointerException | IOException e) {
+            log("Error getting report " + e.getMessage());
+            throw e;
+        } catch (JSONException e) {
+            throw new UnknownServiceException(String.format("Report %s is not available, please update ZAP instance", reportName));
+        }
     }
 
     public String getZapReportXML() throws IOException, UnirestException, URISyntaxException {

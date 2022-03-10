@@ -141,7 +141,7 @@ public class ZapArchive extends Recorder {
             FilePath fpXml = new FilePath(new File(path.toString() + "/" + RAW_REPORT_FILENAME_XML));
             fpXml.write(xmlReport, "UTF-8");
         } catch (Exception e) {
-            throw new ZapExecutionException("Failed to copy raw zap report to build archive.", e);
+            throw new ZapExecutionException("Failed to copy raw zap report to build archive:" + e.getMessage(), e);
         }
     }
 
@@ -193,7 +193,6 @@ public class ZapArchive extends Recorder {
                         "zap: Failed to access workspace for false positives file, it may be on a non-connected slave. False positives will not be suppressed.");
             }
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
             taskListener.getLogger()
                     .println("zap: Failed to do archive false positives file. False positives will not be suppressed");
         }
@@ -228,7 +227,7 @@ public class ZapArchive extends Recorder {
                     alerts.addAll(siteAlerts);
                 }
             return alerts;
-        } catch (IOException | UnirestException | URISyntaxException | JSONException e) {
+        } catch (IOException | UnirestException | URISyntaxException | JSONException | InterruptedException e) {
             return Collections.emptyList();
         }
     }
