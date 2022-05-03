@@ -35,7 +35,7 @@ public class RunZapCrawlerExecution extends SynchronousNonBlockingStepExecution<
         ZapDriver zapDriver = ZapDriverController.getZapDriver(run, listener.getLogger());
 
         try {
-            zapDriver.startZapCrawler(runZapCrawlerParameters.getHost());
+            zapDriver.startZapCrawler(runZapCrawlerParameters);
         } catch (Exception e) {
             getContext().onFailure(new ZapExecutionException("Failed to start ZAP crawler on host: " + runZapCrawlerParameters.getHost(), e, listener.getLogger()));
             return null;

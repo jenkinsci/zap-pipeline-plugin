@@ -2,6 +2,7 @@ package com.vrondakis.zap;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.vrondakis.zap.workflow.RunZapAttackStepParameters;
+import com.vrondakis.zap.workflow.RunZapCrawlerParameters;
 import hudson.FilePath;
 import hudson.Launcher;
 
@@ -23,7 +24,7 @@ public interface ZapDriver {
 
     void setZapMode(String zapMode) throws ZapExecutionException;
 
-    void startZapCrawler(String host) throws ZapExecutionException, ZapExecutionException;
+    void startZapCrawler(RunZapCrawlerParameters zcp) throws ZapExecutionException, ZapExecutionException;
 
     int zapCrawlerStatus();
 

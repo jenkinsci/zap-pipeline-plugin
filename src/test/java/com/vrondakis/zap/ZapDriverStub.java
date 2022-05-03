@@ -3,6 +3,7 @@ package com.vrondakis.zap;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.vrondakis.zap.workflow.RunZapAttackStepParameters;
+import com.vrondakis.zap.workflow.RunZapCrawlerParameters;
 import hudson.FilePath;
 import hudson.Launcher;
 
@@ -61,7 +62,7 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public void startZapCrawler(String host) {
+    public void startZapCrawler(RunZapCrawlerParameters zcp) {
         // Do nothing
     }
 

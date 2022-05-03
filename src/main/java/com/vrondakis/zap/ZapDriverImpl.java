@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.vrondakis.zap.workflow.RunZapCrawlerParameters;
 import org.apache.commons.io.IOUtils;
 
 import com.mashape.unirest.http.Unirest;
@@ -112,18 +113,46 @@ public class ZapDriverImpl implements ZapDriver {
     /**
      * Starts the ZAP crawler on a specified URL
      *
-     * @param host The host to attack
+     * @param zcp The Zap Crawler Parameters to run with
      */
-    public void startZapCrawler(String host) throws ZapExecutionException {
+    public void startZapCrawler(RunZapCrawlerParameters zcp) throws ZapExecutionException {
         if (crawlId != 0) {
             throw new ZapExecutionException("ZAP Crawler already running");
         }
 
-        // Start the scan on a particular site
-        Map<String, String> arguments = Collections.singletonMap("url", host);
-        JSONObject result = zapApi("spider/action/scan", arguments);
+        String scanMode = "scan";
+        Map<String, String> arguments = Collections.singletonMap("url", zcp.getHost());
 
-        crawlId = result.getInt("scan");
+        if (zcp.getUserId() != 0) {
+            log("zap: Loading user ID: " + zcp.getUserId());
+            scanMode += "AsUser";
+            arguments.put("userId", Integer.toString(zcp.getUserId()));
+        }
+
+        if (zcp.getContextId() != 0) {
+            arguments.put("contextId", Integer.toString(zcp.getContextId()));
+        }
+
+        if (zcp.getMaxChildren() != 0) {
+            arguments.put("maxChildren", Integer.toString(zcp.getMaxChildren()));
+        }
+
+        if (zcp.getContextName() != null && !zcp.getContextName().isEmpty()) {
+            arguments.put("contextName", zcp.getContextName());
+        }
+
+        if (zcp.getSubtreeOnly()) {
+            arguments.put("subtreeOnly", Boolean.toString(zcp.getSubtreeOnly()));
+        }
+
+        if (zcp.getRecurse()) {
+            arguments.put("recurse", Boolean.toString(zcp.getRecurse()));
+        }
+
+        // Start the scan on a particular site
+        JSONObject result = zapApi("spider/action/" + scanMode, arguments);
+
+        crawlId = result.getInt(scanMode);
     }
 
     /**
@@ -274,23 +303,43 @@ public class ZapDriverImpl implements ZapDriver {
             }
         }
 
-        // Start the scan on a particular site with a particular user
-        String attackUrl = "ascan/action/scan";
+        // Start the scan on a particular site with a particular user (if set)
+        String scanMode = "scan";
         Map<String, String> arguments = new HashMap<>();
         arguments.put("url", url);
 
         if (zsp.getUser() != 0) {
             log("zap: Loading user ID: " + zsp.getUser());
-            attackUrl += "AsUser";
+            scanMode += "AsUser";
             arguments.put("userId", Integer.toString(zsp.getUser()));
+        }
+
+        if (zsp.getContextId() != 0) {
+            arguments.put("contextId", Integer.toString(zsp.getContextId()));
         }
 
         if (zsp.getScanPolicyName() != null && !zsp.getScanPolicyName().isEmpty()) {
             arguments.put("scanPolicyName", zsp.getScanPolicyName());
         }
 
-        JSONObject result = zapApi(attackUrl, arguments);
-        int zapScanId = result.getInt("scan");
+        if (zsp.getMethod() != null && !zsp.getMethod().isEmpty()) {
+            arguments.put("method", zsp.getMethod());
+        }
+
+        if (zsp.getPostData() != null && !zsp.getPostData().isEmpty()) {
+            arguments.put("postData", zsp.getPostData());
+        }
+
+        if (zsp.getRecurse()) {
+            arguments.put("recurse", Boolean.toString(zsp.getRecurse()));
+        }
+
+        if (zsp.getInScopeOnly()) {
+            arguments.put("inScopeOnly", Boolean.toString(zsp.getInScopeOnly()));
+        }
+
+        JSONObject result = zapApi("ascan/action/" + scanMode, arguments);
+        int zapScanId = result.getInt(scanMode);
         startedScans.add(zapScanId);
 
         return true;

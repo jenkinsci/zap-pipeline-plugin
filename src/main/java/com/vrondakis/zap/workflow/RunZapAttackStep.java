@@ -18,10 +18,15 @@ public class RunZapAttackStep extends Step {
      * @param scanPolicyName The scan policy name to use when attacking (optional). Make sure to load the policy from a file first
      *                       using loadScanPolicy()
      * @param userId         The ZAP user ID to run the attack with, loaded from the context (optional)
+     * @param contextId      The ZAP context ID to run the attack with (optional)
+     * @param recurse        Scans URLS under those captured by the proxy (optional).
+     * @param inScopeOnly    Used to constrain the scan to URLs that are in scope (ignored if a Context or User is specified) (optional).
+     * @param method         Restrict the scan to the provided method (optional).
+     * @param postData       Restrict the scan to the provided postData (optional).
      */
     @DataBoundConstructor
-    public RunZapAttackStep(String scanPolicyName, int userId) {
-        this.runZapAttackStepParameters = new RunZapAttackStepParameters(scanPolicyName, userId);
+    public RunZapAttackStep(String scanPolicyName, int userId, int contextId, boolean recurse, boolean inScopeOnly, String method, String postData) {
+        this.runZapAttackStepParameters = new RunZapAttackStepParameters(scanPolicyName, userId, contextId, recurse, inScopeOnly, method, postData);
     }
 
     @Override
