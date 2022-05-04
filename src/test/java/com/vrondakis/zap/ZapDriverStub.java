@@ -212,6 +212,11 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
+    public List<PluginProgress> zapAttackProgress() {
+        return null;
+    }
+
+    @Override
     public void setZapRootCaFile(String rootCaFile) {
         this.rootCaFile = rootCaFile;
     }

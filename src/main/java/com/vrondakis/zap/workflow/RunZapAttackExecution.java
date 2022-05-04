@@ -1,5 +1,6 @@
 package com.vrondakis.zap.workflow;
 
+import com.vrondakis.zap.PluginProgress;
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
 import com.vrondakis.zap.ZapExecutionException;
@@ -12,6 +13,7 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,7 +56,7 @@ public class RunZapAttackExecution extends SynchronousNonBlockingStepExecution<V
         int timeoutSeconds = zapDriver.getZapTimeout();
         int status = zapDriver.zapAttackStatus();
 
-        int oldStatus = -1;
+        int loops = 0;
         while (status < ZapDriver.COMPLETED_PERCENTAGE) {
             if (OffsetDateTime.now().isAfter(startedTime.plusSeconds(timeoutSeconds))) {
                 listener.getLogger().println("zap: Scan timed out before it could complete");
@@ -64,13 +66,22 @@ public class RunZapAttackExecution extends SynchronousNonBlockingStepExecution<V
             }
 
             status = zapDriver.zapAttackStatus();
-            if (oldStatus!=status) {
-                listener.getLogger().print("\nzap: Scan progress is: " + status + "%");
-                oldStatus = status;
-            }
-            else {
+
+            if (loops % (ZapDriver.ZAP_SCAN_STATUS_PRINT_INTERVAL / ZapDriver.ZAP_SCAN_SLEEP) == 0 || status == ZapDriver.COMPLETED_PERCENTAGE) {
+                listener.getLogger().println("\nzap: Scan progress is: " + status + "%");
+
+                List<PluginProgress> progress = zapDriver.zapAttackProgress();
+                listener.getLogger().println("|------------------------------------------|----------------------|------------|------------|");
+                listener.getLogger().println(String.format("| %-40s | %-20s | %10s | %10s |", "Plugin", "Progress", "Requests", "Alerts"));
+                listener.getLogger().println("|------------------------------------------|----------------------|------------|------------|");
+                for (PluginProgress plugin: progress) {
+                    listener.getLogger().println(String.format("| %-40.40s | %-20.20s | %10.10s | %10.10s |", plugin.getName(), plugin.getStatus(), plugin.getRequests(), plugin.getAlerts()));
+                }
+                listener.getLogger().println("|------------------------------------------|----------------------|--------------|--------------|");
+            } else {
                 listener.getLogger().print(".");
             }
+            loops++;
 
             try {
                 // Stop spamming ZAP with requests as soon as one completes. Status won't have changed in a short time & don't pause

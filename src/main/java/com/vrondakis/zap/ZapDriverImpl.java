@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.vrondakis.zap.workflow.RunZapCrawlerParameters;
+import net.sf.json.JSONException;
 import org.apache.commons.io.IOUtils;
 
 import com.mashape.unirest.http.Unirest;
@@ -267,6 +268,9 @@ public class ZapDriverImpl implements ZapDriver {
             }
         }
 
+        log("returned sites: " + sitesObj);
+        log("Started scans for: " + String.join(", ", scanUrls));
+        log("Started scans total: " + startedScans.size());
         return true;
     }
 
@@ -375,6 +379,43 @@ public class ZapDriverImpl implements ZapDriver {
         }
 
         return totalProgress / (totalScans);
+    }
+
+    /**
+     * Gets the current progress of the attack
+     */
+    public List<PluginProgress> zapAttackProgress() {
+        List<PluginProgress> progress = new ArrayList();
+
+        if (startedScans.isEmpty()) {
+            // Called but no scans running
+            return progress;
+        }
+
+        for (Integer startedScan : startedScans) {
+            Map<String, String> arguments = Collections.singletonMap("scanId", Integer.toString(startedScan));
+            try {
+                JSONObject json = zapApi("ascan/view/scanProgress", arguments);
+                JSONArray scanProgress = json.getJSONArray("scanProgress").getJSONObject(1).getJSONArray("HostProcess");
+
+                for (Object plugin: scanProgress) {
+                    JSONArray status = JSONObject.fromObject(plugin).getJSONArray("Plugin");
+                    progress.add(new PluginProgress(
+                            status.getString(0),
+                            status.getString(1),
+                            status.getString(2),
+                            status.getString(3),
+                            status.getString(4),
+                            status.getString(5),
+                            status.getString(6)
+                    ));
+                }
+            } catch (JSONException | ZapExecutionException e) {
+                // Do nothing
+            }
+        }
+
+        return progress;
     }
 
     /**
