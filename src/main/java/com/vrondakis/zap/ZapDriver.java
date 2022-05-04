@@ -15,6 +15,7 @@ import java.util.List;
 public interface ZapDriver {
     int COMPLETED_PERCENTAGE = 100;
     long ZAP_SCAN_SLEEP = 10;
+    long ZAP_SCAN_STATUS_PRINT_INTERVAL = 60;
     int ZAP_INITIALIZE_TIMEOUT = 100;
     int ZAP_INITIALIZE_WAIT = 20;
 
@@ -85,4 +86,5 @@ public interface ZapDriver {
 
     int zapRecordsToScan() throws ZapExecutionException;
 
+    List<PluginProgress> zapAttackProgress();
 }

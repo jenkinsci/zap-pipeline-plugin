@@ -35,6 +35,7 @@ public class ZapDriverController {
     public static ZapDriver getZapDriver(Run run, PrintStream logger) {
         ZapDriver driver = zapDrivers.get(run.getUrl());
         if (driver != null) {
+            driver.setLogger(logger);
             return driver;
         }
 
