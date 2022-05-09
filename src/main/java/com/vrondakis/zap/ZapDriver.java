@@ -2,6 +2,7 @@ package com.vrondakis.zap;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.vrondakis.zap.workflow.RunZapAttackStepParameters;
+import com.vrondakis.zap.workflow.RunZapCrawlerParameters;
 import hudson.FilePath;
 import hudson.Launcher;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public interface ZapDriver {
     int COMPLETED_PERCENTAGE = 100;
     long ZAP_SCAN_SLEEP = 10;
+    long ZAP_SCAN_STATUS_PRINT_INTERVAL = 60;
     int ZAP_INITIALIZE_TIMEOUT = 100;
     int ZAP_INITIALIZE_WAIT = 20;
 
@@ -23,7 +25,7 @@ public interface ZapDriver {
 
     void setZapMode(String zapMode) throws ZapExecutionException;
 
-    void startZapCrawler(String host) throws ZapExecutionException, ZapExecutionException;
+    void startZapCrawler(RunZapCrawlerParameters zcp) throws ZapExecutionException, ZapExecutionException;
 
     int zapCrawlerStatus();
 
@@ -84,4 +86,5 @@ public interface ZapDriver {
 
     int zapRecordsToScan() throws ZapExecutionException;
 
+    List<PluginProgress> zapAttackProgress();
 }

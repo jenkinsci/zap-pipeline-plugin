@@ -10,8 +10,6 @@ import org.jenkinsci.plugins.workflow.steps.SynchronousNonBlockingStepExecution;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.time.OffsetDateTime;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Executor for startZap() function in jenkinsfile
@@ -25,7 +23,7 @@ public class RunZapCrawlerExecution extends SynchronousNonBlockingStepExecution<
     }
 
     @Override
-    protected Void run() throws Exception {
+    public Void run() throws Exception {
         TaskListener listener = getContext().get(TaskListener.class);;
         Run<?, ?> run = getContext().get(Run.class);
         if (runZapCrawlerParameters == null || runZapCrawlerParameters.getHost().equals("")) {
@@ -37,7 +35,7 @@ public class RunZapCrawlerExecution extends SynchronousNonBlockingStepExecution<
         ZapDriver zapDriver = ZapDriverController.getZapDriver(run, listener.getLogger());
 
         try {
-            zapDriver.startZapCrawler(runZapCrawlerParameters.getHost());
+            zapDriver.startZapCrawler(runZapCrawlerParameters);
         } catch (Exception e) {
             getContext().onFailure(new ZapExecutionException("Failed to start ZAP crawler on host: " + runZapCrawlerParameters.getHost(), e, listener.getLogger()));
             return null;
