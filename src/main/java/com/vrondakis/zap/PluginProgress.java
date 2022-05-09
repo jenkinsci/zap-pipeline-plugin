@@ -6,18 +6,18 @@ public class PluginProgress {
     private String version;
     private String revision;
     private String status;
+    private String timeExpiredInMs;
     private String requests;
     private String alerts;
-    private String additional;
 
-    public PluginProgress(String name, String version, String revision, String status, String requests, String alerts, String additional) {
+    public PluginProgress(String name, String version, String revision, String status, String timeExpiredInMs, String requests, String alerts) {
         this.name = name;
         this.version = version;
         this.revision = revision;
         this.status = status;
+        this.timeExpiredInMs = timeExpiredInMs;
         this.requests = requests;
         this.alerts = alerts;
-        this.additional = additional;
     }
 
     public String getName() {
@@ -44,7 +44,18 @@ public class PluginProgress {
         return alerts;
     }
 
-    public String getAdditional() {
-        return additional;
+    public String getTimeExpiredInMs() {
+        return timeExpiredInMs;
+    }
+
+    public String getFormattedTimeExpired() {
+        if (timeExpiredInMs != null) {
+            long totalTimeExpired = Long.parseLong(timeExpiredInMs);
+            long minutes = totalTimeExpired / 60000L;
+            long seconds = (totalTimeExpired / 1000L) % 60;
+            long milliseconds = totalTimeExpired % 1000;
+            return String.format("%02d:%02d.%03d", minutes, seconds, milliseconds);
+        }
+        return "00:00.000";
     }
 }

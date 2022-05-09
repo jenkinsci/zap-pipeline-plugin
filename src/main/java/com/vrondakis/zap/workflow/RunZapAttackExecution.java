@@ -71,13 +71,13 @@ public class RunZapAttackExecution extends SynchronousNonBlockingStepExecution<V
                 listener.getLogger().println("\nzap: Scan progress is: " + status + "%");
 
                 List<PluginProgress> progress = zapDriver.zapAttackProgress();
-                listener.getLogger().println("|------------------------------------------|----------------------|------------|------------|");
-                listener.getLogger().println(String.format("| %-40s | %-20s | %10s | %10s |", "Plugin", "Progress", "Requests", "Alerts"));
-                listener.getLogger().println("|------------------------------------------|----------------------|------------|------------|");
+                listener.getLogger().println("|------------------------------------------|----------------------|------------|------------|------------|");
+                listener.getLogger().println(String.format("| %-40s | %-20s | %10s | %10s | %10s |", "Plugin", "Progress", "Time", "Requests", "Alerts"));
+                listener.getLogger().println("|------------------------------------------|----------------------|------------|------------|------------|");
                 for (PluginProgress plugin: progress) {
-                    listener.getLogger().println(String.format("| %-40.40s | %-20.20s | %10.10s | %10.10s |", plugin.getName(), plugin.getStatus(), plugin.getRequests(), plugin.getAlerts()));
+                    listener.getLogger().println(String.format("| %-40.40s | %-20.20s | %10.10s | %10.10s | %10.10s |", plugin.getName(), plugin.getStatus(), plugin.getFormattedTimeExpired(), plugin.getRequests(), plugin.getAlerts()));
                 }
-                listener.getLogger().println("|------------------------------------------|----------------------|--------------|--------------|");
+                listener.getLogger().println("|------------------------------------------|----------------------|------------|------------|------------|");
             } else {
                 listener.getLogger().print(".");
             }
