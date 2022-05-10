@@ -33,7 +33,6 @@ var parseRawBuild = function(build) {
 				}
 
 				alert.instances.forEach(instance => {
-					console.log("coucou" + instance['request-header'])
 					alertReformatted.instances.push({
 						uri: instance.uri,
 						method: instance.method,
