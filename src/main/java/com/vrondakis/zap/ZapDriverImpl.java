@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownServiceException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -519,11 +520,48 @@ public class ZapDriverImpl implements ZapDriver {
         throw new ZapExecutionException("Timed out waiting for ZAP application to become active for new connections.");
     }
 
-    public String getZapReport() throws IOException, UnirestException, URISyntaxException {
+    public String getZapReport(boolean extendedReport) throws IOException, UnirestException, URISyntaxException, InterruptedException {
+        if (extendedReport) {
+            return getExtendedZapReport();
+        }
+
         URI uri = new URI("http", null, zapHost, zapPort, "/OTHER/core/other/jsonreport", "formMethod=GET", null);
 
         InputStream response = Unirest.get(uri.toString()).asString().getRawBody();
         return IOUtils.toString(response, StandardCharsets.UTF_8);
+    }
+
+    public String getExtendedZapReport() throws IOException, URISyntaxException, InterruptedException, UnirestException {
+        FilePath reportPath = zapDir.createTempFile("result", ".json");
+
+        URI uri = new URI(
+                "http",
+                null,
+                zapHost,
+                zapPort,
+                "/JSON/reports/action/generate/",
+                String.format(
+                        "title=%s&template=traditional-json-plus&reportFileName=%s&reportDir=%s",
+                        "ZAP-Extended-Report",
+                        reportPath.getName(),
+                        zapDir.getRemote()
+                ),
+                null
+        );
+
+        String apiResult = IOUtils.toString(Unirest.get(uri.toString()).asString().getRawBody(), StandardCharsets.UTF_8);
+
+        try {
+            String fileContents = reportPath.readToString();
+            return fileContents;
+        } catch (NullPointerException | IOException e) {
+            log("Error getting report " + e.getMessage());
+            log("Request for report returned: " + apiResult);
+            throw e;
+        } catch (JSONException e) {
+            log("Request for report returned: " + apiResult);
+            throw new UnknownServiceException("Extended report is not available, please update ZAP instance.");
+        }
     }
 
     public String getZapReportXML() throws IOException, UnirestException, URISyntaxException {

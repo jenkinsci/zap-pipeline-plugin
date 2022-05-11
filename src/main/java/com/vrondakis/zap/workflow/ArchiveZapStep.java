@@ -23,12 +23,13 @@ public class ArchiveZapStep extends Step implements Serializable {
      * @param falsePositivesFilePath File name and path (relative to workspace) to the falsePositives config file - default
      *                               "zapfalsePositives.json"
      * @param keepAlive              If true, the zap application will not be sent the shutdown command.
+     * @param extendedReport         If true, the generated json report will contain more detailed information on each alert instance.
      */
     @DataBoundConstructor
     public ArchiveZapStep(Integer failAllAlerts, Integer failHighAlerts, Integer failMediumAlerts, Integer failLowAlerts,
-                          String falsePositivesFilePath, boolean keepAlive) {
+                          String falsePositivesFilePath, boolean keepAlive, boolean extendedReport) {
         this.archiveZapStepParameters = new ArchiveZapStepParameters(failAllAlerts, failHighAlerts, failMediumAlerts,
-                failLowAlerts, falsePositivesFilePath, keepAlive);
+                failLowAlerts, falsePositivesFilePath, keepAlive, extendedReport);
     }
 
     @Override

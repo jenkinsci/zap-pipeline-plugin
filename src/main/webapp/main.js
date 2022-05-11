@@ -39,6 +39,10 @@ var parseRawBuild = function(build) {
 						param: instance.param,
 						attack: instance.attack,
 						evidence: instance.evidence,
+						requestHeader: instance['request-header'],
+						requestBody: instance['request-body'],
+						responseHeader: instance['response-header'],
+						responseBody: instance['response-body'],
 					})
 				})
 
@@ -184,6 +188,7 @@ App.controller('mainController', function($scope, $rootScope, $http, $window, $q
                     prevAlert.instances.splice(prevInstanceIndex, 1)
                 }
                 instance.showMore = false
+                instance.showExtended = !!instance.requestHeader || !!instance.requestBody || !!instance.responseHeader || !!instance.responseBody
                 instance.newAlert = prevInstanceIndex === -1
 
                 // Increment risk-based counters
