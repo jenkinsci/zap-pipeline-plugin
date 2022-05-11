@@ -410,7 +410,7 @@ public class ZapDriverImpl implements ZapDriver {
                             status.getString(6)
                     ));
                 }
-            } catch (JSONException | ZapExecutionException e) {
+            } catch (JSONException | ZapExecutionException | IndexOutOfBoundsException e) {
                 // Do nothing
             }
         }
