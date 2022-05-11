@@ -190,8 +190,8 @@ public class ZapDriverStub implements ZapDriver {
     }
 
     @Override
-    public String getZapReport() throws IOException {
-        URL url = Resources.getResource("zap-raw.json");
+    public String getZapReport(boolean extendedReport) throws IOException {
+        URL url = Resources.getResource("zap-raw" + (extendedReport ? "-extended.json" : ".json"));
         return Resources.toString(url, Charsets.UTF_8);
     }
 
