@@ -1,17 +1,11 @@
 package com.vrondakis.zap.workflow;
 
-import com.vrondakis.zap.ZapArchive;
 import com.vrondakis.zap.ZapDriver;
 import com.vrondakis.zap.ZapDriverController;
-import com.vrondakis.zap.ZapExecutionException;
-import com.vrondakis.zap.ZapFailBuildAction;
 import hudson.FilePath;
-import hudson.model.Result;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Executor for stopZap() function in Jenkins

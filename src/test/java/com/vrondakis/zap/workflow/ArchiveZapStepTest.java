@@ -9,9 +9,7 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.concurrent.ExecutionException;
 
 
 public class ArchiveZapStepTest extends ZapWorkflow {

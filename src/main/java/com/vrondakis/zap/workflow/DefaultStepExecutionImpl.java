@@ -2,12 +2,10 @@ package com.vrondakis.zap.workflow;
 
 import java.io.IOException;
 
-import hudson.model.Job;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import hudson.FilePath;
-import hudson.Launcher;
 import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;

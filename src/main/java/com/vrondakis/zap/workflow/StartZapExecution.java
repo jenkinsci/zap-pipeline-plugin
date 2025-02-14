@@ -1,16 +1,10 @@
 package com.vrondakis.zap.workflow;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.nio.file.Files;
-import java.time.OffsetDateTime;
-import java.util.concurrent.TimeUnit;
 
 import com.vrondakis.zap.ZapExecutionException;
-import org.apache.commons.lang.ObjectUtils;
 import hudson.FilePath;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import com.vrondakis.zap.ZapDriver;
